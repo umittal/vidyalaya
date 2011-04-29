@@ -1,0 +1,6 @@
+K 13
+svn:externals
+V 50
+ttf2ufm https://ttf2ufm.googlecode.com/svn/trunk/
+
+END

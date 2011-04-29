@@ -1,0 +1,21 @@
+<?php
+require_once "db.inc";
+require_once "vidyalaya.inc";
+
+$students = GetAllData();
+
+
+foreach ($students as $id => $student) {
+	if ($student->IsEnrolled) {
+		$zip = $student->family->address->zipcode;
+		$tata[$zip]++;
+	}
+	
+	
+}
+
+foreach ($tata as $zip => $number) {
+	print "zip $zip has  $number\n";
+}
+
+?>

@@ -1,0 +1,41 @@
+<?php
+require("/var/www/Classes/PHPMailer_v5.1/class.phpmailer.php");
+
+
+function SetupMail() {
+
+  $email = "Admission2011@vidyalaya.us";
+  $name = "Vidyalaya Admissions";
+
+  $mail = new PHPMailer(false); 
+  $mail->IsSMTP(); // send via SMTP
+  $mail->SMTPAuth = true; // turn on SMTP authentication
+  $mail->Username = $admissions; // SMTP username
+  $mail->Password = "Praveen38"; // SMTP password
+  $mail->From = $email;
+  $mail->FromName = $name;
+  $mail->AddReplyTo($email,$name);
+  $mail->IsHTML(true); // send as HTML
+  $mail->WordWrap = 50; // set word wrap
+
+  return $mail;
+}
+
+function AnnounceExisting() {
+  $mail = SetupMail();
+  $mail->AddAddress($email,$name);
+  //$mail->AddAttachment("/var/tmp/file.tar.gz"); // attachment
+  $mail->Subject = "This is the subject";
+  $mail->Body = "Hi,\n";
+  $mail->AltBody = "This is the body when user views in plain text format"; //Text Body
+
+  if(!$mail->Send()) {
+      echo "Mailer Error: " . $mail->ErrorInfo;
+    }  else {
+      echo "Message has been sent";
+  }
+}
+
+
+
+?>

@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/svn/!svn/ver/2/trunk/src/app/X11
+END
+README.html
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/!svn/ver/2/trunk/src/app/X11/README.html
+END
+t1-xf86.334.patch
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/!svn/ver/2/trunk/src/app/X11/t1-xf86.334.patch
+END
+t1-xf86.39.patch
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/!svn/ver/2/trunk/src/app/X11/t1-xf86.39.patch
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/svn/!svn/ver/2/trunk/src/app/X11/README
+END

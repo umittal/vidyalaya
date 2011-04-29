@@ -1,0 +1,71 @@
+key Students2003.SS_CULT_NEXT, value 14
+key Students2003.SS_LANG_NEXT, value 20
+key Students2003.ID, value 1692
+key Students2003.PARENT_ID, value 258.00000
+key Students2003.LAST_NAME, value Agarwal
+key Students2003.FIRST_NAME, value Garv
+key Students2003.NEXT_YEAR_GRADE, value 6
+key Students2003.SS_LANG_GRADE, value 
+key Students2003.SS_CULT_GRADE, value 
+key Students2003.DOB, value 2000-08-22 00:00:00
+key Students2003.EMAIL, value 
+key Students2003.GENDER, value 2
+key Students2003.CONTINUING, value 1
+key Students2003.SS_MUSIC_GRADE, value 
+key Students2003.SS_MUSIC_NEXT, value 0
+key Students2003.STATUS, value 1
+key Students2003.DATE_APPLIED, value 
+key Students2003.DATE_ADMITTED, value 
+key Students2003.HAS_SIBLING, value 1
+key Students2003.PHOTO_PATH, value C:\vidyalaya\yb2009pics\StudentPics\HN\Agarwal, Garv.jpg
+key Parents2003.ID, value 258
+key Parents2003.MLAST_NAME, value Agarwal
+key Parents2003.MFIRST_NAME, value Keta
+key Parents2003.FLAST_NAME, value Agarwal
+key Parents2003.FFIRST_NAME, value Raj
+key Parents2003.MH_PHONE, value 973-625-7539
+key Parents2003.MW_PHONE, value 
+key Parents2003.MC_PHONE, value 973-641-6073
+key Parents2003.M_EMAIL, value keta4@hotmail.com
+key Parents2003.FH_PHONE, value 
+key Parents2003.FW_PHONE, value 
+key Parents2003.FC_PHONE, value 973-978-9488
+key Parents2003.F_EMAIL, value ragarwal4@yahoo.com
+key Parents2003.M_ADDRESS, value 6 Leo Terrace
+key Parents2003.M_CITY, value Denville
+key Parents2003.M_STATE, value Nj
+key Parents2003.M_ZIP_CODE, value 07834
+key Parents2003.F_ADDRESS, value 
+key Parents2003.F_CITY, value 
+key Parents2003.F_STATE, value 
+key Parents2003.F_ZIP_CODE, value 
+key Parents2003.PRIMARY_PHONE_FLAG, value 1
+key Parents2003.PRIMARY_EMAIL_FLAG, value 3
+key Parents2003.COMMUNITY_EMAIL_FLAG, value 1
+key Parents2003.DIRECTORY_FLAG, value 1
+key Parents2003.TYPE_CODE, value 1
+key Parents2003.M_ACTIVITY_CHOICE_1, value 72
+key Parents2003.M_ACTIVITY_CHOICE_2, value 77
+key Parents2003.M_ACTIVITY_CHOICE_3, value 8
+key Parents2003.F_ACTIVITY_CHOICE_1, value 8
+key Parents2003.F_ACTIVITY_CHOICE_2, value 
+key Parents2003.F_ACTIVITY_CHOICE_3, value 
+key Parents2003.AMOUNT_PAID, value 400.0000
+key Parents2003.F_ACTIVITY_ASSIGNED, value 
+key Parents2003.M_ACTIVITY_ASSIGNED, value 
+key LanguageGrades.ID, value 20
+key LanguageGrades.Description, value H2B - Hindi Nov Mid B
+key LanguageGrades.Value, value H2B
+key LanguageGrades.Room, value 23
+key LanguageGrades.Teachers, value Pravina Sawant, Aruna Maheshwari, Preeti Tomar
+key CultureGrades.ID, value 14
+key CultureGrades.Description, value C5A
+key CultureGrades.Value, value 14
+key CultureGrades.Room, value 23
+key CultureGrades.Teachers, value Renuka Gadde, Naresh Suchak, Neeta Rathi
+key SchoolGrade.ID, value 6
+key SchoolGrade.Description, value 5th
+key SchoolGrade.Value, value 5
+key Email_Preferences.ID, value 3
+key Email_Preferences.Description, value Both
+key Email_Preferences.Value, value B

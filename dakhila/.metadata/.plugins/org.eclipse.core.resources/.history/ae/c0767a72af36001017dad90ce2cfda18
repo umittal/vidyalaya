@@ -1,0 +1,35 @@
+<?php
+$libDir="/var/www/dakhila/libvidyalaya/";
+require_once "$libDir/db.inc";
+require_once "$libDir/vidyalaya.inc";
+
+$students = GetAllData();
+
+function cityAllocation() {
+
+	$tata = array();
+	$town = array();
+
+	foreach ($students as $id => $student) {
+		if ($student->IsEnrolled) {
+			$zip = $student->family->address->zipcode;
+			$city = $student->family->address->city;
+			if (array_key_exists($zip, $tata)) {
+				$tata[$zip]++;
+			} else {
+				$tata[$zip]=1;
+				$town[$zip] = $city;
+			}
+		}
+
+
+	}
+	ksort($tata);
+	foreach ($tata as $zip => $number) {
+		printf( "%2d, %s, %s\n", $number,  $zip, $town[$zip] );
+	}
+}
+
+$students = GetAllData();
+
+?>
