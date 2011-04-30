@@ -1,5 +1,5 @@
 <?php
-$libDir="/var/www/dakhila/libVidyalaya/";
+$libDir="../dakhila/libVidyalaya/";
 require_once "$libDir/db.inc";
 require_once "$libDir/vidyalaya.inc";
 
@@ -454,7 +454,8 @@ function utilTesting() {
 	print Calendar::CurrentYear() ."\n";
 }
 
-//EmailCheck("shikshab@yahoo.com");
+EmailCheck("murali.gogineni@gmail.com");
+EmailCheck("sujathakrishna28@yahoo.com");
 
 //utilTesting();
 

@@ -1,5 +1,5 @@
 <?php
-$libDir="/var/www/dakhila/libVidyalaya/";
+$libDir="../../dakhila/libVidyalaya/";
 require_once "$libDir/db.inc";
 require_once "$libDir/vidyalaya.inc";
 
@@ -140,8 +140,10 @@ function NewFamiliesOrientation() {
 
 $students = GetAllData();
 
-ExistingFamilies($students);
-NewFamiliesOrientation();
+// ExistingFamilies($students);
+//NewFamiliesOrientation();
+
+NewFamilyOrientation(Family::GetFamilyId(441));
 
 
 
