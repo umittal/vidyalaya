@@ -125,7 +125,7 @@ function printAllFamilies($students) {
 	$printDir = "/home/umesh/package2011";
 
 	foreach (Family::$objArray as $family) {
-		if ($family->id != 386) continue;
+		if ($family->id != 413) continue;
 		//if ($family->category->id != FamilyCategory::Waiting) continue;
 		$count = GetEnrolledStudentCountForFamily($family->id, $students);
 		if ($count > 0 || $family->category->id == FamilyCategory::Waiting) {
