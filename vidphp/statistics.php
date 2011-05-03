@@ -431,7 +431,6 @@ function HandlePraveenStyleEmail(&$emailArray, $praveenStyle, $id) {
 }
 
 function EmailCheck($email) {
-	GetAllData();
 	$emailArray = array();
 	
 	foreach (Family::$objArray as $family) {
@@ -442,11 +441,15 @@ function EmailCheck($email) {
 			HandlePraveenStyleEmail($emailArray, $student->email, $family->id);
 		}
 	}
-	
-	if (empty($emailArray[$email])) {
+
+	$matchingArray = preg_grep_keys($email, $emailArray);
+	if (empty($matchingArray)) {
+	  //	if (empty($emailArray[$email])) {
 		print "email **$email** does not exist in our databse\n";
 	} else {
-		print "Family id for **$email** is $emailArray[$email]\n";
+	  foreach ($matchingArray as $email => $familyId) {
+	    print "Family id for **$email** is $familyId\n";
+	  }
 	}
 }
 
@@ -454,8 +457,9 @@ function utilTesting() {
 	print Calendar::CurrentYear() ."\n";
 }
 
-EmailCheck("murali.gogineni@gmail.com");
-EmailCheck("sujathakrishna28@yahoo.com");
+	GetAllData();
+EmailCheck("karth");
+//EmailCheck("sujathakrishna28@yahoo.com");
 
 //utilTesting();
 

@@ -30,6 +30,17 @@ function trimOffEnd( $off, $str ) {
         return substr( $str, 0, strlen( $str ) - strlen( $off ) );
 }
 
+function preg_grep_keys ($pattern, $input, $flags=0) {
+
+  $keys = preg_grep("/{$pattern}/", array_keys($input), $flags);
+  $vals = array();
+
+  foreach ($keys as $key) {
+    $vals[$key] = $input[$key];
+  }
+  return $vals;
+}
+
 Class Calendar {
 	const BaseYear = 2010
 	, Today = 1
