@@ -39,6 +39,9 @@ print '
 <tr><td><a href="php/studentListByLanguage.php">Student By Language Class</tr>
 <tr><td><a href="php/studentListByCulture.php">Student By Culture Class</tr>
 <tr><td><a href="php/familyList.php">Families</tr>
+<tr><td><a href="php/dataViewer.php?command=Family&familyId=47">Family Detail</tr>
+<tr><td><a href="php/dataViewer.php?command=Registration&familyId=47">Registration Form</tr>
+<tr><td><a href="php/dataViewer.php?command=MedicalForm&studentId=1446">Medical Form</tr>
 </table>
 ';
 
