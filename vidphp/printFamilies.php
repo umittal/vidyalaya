@@ -1,6 +1,6 @@
 <?php
 
-$libDir="/var/www/dakhila/libVidyalaya/";
+$libDir="../dakhila/libVidyalaya/";
 require_once "$libDir/db.inc";
 require_once "$libDir/vidyalaya.inc";
 require_once "HTML/Template/ITX.php";
@@ -125,7 +125,7 @@ function printAllFamilies($students) {
 	$printDir = "/home/umesh/package2011";
 
 	foreach (Family::$objArray as $family) {
-		if ($family->id != 413) continue;
+		if ($family->id != 209) continue;
 		//if ($family->category->id != FamilyCategory::Waiting) continue;
 		$count = GetEnrolledStudentCountForFamily($family->id, $students);
 		if ($count > 0 || $family->category->id == FamilyCategory::Waiting) {

@@ -53,14 +53,14 @@ function DisplayFamilyTemplate (&$template, $family, $students) {
 	$template->setVariable("MF", "Father");
 	$template->setVariable("NAME", $family->father->fullName());
 	$template->setVariable("EMAIL", $family->father->email);
-	$template->setVariable("CELL", $family->father->workPhone);
+	$template->setVariable("WORK", $family->father->workPhone);
 	$template->setVariable("CELL", $family->father->cellPhone);
 	$template->setVariable("ISCONTACTABLE", YesNoMap($family->father->IsContactable));
 	$template->parseCurrentBlock();
 
 	$template->setVariable("MF", "Mother");
 	$template->setVariable("EMAIL", $family->mother->email);
-	$template->setVariable("CELL", $family->mother->workPhone);
+	$template->setVariable("WORK", $family->mother->workPhone);
 	$template->setVariable("CELL", $family->mother->cellPhone);
 	$template->setVariable("NAME", $family->mother->fullName());
 	$template->setVariable("ISCONTACTABLE", YesNoMap($family->mother->IsContactable));
