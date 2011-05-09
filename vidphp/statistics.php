@@ -457,8 +457,16 @@ function utilTesting() {
 	print Calendar::CurrentYear() ."\n";
 }
 
-	GetAllData();
-EmailCheck("manoj");
+function dummy() {
+
+	$enrolled = Enrollment::GetAllEnrollmentForFacilitySession(1, 0);
+	print "count of enrolled is " . count($enrolled) . "\n";
+}
+
+dummy();
+
+//	GetAllData();
+// EmailCheck("manoj");
 //EmailCheck("sujathakrishna28@yahoo.com");
 
 //utilTesting();

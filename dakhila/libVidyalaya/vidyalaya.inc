@@ -373,7 +373,7 @@ class AvailableClass {
 		$this->year= $row["AvailableClass.year"];
 		$this->course = $row["AvailableClass.course"];
 		$this->section = $row["AvailableClass.section"];
-		$this->room = Rooms::GetItembyId($row["AvailableClass.room"]);
+		$this->room = Rooms::GetItemById($row["AvailableClass.room"]);
 		$this->startTime = $row["AvailableClass.startTime"];
 		$this->endTime = $row["AvailableClass.endTime"];
 
@@ -427,7 +427,7 @@ class Rooms{
 		}
 	}
 	
-	public static function GetItemId($key) {
+	public static function GetItemById($key) {
 	 	self::firstTimeCall();
 	 	return self::$objArray[$key];
 	 }	
@@ -470,14 +470,17 @@ class Enrollment{
 		from Enrollment
 			inner join AvailableClass on Enrollment.availableClass = AvailableClass.id
 			inner join Rooms on AvailableClass.room = Rooms.id
-		where AvailableClass.year = $year and Rooms.facility = $facitlity
+		where AvailableClass.year = $year and Rooms.facility = $facility
 		";
 		$enrollmentArray = Array();
 		
+		print "query is $query\n";
+
 		$result = VidDb::query($query);
 		while ($row = mysql_fetch_alias_array($result)) {
 			$enrollmentArray[] = new self($row);
 		}
+		print "count is " . count($enrollmentArray) . "\n";
 		return $enrollmentArray;
 	}
 	
