@@ -1,16 +1,18 @@
 <?php
 require_once "util.inc";
 
-class Language {
+class Department {
 	public $id = null;
 
 	const Hindi = 1
 	, Gujarati = 2
 	, Telugu = 3
+	, Culture = 4
+	, Kindergarten = 5
 	;
 
 	public function Name() {
-		return Language::NameFromId($this->id);
+		return Department::NameFromId($this->id);
 	}
 
 	public static function NameFromId($number) {
@@ -18,15 +20,19 @@ class Language {
 			case 1: return "Hindi";
 			case 2: return "Gujarati";
 			case 3: return "Telugu";
+			case 4: return "Culture";
+			case 5: return "Kindergarten";
 			default: return "Unknown";
 		}
 	}
 
 	public static function NameFromChar($char) {
 		switch ($char) {
-			case "H": return Language::NameFromId(1);
-			case "G": return Language::NameFromId(2);
-			case "T": return Language::NameFromId(3);
+			case "H": return Department::NameFromId(1);
+			case "G": return Department::NameFromId(2);
+			case "T": return Department::NameFromId(3);
+			case "C": return Department::NameFromId(4);
+			case "C": return Department::NameFromId(5);
 			default: return "unknown";
 		}
 	}
@@ -36,6 +42,8 @@ class Language {
 			case "H": return 1;
 			case "G": return 2;
 			case "T": return 3;
+			case "C": return 4;
+			case "K": return 5;
 			default: return null;
 		}
 	}
@@ -47,7 +55,7 @@ class Language {
 		} else {
 			$langChar = $symbol[0];
 		}
-		return Language::NameFromChar($langChar);
+		return Department::NameFromChar($langChar);
 	}
 	
 	public static function IdFromPraveenSymbol($symbol) {
@@ -56,7 +64,7 @@ class Language {
 		} else {
 			$langChar = $symbol[0];
 		}
-		return Language::IdFromChar($langChar);
+		return Department::IdFromChar($langChar);
 	}
 }
 
@@ -85,6 +93,21 @@ class Student {
     return self::$objArray[$key];
  }
  
+ public static function RegisteredStudents() {
+ 	$students = Array();
+ 	if (count(Student::$objArray) == 0) {
+ 		GetAllData();
+ 	}
+ 	
+ 	foreach (Student::$objArray as $student) {
+ 		if ($student->IsEnrolled) {
+ 			$students[] = $student; 
+ 		}
+ 	}
+ 	
+ 	return $students;
+ }
+ 
  public function Age(){
  	return Calendar::Age($this->dateOfBirth);
  }
@@ -105,7 +128,7 @@ class Student {
  
  public function LanguageInterest() {
  	if (!empty($this->languagePreference)) {
- 		return Language::NameFromId($this->languagePreference);
+ 		return Department::NameFromId($this->languagePreference);
  	}
  	return "Unknown";
  }
@@ -192,6 +215,9 @@ class Course {
   public $description=null;
   public $room=null;
   public $teachers=null;
+  
+  public $department=null;
+  public $level=null;
 
   public static $objArray = Array ();
   public static function GetCourse($row, $lc) {
@@ -222,22 +248,201 @@ class Course {
     if ($lc == "l") {
       $this->id = $lc . $row["LanguageGrades.ID"];
       $this->SetVariablesFromRow($row, "LanguageGrades.Value", "LanguageGrades.Description",
-				 "LanguageGrades.Room", "LanguageGrades.Teachers");
+				 "LanguageGrades.Room", "LanguageGrades.Teachers", $lc);
     } else if ($lc == "c") {
       $this->id = $lc . $row["CultureGrades.ID"];
       $this->SetVariablesFromRow($row, "CultureGrades.Value", "CultureGrades.Description",
-				 "CultureGrades.Room", "CultureGrades.Teachers");
+				 "CultureGrades.Room", "CultureGrades.Teachers", $lc);
     }
 
   }
+  
+  private static function GetLevelFromPraveenSymbol($symbol, $description, $lc) {
+  	if ($lc = "c") $symbol = $description;
+  	  	if (empty($symbol)) return 0;
+  	if (beginswith($symbol, "KG")) return 0;
+  	if (strlen($symbol) < 2) {
+  		print "Debug: having issues with symbol: $symbol\n"; 
+  	}
+  	return $symbol[1];
+  }
 
-  private function SetVariablesFromRow($row, $symbol, $description, $room, $teachers) {
+  private function GetDepartmnetFromPraveenSymbol() {
+  	$chartolook = $this->lc == "c"? $this->description[0] : $this->symbol[0];
+  	return Department::IdFromChar($chartolook);
+  }
+  
+  private function SetVariablesFromRow($row, $symbol, $description, $room, $teachers, $lc) {
       $this->symbol = $row[$symbol];
       $this->description = $row[$description];
       $this->room = $row[$room];
       $this->teachers = $row[$teachers];
+      
+//      print "what is going on $row[$symbol], $row[$description]  \n";
+      $this->level =  self::GetLevelFromPraveenSymbol($this->symbol, $this->description, $this->lc);
+      $this->department = $this->GetDepartmnetFromPraveenSymbol();
+    //print "Adding course: dept = $this->department, level = $this->level: $this->symbol, $this->description: \n";
   }
 
+}
+
+// ************** 
+class CourseCatalog {
+	public $id=null;
+	public $department = null;
+	public $level= null;
+	public $short=null;
+	public $full = null;
+	
+	public static function GetCourseCatalogFromCourse($course) {
+		//print "Debug: Going to look for $course->department, $course->level\n";
+		foreach (self::$objArray as $coursecatalog ) {
+			if (($coursecatalog->department == $course->department) && ($coursecatalog->level == $course->level))
+			return $coursecatalog;
+		}
+		return null;
+	}
+
+
+	public static $objArray = Array ();
+
+	public static function GetCourseCatalog($row) {
+		$key = $row["CourseCatalog.id"];
+		if (!array_key_exists($key, self::$objArray)) {
+			$instance = new CourseCatalog();
+			self::$objArray[$key] = $instance;
+			$instance->setVariables($row);
+		}
+		return self::$objArray[$key];
+	}
+
+	public function setVariables($row) {
+		$this->id = $row["CourseCatalog.id"];
+		$this->department = $row["CourseCatalog.department"];
+		$this->level = $row["CourseCatalog.level"];
+		$this->short = $row["CourseCatalog.short"];
+		$this->full = $row["CourseCatalog.full"];
+
+	}
+
+}
+
+// ************** 
+class AvailableClass {
+	public $id=null;
+	public $year = null;
+	public $course= null;
+	public $section=null;
+	public $startTime = null;
+	public $endTime = null;
+	
+	private static function firstTimeCall() {
+		if (!empty(self::$objArray)) return;
+		$query = "select * from AvailableClass";
+		$result = VidDb::query($query);
+		while ($row = mysql_fetch_alias_array($result)) {
+			self::ReadRow($row);
+		}
+	}
+		
+		
+	public static function findAvailableClassFromCourse($course) {
+		//print "Looking for $course->description, ";
+		$courseCatalog = CourseCatalog::GetCourseCatalogFromCourse($course);
+		if (empty($courseCatalog)) die ("catalog not found found for $course->description");
+		$courseSection = strlen($course->symbol) > 2 ? $course->symbol[2] : "";
+
+		self::firstTimeCall();
+		foreach (self::$objArray as $availableClass) {
+			if (($availableClass->course == $courseCatalog->id) && ($availableClass->section == $courseSection)){
+			//	print "returned id should $availableClass->id\n";
+				return $availableClass;
+			}
+
+		}
+
+		$startTime = "10:00"; $endTime="11:00";
+		if ($course->lc == "c") {$startTime = "11:00"; $endTime="11:45";}
+		if ($course->symbol[0] == "K") {$startTime = "10:00"; $endTime="11:30";}
+
+		$room = Rooms::findEastlakeRoomFromCourse($course);
+
+		$sql = "insert into AvailableClass set ";
+		$sql .= "year=0, course=$courseCatalog->id, section = \"$courseSection\", room = $room->id, startTime = \"$startTime\", endTime = \"$endTime\" ";
+		//print "Debug: executing $sql;\n";
+		$result = VidDb::query($sql);
+		//print "inserted: course = $course->description\n";
+		self::$objArray = Array();
+		return self::findAvailableClassFromCourse($course);
+	}
+
+	public static $objArray = Array ();
+
+	private static function ReadRow($row) {
+		$key = $row["AvailableClass.id"];
+		if (!array_key_exists($key, self::$objArray)) {
+			$instance = new AvailableClass();
+			self::$objArray[$key] = $instance;
+			$instance->setVariables($row);
+		}
+		return self::$objArray[$key];
+	}
+
+	private function setVariables($row) {
+		$this->id = $row["AvailableClass.id"];
+		$this->year= $row["AvailableClass.year"];
+		$this->course = $row["AvailableClass.course"];
+		$this->section = $row["AvailableClass.section"];
+		$this->startTime = $row["AvailableClass.startTime"];
+		$this->endTime = $row["AvailableClass.endTime"];
+
+	}
+	
+}
+
+// ************** 
+class Rooms{
+	public $id=null;
+	public $facility = null;
+	public $roomNumber = null;
+	public $capacity =null;
+		
+	private static function firstTimeCall() {
+		if (!empty(self::$objArray)) return;
+		$query = "select * from Rooms";
+		$result = VidDb::query($query);
+		while ($row = mysql_fetch_alias_array($result)) {
+			self::ReadRow($row);
+		}
+	}
+	
+	public static function findEastlakeRoomFromCourse($course) {
+		self::firstTimeCall();
+		foreach (self::$objArray as $room) {
+			//print "Trying, room = $room->roomNumber, facility = $room->facility\n";
+			if ($room->roomNumber== $course->room && $room->facility == 1) return $room;
+		}
+		die( "Error: room not found for $course->symbol, $course->description, $course->room\n");
+	}
+
+	public static $objArray = Array ();
+
+	private static function ReadRow($row) {
+		$key = $row["Rooms.id"];
+		if (!array_key_exists($key, self::$objArray)) {
+			$instance = new Rooms();
+			self::$objArray[$key] = $instance;
+			$instance->setVariables($row);
+		}
+		return self::$objArray[$key];
+	}
+
+	private function setVariables($row) {
+		$this->id = $row["Rooms.id"];
+		$this->facility= $row["Rooms.facility"];
+		$this->roomNumber = $row["Rooms.room"];
+		$this->capacity = $row["Rooms.capacity"];
+	}
 }
 
 // ************** 
@@ -275,8 +480,6 @@ class StudentStatus {
   }
  
 }
-
-
 
 // ************** 
 class FamilyCategory {
@@ -560,6 +763,13 @@ function CreateDictionary($connection) {
 	if (!($result = mysql_query($query, $connection))) showerror();
 	while ($row = mysql_fetch_alias_array($result)) {
 		StudentStatus::GetStudentStatus($row);
+	}
+	
+	// load CourseCatalog
+	$query = "select * from CourseCatalog";
+	if (!($result = mysql_query($query, $connection))) showerror();
+	while ($row = mysql_fetch_alias_array($result)) {
+		CourseCatalog::GetCourseCatalog($row);
 	}
 	
 	// Load Students

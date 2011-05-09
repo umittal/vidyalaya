@@ -41,4 +41,28 @@
       return $connection;
 
    }
-?>
+   
+   class VidDb {
+   	private static $hostname = "vidyalaya.db.4718809.hostedresource.com";
+   	private static $databasename = "vidyalaya";
+   	private static $username = "vidyalaya";
+   	private static $password = "Praveen38";
+   	private static $connection = null;
+   	 
+   	private static function connect() {
+   		if (!empty(self::$connection)) return;
+   		if (!self::$connection =  mysql_connect(self::$hostname, self::$username, self::$password))
+   			showerror("Cannot connect");
+   		if (!mysql_selectdb(self::$databasename, self::$connection))
+   			showerror();
+   	}
+   	
+   	public static function query($query) {
+   		self::connect();
+   		if (!($result = mysql_query($query, self::$connection))) showerror();
+   		return $result;
+   	}
+   	 
+
+   }
+   ?>

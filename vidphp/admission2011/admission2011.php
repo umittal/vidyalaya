@@ -143,7 +143,9 @@ $students = GetAllData();
 // ExistingFamilies($students);
 //NewFamiliesOrientation();
 
-NewFamilyOrientation(Family::GetFamilyId(442));
+NewFamilyOrientation(Family::GetFamilyId(443));
+NewFamilyOrientation(Family::GetFamilyId(444));
+NewFamilyOrientation(Family::GetFamilyId(446));
 
 
 
