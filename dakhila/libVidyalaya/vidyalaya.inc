@@ -91,58 +91,65 @@ class Student {
       self::$objArray[$key] = new Student($row);
     }
     return self::$objArray[$key];
- }
- 
- public static function RegisteredStudents() {
- 	$students = Array();
- 	if (count(Student::$objArray) == 0) {
- 		GetAllData();
- 	}
- 	
- 	foreach (Student::$objArray as $student) {
- 		if ($student->IsEnrolled) {
- 			$students[] = $student; 
- 		}
- 	}
- 	
- 	return $students;
- }
- 
- public function Age(){
- 	return Calendar::Age($this->dateOfBirth);
- }
- 
+  }
+
+  private static function firstTimeCall() {
+  	if (!empty(self::$objArray)) return;
+  	GetAllData();
+  }
+
+  public static function GetItemById($key) {
+  	self::firstTimeCall();
+  	return self::$objArray[$key];
+  }
+
+  public static function RegisteredStudents() {
+  	self::firstTimeCall();
+  	$students = Array();
+  	foreach (Student::$objArray as $student) {
+  		if ($student->IsEnrolled) {
+  			$students[] = $student;
+  		}
+  	}
+
+  	return $students;
+  }
+
+  public function Age(){
+  	return Calendar::Age($this->dateOfBirth);
+  }
+
   public function AgeAt($rule){
- 	return Calendar::AgeAt($this->dateOfBirth, $rule);
- }
- 
- public function Grade(){
- 	return Calendar::GradeAt($this->firstGradeYear, Calendar::CurrentSession);
- }
- 
+  	return Calendar::AgeAt($this->dateOfBirth, $rule);
+  }
+
+  public function Grade(){
+  	return Calendar::GradeAt($this->firstGradeYear, Calendar::CurrentSession);
+  }
+
   public function GradeAt($rule){
- 	return Calendar::GradeAt($this->firstGradeYear, $rule);
- }
- 
- 
- 
- public function LanguageInterest() {
- 	if (!empty($this->languagePreference)) {
- 		return Department::NameFromId($this->languagePreference);
- 	}
- 	return "Unknown";
- }
+  	return Calendar::GradeAt($this->firstGradeYear, $rule);
+  }
+
+
+
+  public function LanguageInterest() {
+  	if (!empty($this->languagePreference)) {
+  		return Department::NameFromId($this->languagePreference);
+  	}
+  	return "Unknown";
+  }
 
 
   public function fullName() {
-    return $this->firstName . " " . $this->lastName;
+  	return $this->firstName . " " . $this->lastName;
   }
-  
+
   public function parentsName() {
   	return $this->family->parentsName();
   }
-  
-  
+
+
   public function mailingListArray () {
     $mailArray = array();
     if (count($this->family->mother->mailingListArray()) >0) {
@@ -173,20 +180,20 @@ class Student {
 
     $dob = $row["Students2003.DOB"];
     if (strtotime($dob) < strtotime("1970-01-01")) {
-//    if ($dob < "1970-01-01") {
+    	//    if ($dob < "1970-01-01") {
      $this->dateOfBirth = null;
-} else {
-    $this->dateOfBirth = $dob;
-}
-    
+    } else {
+    	$this->dateOfBirth = $dob;
+    }
+
     $this->family = Family::GetFamilyId($row["Students2003.PARENT_ID"]);
     $this->registration = new Registration($row);
     $this->studentStatus = StudentStatus::GetStudentStatusId($row["Students2003.STATUS"]);
-    $this->IsEnrolled = $this->studentStatus->id == StudentStatus::Active; 
-//  	if ($row["Students2003.STATUS"] == 1) {$this->IsEnrolled = true;}
-//	$grade = $row["Students2003.NEXT_YEAR_GRADE"];
-	$this->firstGradeYear=$row["Students2003.YearFirstGrade"];
-	$this->languagePreference =  $row["Students2003.LanguageInterest"];
+    $this->IsEnrolled = $this->studentStatus->id == StudentStatus::Active;
+    //  	if ($row["Students2003.STATUS"] == 1) {$this->IsEnrolled = true;}
+    //	$grade = $row["Students2003.NEXT_YEAR_GRADE"];
+    $this->firstGradeYear=$row["Students2003.YearFirstGrade"];
+    $this->languagePreference =  $row["Students2003.LanguageInterest"];
   }
 }
 
@@ -333,6 +340,7 @@ class AvailableClass {
 	public $year = null;
 	public $course= null;
 	public $section=null;
+	public $room = null;
 	public $startTime = null;
 	public $endTime = null;
 	
@@ -345,8 +353,33 @@ class AvailableClass {
 		}
 	}
 		
-		
-	public static function findAvailableClassFromCourse($course) {
+
+	public static function GetItemById($key) {
+	 	self::firstTimeCall();
+	 	return self::$objArray[$key];
+	 }	
+	 
+	private static $objArray = Array ();
+
+	private static function ReadRow($row) {
+		$key = $row["AvailableClass.id"];
+		if (!array_key_exists($key, self::$objArray)) 
+			self::$objArray[$key] = new self($row);
+		return self::$objArray[$key];
+	}
+	
+	public function __construct($row) {
+		$this->id = $row["AvailableClass.id"];
+		$this->year= $row["AvailableClass.year"];
+		$this->course = $row["AvailableClass.course"];
+		$this->section = $row["AvailableClass.section"];
+		$this->room = Rooms::GetItembyId($row["AvailableClass.room"]);
+		$this->startTime = $row["AvailableClass.startTime"];
+		$this->endTime = $row["AvailableClass.endTime"];
+
+	}
+
+		public static function findAvailableClassFromCourse($course) {
 		//print "Looking for $course->description, ";
 		$courseCatalog = CourseCatalog::GetCourseCatalogFromCourse($course);
 		if (empty($courseCatalog)) die ("catalog not found found for $course->description");
@@ -375,28 +408,6 @@ class AvailableClass {
 		self::$objArray = Array();
 		return self::findAvailableClassFromCourse($course);
 	}
-
-	public static $objArray = Array ();
-
-	private static function ReadRow($row) {
-		$key = $row["AvailableClass.id"];
-		if (!array_key_exists($key, self::$objArray)) {
-			$instance = new AvailableClass();
-			self::$objArray[$key] = $instance;
-			$instance->setVariables($row);
-		}
-		return self::$objArray[$key];
-	}
-
-	private function setVariables($row) {
-		$this->id = $row["AvailableClass.id"];
-		$this->year= $row["AvailableClass.year"];
-		$this->course = $row["AvailableClass.course"];
-		$this->section = $row["AvailableClass.section"];
-		$this->startTime = $row["AvailableClass.startTime"];
-		$this->endTime = $row["AvailableClass.endTime"];
-
-	}
 	
 }
 
@@ -416,6 +427,11 @@ class Rooms{
 		}
 	}
 	
+	public static function GetItemId($key) {
+	 	self::firstTimeCall();
+	 	return self::$objArray[$key];
+	 }	
+	
 	public static function findEastlakeRoomFromCourse($course) {
 		self::firstTimeCall();
 		foreach (self::$objArray as $room) {
@@ -429,19 +445,48 @@ class Rooms{
 
 	private static function ReadRow($row) {
 		$key = $row["Rooms.id"];
-		if (!array_key_exists($key, self::$objArray)) {
-			$instance = new Rooms();
-			self::$objArray[$key] = $instance;
-			$instance->setVariables($row);
-		}
+		if (!array_key_exists($key, self::$objArray)) 
+			self::$objArray[$key] = new self($row);
 		return self::$objArray[$key];
 	}
 
-	private function setVariables($row) {
+	public function __construct($row) {
 		$this->id = $row["Rooms.id"];
 		$this->facility= $row["Rooms.facility"];
 		$this->roomNumber = $row["Rooms.room"];
 		$this->capacity = $row["Rooms.capacity"];
+	}
+}
+
+// Enrolled students 
+class Enrollment{
+	public $student=null;
+	public $class = null;
+	public $academicGrade = null;
+	public $disciplineGrade =null;
+		
+	public static function GetAllEnrollmentForFacilitySession($facility, $year) {
+		$query = "select * 
+		from Enrollment
+			inner join AvailableClass on Enrollment.availableClass = AvailableClass.id
+			inner join Rooms on AvailableClass.room = Rooms.id
+		where AvailableClass.year = $year and Rooms.facility = $facitlity
+		";
+		$enrollmentArray = Array();
+		
+		$result = VidDb::query($query);
+		while ($row = mysql_fetch_alias_array($result)) {
+			$enrollmentArray[] = new self($row);
+		}
+		return $enrollmentArray;
+	}
+	
+	public function __construct($row) {
+		$this->student = Student::GetItemById($row["Enrollment.student"]);
+    	$this->class= AvailableClass::GetItemById($row["Enrollment.availableClass"]);
+    	
+		$this->academicGrade = $row["Enrollment.gradeAcademic"];
+		$this->disciplineGrade = $row["Enrollment.gradeDiscipline"];
 	}
 }
 
