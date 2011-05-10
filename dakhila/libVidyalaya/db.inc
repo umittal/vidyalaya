@@ -59,7 +59,10 @@
    	
    	public static function query($query) {
    		self::connect();
+		// do the cli check here
+		print "executing query: $query\n";
    		if (!($result = mysql_query($query, self::$connection))) showerror();
+		print "count is " . count($result) . "\n";
    		return $result;
    	}
    	 

@@ -306,6 +306,7 @@ class CourseCatalog {
 	
 	public static function GetCourseCatalogFromCourse($course) {
 		//print "Debug: Going to look for $course->department, $course->level\n";
+	 	self::firstTimeCall();
 		foreach (self::$objArray as $coursecatalog ) {
 			if (($coursecatalog->department == $course->department) && ($coursecatalog->level == $course->level))
 			return $coursecatalog;
@@ -313,24 +314,31 @@ class CourseCatalog {
 		return null;
 	}
 
+	private static function firstTimeCall() {
+		if (!empty(self::$objArray)) return;
+		$query = "select * from CourseCatalog";
+		$result = VidDb::query($query);
+		while ($row = mysql_fetch_alias_array($result)) {
+			self::ReadRow($row);
+		}
+	}
+		
 	public static function GetItemById($key) {
 	 	self::firstTimeCall();
+//		print "debug: trying to find $key in coursecatalog\n";
 	 	return self::$objArray[$key];
 	 }	
 	 
 	public static $objArray = Array ();
 
-	public static function GetCourseCatalog($row) {
+	private static function ReadRow($row) {
 		$key = $row["CourseCatalog.id"];
-		if (!array_key_exists($key, self::$objArray)) {
-			$instance = new CourseCatalog();
-			self::$objArray[$key] = $instance;
-			$instance->setVariables($row);
-		}
+		if (!array_key_exists($key, self::$objArray)) 
+			self::$objArray[$key] = new self($row);
 		return self::$objArray[$key];
 	}
-
-	public function setVariables($row) {
+	
+	public function __construct($row) {
 		$this->id = $row["CourseCatalog.id"];
 		$this->department = $row["CourseCatalog.department"];
 		$this->level = $row["CourseCatalog.level"];
@@ -359,7 +367,10 @@ class AvailableClass {
 			self::ReadRow($row);
 		}
 	}
-		
+
+	public function short() {
+	       return empty($this->section) ? $this->course->short : $this->course->short . $this->section;
+	}		
 
 	public static function GetItemById($key) {
 	 	self::firstTimeCall();
@@ -378,7 +389,7 @@ class AvailableClass {
 	public function __construct($row) {
 		$this->id = $row["AvailableClass.id"];
 		$this->year= $row["AvailableClass.year"];
-		$this->course = $row["AvailableClass.course"];
+		$this->course = CourseCatalog::GetItemById($row["AvailableClass.course"]);
 		$this->section = $row["AvailableClass.section"];
 		$this->room = Rooms::GetItemById($row["AvailableClass.room"]);
 		$this->startTime = $row["AvailableClass.startTime"];
@@ -394,7 +405,7 @@ class AvailableClass {
 
 		self::firstTimeCall();
 		foreach (self::$objArray as $availableClass) {
-			if (($availableClass->course == $courseCatalog->id) && ($availableClass->section == $courseSection)){
+			if (($availableClass->course->id == $courseCatalog->id) && ($availableClass->section == $courseSection)){
 			//	print "returned id should $availableClass->id\n";
 				return $availableClass;
 			}
@@ -481,13 +492,10 @@ class Enrollment{
 		";
 		$enrollmentArray = Array();
 		
-		print "query is $query\n";
-
 		$result = VidDb::query($query);
 		while ($row = mysql_fetch_alias_array($result)) {
 			$enrollmentArray[] = new self($row);
 		}
-		print "count is " . count($enrollmentArray) . "\n";
 		return $enrollmentArray;
 	}
 	
@@ -821,12 +829,6 @@ function CreateDictionary($connection) {
 		StudentStatus::GetStudentStatus($row);
 	}
 	
-	// load CourseCatalog
-	$query = "select * from CourseCatalog";
-	if (!($result = mysql_query($query, $connection))) showerror();
-	while ($row = mysql_fetch_alias_array($result)) {
-		CourseCatalog::GetCourseCatalog($row);
-	}
 	
 	// Load Students
 	$query = LoadStudents("", "");

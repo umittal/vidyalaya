@@ -29,7 +29,9 @@ class RoomUtilization {
 			print "$i. Room Number: $room->roomNumber\n";
 			foreach ($availableClass as $classid => $students) {
 				$classa = AvailableClass::GetItemById($classid);
-				print "$classa->startTime - $classa->endTime: Class: $classid, student count = " . count($students) . "\n";	
+				$cc = CourseCatalog::GetItemById($classa->course->id);
+				print "$classa->startTime - $classa->endTime: Course: " . $classa->short(). 
+				", student count = " . count($students) . "\n";	
 			}
 			$i++;
 			print "\n";
