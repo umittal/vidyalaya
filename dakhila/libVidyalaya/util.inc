@@ -87,7 +87,7 @@ Class Calendar {
 	}
 	
 	public static function Age($dob) {
-		return AgeAt($dob, Calendar::Today);
+		return self::AgeAt($dob, Calendar::Today);
 	}
 	
 	public static function GradeAt($first, $rule) {

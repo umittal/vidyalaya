@@ -41,6 +41,7 @@ class TransitionFromPraveen {
 		$this->outAvailable = fopen($filenameAvailable, "w");
 		$this->outEnrollment = fopen($filenameEnrollment, "w");
 
+		$result = VidDb::query("delete  from $this->tableEnrollment;");
 		$result = VidDb::query("delete  from $this->tableAvailable;");
 		fwrite($this->outAvailable, "delete  from $this->tableAvailable;\n");
 		fwrite($this->outEnrollment, "delete  from $this->tableEnrollment;\n");

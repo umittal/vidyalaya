@@ -457,13 +457,29 @@ function utilTesting() {
 	print Calendar::CurrentYear() ."\n";
 }
 
-function dummy() {
+function classUtilizationReport() {
 
-	$utilization = RoomUtilization::utilization(1, 0);
-	print "count of enrolled is " . count($utilization) . "\n";
+//	$utilization = RoomUtilization::utilization(1, 0);
+	$utilization = RoomUtilization::utilizationDept(1, 0, Department::Culture);
+//	print "count of enrolled is " . count($utilization) . "\n";
 }
 
-dummy();
+
+function emailListForVasudha() {
+	 foreach (Student::RegisteredStudents()  as $student) {
+	 	 $fields = Array();
+		 $fields[] = $student->id;
+		 $fields[] = $student->fullName();
+		 $fields[] = $student->GenderName();
+		 $fields[] = sprintf("%2d", $student->Age());
+		 $fields[] = implode("; ", $student->mailingListArray());
+
+		 print implode (", ", $fields) . "\n";
+	 }
+}
+
+classUtilizationReport();
+//emailListForVasudha();
 
 //	GetAllData();
 // EmailCheck("manoj");

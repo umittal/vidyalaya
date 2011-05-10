@@ -1,6 +1,22 @@
 <?php
 require_once "util.inc";
 
+class Gender {
+      const Girl = 1
+      , Boy = 2
+      , Unknown = 3
+      ;
+
+public static function NameFromId($number) {
+	switch ($number) {
+		case 1: return "Girl";
+		case 2: return "Boy";
+		default: return "Unknown";
+	}
+	}
+
+}
+
 class Department {
 	public $id = null;
 
@@ -134,7 +150,9 @@ class Student {
   	return Calendar::GradeAt($this->firstGradeYear, $rule);
   }
 
-
+  public function GenderName() {
+  	 return Gender::NameFromId($this->gender);
+	 }
 
   public function LanguageInterest() {
   	if (!empty($this->languagePreference)) {
@@ -281,6 +299,13 @@ class Course {
   	$chartolook = $this->lc == "c"? $this->description[0] : $this->symbol[0];
   	return Department::IdFromChar($chartolook);
   }
+
+  public function GetSectionFromPraveenSymbol() {
+  	  $symboltocheck = $this->lc == "c"? $this->description : $this->symbol;
+	  $courseSection = strlen($symboltocheck) > 2 ? $symboltocheck[2] : "";
+	  if ($courseSection == "-") return null;
+	  return $courseSection;
+  }
   
   private function SetVariablesFromRow($row, $symbol, $description, $room, $teachers, $lc) {
       $this->symbol = $row[$symbol];
@@ -397,11 +422,11 @@ class AvailableClass {
 
 	}
 
-		public static function findAvailableClassFromCourse($course) {
+	public static function findAvailableClassFromCourse($course) {
 		//print "Looking for $course->description, ";
 		$courseCatalog = CourseCatalog::GetCourseCatalogFromCourse($course);
 		if (empty($courseCatalog)) die ("catalog not found found for $course->description");
-		$courseSection = strlen($course->symbol) > 2 ? $course->symbol[2] : "";
+		$courseSection = $course->GetSectionFromPraveenSymbol();
 
 		self::firstTimeCall();
 		foreach (self::$objArray as $availableClass) {
