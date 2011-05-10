@@ -20,21 +20,9 @@ function GetEnrolledStudentCountForFamily($id, $students) {
 	return $count;
 }
 
-function GetPdfForFamily($family, $count, $students) {
+function GetPdfForFamilyV2($family) {
 	$dompdf = new DOMPDF();
-	$template = new HTML_Template_ITX("/var/www/dakhila/templates");
-	$html = DisplayFamily($template, $family, $students);
-	
-	 $paper = DOMPDF_DEFAULT_PAPER_SIZE;
-	 $orientation = "landscape";
-	 $dompdf->set_paper($paper, $orientation);
-	$dompdf->load_html($html);
-	$dompdf->render();	
-	return $dompdf->output();
-}
-
-function GetPdfForFamilyV2($family, $students) {
-	$dompdf = new DOMPDF();
+	$students = Student::AllStudents();
 
 	// Header 
 	$template = new HTML_Template_ITX("/var/www/dakhila/templates");
@@ -121,22 +109,6 @@ function GetPdfForFamilyV2($family, $students) {
 	return $dompdf->output();
 }
 
-function printAllFamilies($students) {
-	$printDir = "/home/umesh/package2011";
-
-	foreach (Family::$objArray as $family) {
-		if ($family->id != 335) continue;
-		//if ($family->category->id != FamilyCategory::Waiting) continue;
-		$count = GetEnrolledStudentCountForFamily($family->id, $students);
-		if ($count > 0 || $family->category->id == FamilyCategory::Waiting) {
-			//$pdf = GetPdfForFamily($family, $count, $students);
-			$pdf = GetPdfForFamilyV2($family, $students);
-			$fileName = $printDir . "/Family-" . $family->id . ".pdf";
-			file_put_contents("$fileName", $pdf);
-			echo "printed $fileName\n";
-		}
-	}
-}
 
 function GetPdfForMedical($student) {
 	$dompdf = new DOMPDF();
@@ -165,8 +137,39 @@ function printMedicalForms($students) {
 	}
 }
 
-$students = GetAllData();
-printAllFamilies($students);
+function printOneFamily($family) {
+	$printDir = "/home/umesh/package2011";
+	$pdf = GetPdfForFamilyV2($family);
+	$fileName = $printDir . "/Family-" . $family->id . ".pdf";
+	file_put_contents("$fileName", $pdf);
+	echo "printed $fileName\n";
+}
+
+function printAllFamilies($students) {
+	foreach (Family::$objArray as $family) {
+		$count = GetEnrolledStudentCountForFamily($family->id, $students);
+		if ($count > 0 || $family->category->id == FamilyCategory::Waiting) 		printOneFamily($family);
+	}
+}
+
+while (1) {
+	echo "Enter the id of family you want to print : ";
+	$handle = fopen ("php://stdin","r");
+	$line = trim(fgets($handle));
+	if ($line == "q") break;
+	if (intval($line) ==0 ) {
+		print "found: $line, expecting an integer\n\n";
+		continue;
+	}
+	printOneFamily (Family::GetItemById($line));
+}
+echo "\n";
+echo "Thank you for using my print program...\n";
+
+
+
+//$students = GetAllData();
+//printAllFamilies($students);
 
 //printMedicalForms($students);
 

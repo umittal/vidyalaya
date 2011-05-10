@@ -102,16 +102,19 @@ class Student {
   	self::firstTimeCall();
   	return self::$objArray[$key];
   }
+  
+  public static function AllStudents() {
+  	self::firstTimeCall();
+  	return self::$objArray;
+  }
+  
 
   public static function RegisteredStudents() {
   	self::firstTimeCall();
   	$students = Array();
   	foreach (Student::$objArray as $student) {
-  		if ($student->IsEnrolled) {
-  			$students[] = $student;
-  		}
+  		if ($student->IsEnrolled) $students[] = $student;
   	}
-
   	return $students;
   }
 
@@ -186,7 +189,7 @@ class Student {
     	$this->dateOfBirth = $dob;
     }
 
-    $this->family = Family::GetFamilyId($row["Students2003.PARENT_ID"]);
+    $this->family = Family::GetItemById($row["Students2003.PARENT_ID"]);
     $this->registration = new Registration($row);
     $this->studentStatus = StudentStatus::GetStudentStatusId($row["Students2003.STATUS"]);
     $this->IsEnrolled = $this->studentStatus->id == StudentStatus::Active;
@@ -310,7 +313,11 @@ class CourseCatalog {
 		return null;
 	}
 
-
+	public static function GetItemById($key) {
+	 	self::firstTimeCall();
+	 	return self::$objArray[$key];
+	 }	
+	 
 	public static $objArray = Array ();
 
 	public static function GetCourseCatalog($row) {
@@ -584,15 +591,16 @@ class Family {
     return self::$objArray[$key];
  }
  
-   public static function GetFamilyId($id) {
-   	$key = (integer) $id;
-    if (!array_key_exists($key, self::$objArray)) {
-//    	print "*** No family found for id $key\n";
-    	return null;
-    }
-    return self::$objArray[$key];
- }
  
+ 	private static function firstTimeCall() {
+		if (!empty(self::$objArray)) return;
+		GetAllData();
+	}
+	
+	public static function GetItemById($key) {
+	 	self::firstTimeCall();
+	 	return self::$objArray[$key];
+	 }	
  
  public function parentsName() {
    	if ($this->mother->lastName == $this->father->lastName) {
@@ -847,7 +855,7 @@ function GetAllData() {
     showerror();
 
 
-  //  echo "I made it to main\n";
+  echo "I made it to main\n";
 
   $dictStudents = CreateDictionary($connection);
   return $dictStudents;

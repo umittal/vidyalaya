@@ -2,7 +2,7 @@
 $libDir="../dakhila/libVidyalaya/";
 require_once "$libDir/db.inc";
 require_once "$libDir/vidyalaya.inc";
-
+require_once "$libDir/reports.inc";
 
 
 function cityAllocation($students) {
@@ -459,8 +459,8 @@ function utilTesting() {
 
 function dummy() {
 
-	$enrolled = Enrollment::GetAllEnrollmentForFacilitySession(1, 0);
-	print "count of enrolled is " . count($enrolled) . "\n";
+	$utilization = RoomUtilization::utilization(1, 0);
+	print "count of enrolled is " . count($utilization) . "\n";
 }
 
 dummy();

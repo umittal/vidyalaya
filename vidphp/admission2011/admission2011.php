@@ -109,6 +109,7 @@ function NewFamilyOrientation($family) {
   $mail->AddAttachment("$attachDir/2011AnnualForm.pdf"); // attachment
 
   $customizedPdf = "/home/umesh/package2011/Family-". $family->id . ".pdf";
+  if (!file_exists($customizedPdf)) die ("customized file $customizedPdf not found, aborting\n");
   $mail->AddAttachment("$customizedPdf"); // attachment
   
 //  $draft = "<p>This is a <u>draft</u> message being sent for review. Please send all comments, trivial/substantial. The real mail will come later.";
@@ -143,9 +144,7 @@ $students = GetAllData();
 // ExistingFamilies($students);
 //NewFamiliesOrientation();
 
-NewFamilyOrientation(Family::GetFamilyId(443));
-NewFamilyOrientation(Family::GetFamilyId(444));
-NewFamilyOrientation(Family::GetFamilyId(446));
+NewFamilyOrientation(Family::GetItemById(447));
 
 
 
