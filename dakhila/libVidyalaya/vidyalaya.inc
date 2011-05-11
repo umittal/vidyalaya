@@ -604,53 +604,58 @@ class FamilyCategory {
 
 // ************** 
 class Family {
-  public $id=null;
-  public $mother = null;
-  public $father = null;
-  public $address=null;
-  public $phone=null;
-  public $category = null;
-  public $priority_date = null;
+	public $id=null;
+	public $mother = null;
+	public $father = null;
+	public $address=null;
+	public $phone=null;
+	public $category = null;
+	public $priority_date = null;
 
-  public static $objArray = Array ();
-  
-  public static function GetFamily($row) {
-    $key = $row["Parents2003.ID"];
-    if (!array_key_exists($key, self::$objArray)) {
-      $instance = new Family();
-      self::$objArray[$key] = $instance;
-      $instance->setVariables($row);
-    }
-    return self::$objArray[$key];
- }
- 
- 
- 	private static function firstTimeCall() {
+	public static $objArray = Array ();
+
+	public static function GetFamily($row) {
+		$key = $row["Parents2003.ID"];
+		if (!array_key_exists($key, self::$objArray)) {
+			$instance = new Family();
+			self::$objArray[$key] = $instance;
+			$instance->setVariables($row);
+		}
+		return self::$objArray[$key];
+	}
+
+
+	private static function firstTimeCall() {
 		if (!empty(self::$objArray)) return;
 		GetAllData();
 	}
-	
+
 	public static function GetItemById($key) {
-	 	self::firstTimeCall();
-	 	return self::$objArray[$key];
-	 }	
- 
- public function parentsName() {
-   	if ($this->mother->lastName == $this->father->lastName) {
-  		return $this->father->firstName . " / " .$this->mother->firstName . " "  . $this->father->lastName;
-  	}else { 
-  	  return $this->father->firstName . " "  . $this->father->lastName . " / " .$this->mother->firstName . " "  . $this->mother->lastName;
-  	}
- }
- 
- public function Children() {
- 	$children = array();
- 	foreach (Student::$objArray as $student) {
- 		if ($student->family->id == $this->id) $children[] = $student;
- 	}
- 	return $children;
- }
- 
+		self::firstTimeCall();
+		return self::$objArray[$key];
+	}
+
+	public static function GetAllFamilies() {
+		self::firstTimeCall();
+		return self::$objArray;
+	}
+
+	public function parentsName() {
+		if ($this->mother->lastName == $this->father->lastName) {
+			return $this->father->firstName . " / " .$this->mother->firstName . " "  . $this->father->lastName;
+		}else {
+			return $this->father->firstName . " "  . $this->father->lastName . " / " .$this->mother->firstName . " "  . $this->mother->lastName;
+		}
+	}
+
+	public function Children() {
+		$children = array();
+		foreach (Student::$objArray as $student) {
+			if ($student->family->id == $this->id) $children[] = $student;
+		}
+		return $children;
+	}
+
 
 
   public function setVariables($row) {

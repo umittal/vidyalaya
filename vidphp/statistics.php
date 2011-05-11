@@ -430,29 +430,6 @@ function HandlePraveenStyleEmail(&$emailArray, $praveenStyle, $id) {
 	}
 }
 
-function EmailCheck($email) {
-	$emailArray = array();
-	
-	foreach (Family::$objArray as $family) {
-		HandlePraveenStyleEmail($emailArray, $family->mother->email, $family->id);
-		HandlePraveenStyleEmail($emailArray, $family->father->email, $family->id);
-		
-		foreach ($family->Children() as $student) {
-			HandlePraveenStyleEmail($emailArray, $student->email, $family->id);
-		}
-	}
-
-	$matchingArray = preg_grep_keys($email, $emailArray);
-	if (empty($matchingArray)) {
-	  //	if (empty($emailArray[$email])) {
-		print "email **$email** does not exist in our databse\n";
-	} else {
-	  foreach ($matchingArray as $email => $familyId) {
-	    print "Family id for **$email** is $familyId\n";
-	  }
-	}
-}
-
 function utilTesting() {
 	print Calendar::CurrentYear() ."\n";
 }
@@ -478,6 +455,14 @@ function emailListForVasudha() {
 	 }
 }
 
+function testExcelThing() {
+	$workbook = new VidBook();
+	$sheet = $workbook->setActiveSheet(0, "umesh is best", "haha");
+	$workbook->fillData($sheet);
+	$workbook->SaveWorkbook("/tmp/a.xlsx");
+}
+
+//testExcelThing();
 classUtilizationReport();
 //emailListForVasudha();
 

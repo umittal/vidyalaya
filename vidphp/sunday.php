@@ -31,6 +31,12 @@
 
  */
 
+$libDir="../dakhila/libVidyalaya/";
+require_once "$libDir/reports.inc";
+
+
+$mainFunctions = array("mail" => "mailFunction", "print" => "printFunction");
+
 function sunday_usage() {
 	echo
     "\nUsage: {$_SERVER["argv"][0]} [options] command\n\n".
@@ -129,11 +135,45 @@ function getoptions() {
 	return $opts;
 }
 
+function mailFunction(){
+	print "mail function - i was here\n";
+
+	while (1) {
+	echo "email address to search: ";
+	$handle = fopen ("php://stdin","r");
+	$email= trim(fgets($handle));
+	if ($email == "quit") break;
+		VidUtil::EmailCheck($email);
+	}
+}
+
+function printFunction(){
+	print "print function - i was here\n";
+}
+
+
+function mainFunction($mainFunctions) {
+	while (1) {
+	echo "Enter a command: ";
+	$handle = fopen ("php://stdin","r");
+	$line = trim(fgets($handle));
+	if ($line == "quit") break;
+	
+	if (empty($mainFunctions[$line])) {
+		print "Invalid command -$line- specified, select a valid one\n";
+	} else {
+		$mainFunctions[$line]();
+	}
+	
+}
+echo "\n";
+echo "Thank you for using my print program...\n";
+
+	
+}
+
 //var_dump($_SERVER);
 
-$libDir="/var/www/dakhila/libVidyalaya/";
-require_once "$libDir/db.inc";
-require_once "$libDir/vidyalaya.inc";
 
 global $_dompdf_show_warnings, $_dompdf_debug, $_DOMPDF_DEBUG_TYPES;
 
@@ -146,12 +186,22 @@ switch ( $sapi ) {
 
 		$opts = getoptions();
 
-		if ( isset($opts["h"]) || (!isset($opts["command"]) && !isset($opts["l"])) ) {
+		if ( isset($opts["h"]))  {
 			sunday_usage();
 			exit;
 		}
+		
+		if  (!isset($opts["command"]) && !isset($opts["l"])) {
+			mainFunction($mainFunctions);
+		}
+	if (empty($mainFunctions[$opts["command"]])) {
+		print "Invalid command -$line- specified, select a valid one from ". implode (", ", array_keys($mainFunctions)) . "\n";
+	} else {
+		$mainFunctions[$opts["command"]]();
+	}
+		
 		break;
-
 	default:
 		print "I do not really know what to do here where sapi = $sapi";
 }
+
