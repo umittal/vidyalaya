@@ -110,51 +110,83 @@ class RoomUtilization {
 		}
 		$workbook->SaveWorkbook("/tmp/cultureRoster.xlsx");
 	}
-
-
-
 }
+
+
 
 class VidUtil {
 	private function AddEmailArray (&$emailArray, $email, $id) {
-	if (!empty($emailArray[$email])) {
-		print "Error: email $email already assigned to id $emailArray[$email], trying to assign it to $id\n";
-	} else {
-		$emailArray[$email] = $id;
-	}
-}
-
-private function HandlePraveenStyleEmail(&$emailArray, $praveenStyle, $id) {
-	foreach (explode(";", $praveenStyle) as $email) {
-		if (!empty($email)) {
-			self::AddEmailArray($emailArray, $email, $id);
+		if (!empty($emailArray[$email])) {
+			print "Error: email $email already assigned to id $emailArray[$email], trying to assign it to $id\n";
+		} else {
+			$emailArray[$email] = $id;
 		}
 	}
-}
-	
+
+	private function HandlePraveenStyleEmail(&$emailArray, $praveenStyle, $id) {
+		foreach (explode(";", $praveenStyle) as $email) {
+			if (!empty($email)) {
+				self::AddEmailArray($emailArray, $email, $id);
+			}
+		}
+	}
+
 	public static function EmailCheck($email) {
-	$emailArray = array();
-	
-	foreach (Family::GetAllFamilies() as $family) {
-		self::HandlePraveenStyleEmail($emailArray, $family->mother->email, $family->id);
-		self::HandlePraveenStyleEmail($emailArray, $family->father->email, $family->id);
-		
-		foreach ($family->Children() as $student) {
-			self::HandlePraveenStyleEmail($emailArray, $student->email, $family->id);
+		$emailArray = array();
+
+		foreach (Family::GetAllFamilies() as $family) {
+			self::HandlePraveenStyleEmail($emailArray, $family->mother->email, $family->id);
+			self::HandlePraveenStyleEmail($emailArray, $family->father->email, $family->id);
+
+			foreach ($family->Children() as $student) {
+				self::HandlePraveenStyleEmail($emailArray, $student->email, $family->id);
+			}
+		}
+
+		$matchingArray = preg_grep_keys($email, $emailArray);
+		if (empty($matchingArray)) {
+	  //	if (empty($emailArray[$email])) {
+			print "email **$email** does not exist in our database\n";
+		} else {
+	  foreach ($matchingArray as $email => $familyId) {
+	  	print "Family id for **$email** is $familyId\n";
+	  }
 		}
 	}
 
-	$matchingArray = preg_grep_keys($email, $emailArray);
-	if (empty($matchingArray)) {
-	  //	if (empty($emailArray[$email])) {
-		print "email **$email** does not exist in our database\n";
-	} else {
-	  foreach ($matchingArray as $email => $familyId) {
-	    print "Family id for **$email** is $familyId\n";
-	  }
+	public static function WaitingList() {
+		$waiting = Array(); $i=1;
+		foreach (Student::AllStudents() as $student) {
+			if ($student->studentStatus->id != StudentStatus::Waiting) continue;
+			$waiting[]=$student;
+			print "$i, $student->id, "
+			.  ", " .$student->family->id
+			.  ", " .$student->fullName() 
+			. ", " . $student->GenderName() 
+			. ", " . sprintf("%2d", $student->AgeAt(Calendar::RegistrationSession))
+			. ", " . Department::NameFromId($student->languagePreference)
+			
+			. "\n";
+			$i++;
+		}
 	}
-}
-	
+
+	private static function printParentContact($parent, $family) {
+
+		if (!empty($parent->email)) {
+			print $parent->firstName . ", " . $parent->lastName . ", " . $parent->email .
+			", \"" . $family->address->OneLineAddress() . "\", " . $parent->cellPhone . "\n";
+		}
+	}
+
+	public static function printMemberList() {
+		print "First Name, Last Name, E-mail Address, Home Address, Mobile Phone\n";
+		foreach (Family::GetAllFamilies() as $family) {
+			self::printParentContact($family->mother, $family);
+			self::printParentContact($family->father, $family);
+		}
+	}
+
 }
 
 

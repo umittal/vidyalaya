@@ -35,7 +35,7 @@ $libDir="../dakhila/libVidyalaya/";
 require_once "$libDir/reports.inc";
 
 
-$mainFunctions = array("mail" => "mailFunction", "print" => "printFunction");
+$mainFunctions = array("mail" => "mailFunction", "print" => "printFunction", "misc" => "miscFunction");
 
 function sunday_usage() {
 	echo
@@ -148,7 +148,20 @@ function mailFunction(){
 }
 
 function printFunction(){
-	print "print function - i was here\n";
+	print "print function - i have nothing to do\n";
+}
+
+function miscFunction() {
+	$mainFunctions = array("wait" => "WaitingList", "member" => "printMemberList");
+	print "type one from ". implode (", ", array_keys($mainFunctions)) . "\n";
+	while (1) {
+		echo "enter misc command: ";
+		$handle = fopen ("php://stdin","r");
+		$misc= trim(fgets($handle));
+		if ($misc == "quit") break;
+		if (!empty($mainFunctions[$misc])) VIdUtil::$mainFunctions[$misc]();
+		print "\n";
+	}
 }
 
 
@@ -193,6 +206,7 @@ switch ( $sapi ) {
 		
 		if  (!isset($opts["command"]) && !isset($opts["l"])) {
 			mainFunction($mainFunctions);
+			break;
 		}
 	if (empty($mainFunctions[$opts["command"]])) {
 		print "Invalid command -$line- specified, select a valid one from ". implode (", ", array_keys($mainFunctions)) . "\n";
