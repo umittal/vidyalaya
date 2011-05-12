@@ -51,8 +51,48 @@ class TransitionFromPraveen {
 
 }
 
-$object = new TransitionFromPraveen();
+class CourseTeacher {
 
-$object->InsertAvalableEnrollment();
+  private static $doneArray = Array();
+  
+  private static function processCourseTeacher($course) {
+    if (!empty(self::$doneArray[$course->id])) return;
+    $symbol = $course->lc == "c" ? $course->description : $course->symbol;
+#    print "$symbol: $course->teachers\n";
+    foreach (explode(",", $course->teachers) as $a) {
+      $teacher = explode (" ", trim($a));
+      $first = $teacher[0];
+      $last = $teacher[count($teacher) - 1];
+
+      $found = 0;
+      foreach(Family::GetAllFamilies() as $family) {
+	if ($first == $family->mother->firstName && $last == $family->mother->lastName) {
+	  print "$symbol, $first, $last, m $family->id, " . $family->mother->email . "\n";
+	  $found=1;
+	} 
+	if ($first == $family->father->firstName && $last ==$family->father->lastName) {
+	  print "$symbol, $first, $last, f $family->id, " . $family->father->email . "\n";
+	  $found=1;
+	}
+      }
+      if ($found != 1) print "$symbol, $first, $last,, not found\n";
+    }
+
+    self::$doneArray[$course->id] = 1;
+  }
+  public static function ConvertTeacherToObject() {
+    foreach (Student::RegisteredStudents() as $student) {
+      self::processCourseTeacher($student->registration->language);
+      self::processCourseTeacher($student->registration->culture);
+    }
+  }
+
+}
+
+CourseTeacher::ConvertTeacherToObject();
+
+//$object = new TransitionFromPraveen();
+
+//$object->InsertAvalableEnrollment();
 
 ?>

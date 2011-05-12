@@ -462,8 +462,16 @@ function testExcelThing() {
 	$workbook->SaveWorkbook("/tmp/a.xlsx");
 }
 
+function ConvertTeacherToObject() {
+  foreach (Student::RegisteredStudents() as $student) {
+    processCourseTeacher($student->registration->language);
+    processCourseTeacher($student->registration->culture);
+  }
+}
+
+ConvertTeacherToObject();
 //testExcelThing();
-classUtilizationReport();
+//classUtilizationReport();
 //emailListForVasudha();
 
 //	GetAllData();

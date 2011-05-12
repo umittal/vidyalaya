@@ -156,14 +156,16 @@ class VidUtil {
 
 	public static function WaitingList() {
 		$waiting = Array(); $i=1;
+		print "#, student, Family, name, gender, age, grade, language\n";
 		foreach (Student::AllStudents() as $student) {
 			if ($student->studentStatus->id != StudentStatus::Waiting) continue;
 			$waiting[]=$student;
-			print "$i, $student->id, "
-			.  ", " .$student->family->id
-			.  ", " .$student->fullName() 
+			print "$i, $student->id"
+			. ", " . $student->family->id
+			. ", " . $student->fullName() 
 			. ", " . $student->GenderName() 
 			. ", " . sprintf("%2d", $student->AgeAt(Calendar::RegistrationSession))
+			. ", " . sprintf("%2d", $student->GradeAt(Calendar::RegistrationSession))
 			. ", " . Department::NameFromId($student->languagePreference)
 			
 			. "\n";
