@@ -54,6 +54,14 @@ class TransitionFromPraveen {
 class CourseTeacher {
 
   private static $doneArray = Array();
+
+  private static function printTeacher($course, $parent, $family, $symbol, $c) {
+    if ($symbol=="CK") $availableClass = AvailableClass::GetItemById(236); else
+    $availableClass = AvailableClass::findAvailableClassFromCourse($course);
+    $email = empty($parent->email) ? "missing email" : $parent->email;
+    print "$symbol, $parent->firstName, $parent->lastName, $c $family->id, $parent->email \n";
+
+  }
   
   private static function processCourseTeacher($course) {
     if (!empty(self::$doneArray[$course->id])) return;
@@ -67,15 +75,16 @@ class CourseTeacher {
       $found = 0;
       foreach(Family::GetAllFamilies() as $family) {
 	if ($first == $family->mother->firstName && $last == $family->mother->lastName) {
-	  print "$symbol, $first, $last, m $family->id, " . $family->mother->email . "\n";
-	  $found=1;
+	  self::printTeacher($course, $family->mother, $family, $symbol, "m");
+	  //;	  print "$symbol, $first, $last, m $family->id, " . $family->mother->email . "\n";
+	  $found++;
 	} 
 	if ($first == $family->father->firstName && $last ==$family->father->lastName) {
-	  print "$symbol, $first, $last, f $family->id, " . $family->father->email . "\n";
-	  $found=1;
+	  self::printTeacher($course, $family->father, $family, $symbol, "f");
+	  $found++;
 	}
       }
-      if ($found != 1) print "$symbol, $first, $last,, not found\n";
+      if ($found != 1) print "$symbol, $first, $last,, found= $found\n";
     }
 
     self::$doneArray[$course->id] = 1;
