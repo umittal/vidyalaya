@@ -92,6 +92,7 @@ class RoomUtilization {
 				if ($cc->department == $dept) {
 					print "$i. Room Number: $room->roomNumber, Course: " . $classa->short(). "\n";
 					$sheet = $workbook->setActiveSheet($i-1	, $classa->short(), $classa->short());
+					$sheet->setCellValue('A1', "Room Number: $room->roomNumber, Course: " . $classa->short());
 					$row = 2;
 					foreach ($enrollments as $enrollment) {
 						$student = $enrollment->student;
@@ -109,6 +110,31 @@ class RoomUtilization {
 			print "\n";
 		}
 		$workbook->SaveWorkbook("/tmp/cultureRoster.xlsx");
+	}
+
+
+	// List Students in any department
+	public static function listStudentsDept($facility, $year, $dept) {
+	  self::firstTimeCall ($facility, $year);
+	  $i = 1;
+	  foreach (self::$objArray as  $roomid => $availableClass) {
+	    $room = Rooms::GetItemById($roomid);
+	    foreach ($availableClass as $classid => $enrollments) {
+	      $classa = AvailableClass::GetItemById($classid);
+	      $cc = CourseCatalog::GetItemById($classa->course->id);
+
+	      if ($cc->department == $dept) {
+		foreach ($enrollments as $enrollment) {
+		  $student = $enrollment->student;
+		  print $i .  ", " .  $student->id . ", " .$student->fullName();
+		  print ",Room: $room->roomNumber, Course: " . $classa->short();
+		  print "\n";
+		  $i++;
+		}
+	      }
+
+	    }
+	  }
 	}
 }
 

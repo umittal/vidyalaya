@@ -438,6 +438,8 @@ function classUtilizationReport() {
 
 //	$utilization = RoomUtilization::utilization(1, 0);
 	$utilization = RoomUtilization::utilizationDept(1, 0, Department::Culture);
+//	$utilization = RoomUtilization::listStudentsDept(1, 0, Department::Culture);
+
 //	print "count of enrolled is " . count($utilization) . "\n";
 }
 
@@ -469,9 +471,9 @@ function ConvertTeacherToObject() {
   }
 }
 
-ConvertTeacherToObject();
+//ConvertTeacherToObject();
 //testExcelThing();
-//classUtilizationReport();
+classUtilizationReport();
 //emailListForVasudha();
 
 //	GetAllData();
