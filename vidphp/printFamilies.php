@@ -152,6 +152,31 @@ function printAllFamilies($students) {
 	}
 }
 
+$sapi = php_sapi_name();
+switch ( $sapi ) {
+
+	case "cli":
+
+			
+		if( $_SERVER["argc"] != 2) die ("sorry, i can only handle one argument right now\n");
+		$line = trim($_SERVER["argv"][1]);
+	if ($line == "q") break;
+	$entry =intval($line);
+	if ($entry == 0 ) {
+		print "found: $line, expecting an integer\n\n";
+		break;
+	}
+	print "printing  $entry\n";
+	printOneFamily (Family::GetItemById($entry));
+	break;
+		
+	default:
+		die ("do not know how to handle $sapi yet\n");
+}
+echo "\n";
+echo "Thank you for using my print program...\n";
+		exit;
+
 while (1) {
 	echo "Enter the id of family you want to print : ";
 	$handle = fopen ("php://stdin","r");
@@ -163,8 +188,6 @@ while (1) {
 	}
 	printOneFamily (Family::GetItemById($line));
 }
-echo "\n";
-echo "Thank you for using my print program...\n";
 
 
 

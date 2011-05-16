@@ -1,9 +1,10 @@
 <?php
+
 $libDir="../../dakhila/libVidyalaya/";
 require_once "$libDir/db.inc";
 require_once "$libDir/vidyalaya.inc";
 
-require("/var/www/Classes/PHPMailer_v5.1/class.phpmailer.php");
+require("../../Classes/PHPMailer_v5.1/class.phpmailer.php");
 
 
 function SetupMail() {
@@ -63,7 +64,7 @@ function AnnounceExisting($family) {
 //  $draft = "<p>This is a <u>draft</u> message being sent for review. Please send all comments, trivial/substantial. The real mail will come later.";
 	$draft="";
   $salutation = "<p>Dear " . $family->parentsName() . ",";
-  $mail->Body = $draft . $salutation . file_get_contents("/var/www/vidphp/admission2011/announce-existing.html");
+  $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/announce-existing.html");
   $mail->AltBody = "This is the body when user views in plain text format"; //Text Body
 
 //  if ($family->id != 43) return;
@@ -106,7 +107,6 @@ function NewFamilyOrientation($family) {
   $attachDir = "/home/umesh/admissions";
   $mail->AddAttachment("$attachDir/Volunteer2011.pdf"); // attachment
   $mail->AddAttachment("$attachDir/ParticipationAgreement.pdf"); // attachment
-  $mail->AddAttachment("$attachDir/2011AnnualForm.pdf"); // attachment
 
   $customizedPdf = "/home/umesh/package2011/Family-". $family->id . ".pdf";
   if (!file_exists($customizedPdf)) die ("customized file $customizedPdf not found, aborting\n");
@@ -115,12 +115,12 @@ function NewFamilyOrientation($family) {
 //  $draft = "<p>This is a <u>draft</u> message being sent for review. Please send all comments, trivial/substantial. The real mail will come later.";
   $draft="";
   $salutation = "<p>Dear " . $family->parentsName() . ",";
-  $mail->Body = $draft . $salutation . file_get_contents("/var/www/vidphp/admission2011/neworientation.html");
+  $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/neworientation.html");
   $mail->AltBody = "This is the body when user views in plain text format"; //Text Body
 
   	print "Family id: $family->id, Name: " . $family->parentsName() . "\n";
   
-//  if ($family->id != 402) return;
+  //if ($family->id != 402) return;
 
   if(!$mail->Send()) {
     echo "Mailer Error: " . $mail->ErrorInfo . "\n";
@@ -144,7 +144,7 @@ $students = GetAllData();
 // ExistingFamilies($students);
 //NewFamiliesOrientation();
 
-NewFamilyOrientation(Family::GetItemById(448));
+NewFamilyOrientation(Family::GetItemById(449));
 
 
 
