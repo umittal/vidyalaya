@@ -28,7 +28,8 @@ function SetupMail() {
 
 // set the TO address field of mail to family's email address
 function SetFamilyAddress(&$mail, $family) {
-
+//	$mail->AddAddress("umesh@vidyalaya.us", "Testing post orientation"); 	return;
+	
   foreach (explode(";", $family->mother->email) as $toAddress) {
     if (!empty($toAddress)) {
       print "I will send to ". $family->id . ": Mother: " . $family->mother->fullName() . ": " .  $toAddress . "\n";
@@ -130,6 +131,39 @@ function NewFamilyOrientation($family) {
 	
 }
 
+function PostOrientation($family) {
+  $mail = SetupMail();
+  SetFamilyAddress($mail, $family);
+
+  $mail->Subject = "Vidyalaya Admission 2011-12 - Family $family->id";
+  
+  // attachments
+  $customizedPdf = "/home/umesh/package2011/Family-". $family->id . ".pdf";
+  if (!file_exists($customizedPdf)) die ("customized file $customizedPdf not found, aborting\n");
+  $mail->AddAttachment("$customizedPdf"); // attachment
+  
+  $attachDir = "/home/umesh/admissions";
+  $mail->AddAttachment("$attachDir/Volunteer2011.pdf"); // attachment
+  $mail->AddAttachment("$attachDir/ParticipationAgreement.pdf"); // attachment
+
+  //  $draft = "<p>This is a <u>draft</u> message being sent for review. Please send all comments, trivial/substantial. The real mail will come later.";
+  $draft="";
+  $salutation = "<p>Dear " . $family->parentsName() . ",";
+  $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/postorientation.html");
+  $mail->AltBody = "Family: $family->id"; //Text Body
+
+  	print "Family id: $family->id, Name: " . $family->parentsName() . "\n";
+  
+  //if ($family->id != 402) return;
+
+  if(!$mail->Send()) {
+    echo "Mailer Error: " . $mail->ErrorInfo . "\n";
+  }  else {
+    echo "Message has been sent\n";
+  }
+	
+}
+
 function NewFamiliesOrientation() {
 
 	foreach (Family::$objArray as $family) {
@@ -144,8 +178,6 @@ $students = GetAllData();
 // ExistingFamilies($students);
 //NewFamiliesOrientation();
 
-NewFamilyOrientation(Family::GetItemById(454));
-
-
+PostOrientation(Family::GetItemById(344));
 
 ?>
