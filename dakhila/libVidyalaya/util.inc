@@ -111,4 +111,22 @@ Class Calendar {
 	
 }
 
+class EnumFamilyTracker {
+	const registered = 1;
+	const waitlist = 2;
+	const pendingRegistration = 3;
+	const movingAway = 4;
+	const notInterested = 5;
+	const nextYear=6;
+
+    public function enum($string){
+    	
+    		$tocheck = 'EnumFamilyTracker::'.$string;
+    		$value =constant($tocheck);
+    		if (empty($value)) throw new Exception("value $value for $string, $tocheck not found in EnumFamilyTracker"); 
+        return $value;
+    }
+}
+
+
 ?>

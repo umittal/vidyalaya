@@ -647,6 +647,23 @@ class Family {
 			return $this->father->firstName . " "  . $this->father->lastName . " / " .$this->mother->firstName . " "  . $this->mother->lastName;
 		}
 	}
+	
+	public function GetRegisteredFamilies($facility, $year){
+		$list = array();
+		foreach(Enrollment::GetAllEnrollmentForFacilitySession($facility, $year) as $enrollment) {
+			$list[] = $enrollment->student->family;
+		}
+		return $list;
+	}
+	
+	public function GetWaitlistFamilies(){
+		$list = array();
+		foreach (self::GetAllFamilies() as $family) {
+		if($family->category->id == FamilyCategory::Waiting) $list[] = $family;
+		}
+		return $list;
+	}
+	
 
 	public function Children() {
 		$children = array();
