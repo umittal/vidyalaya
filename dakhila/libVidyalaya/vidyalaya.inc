@@ -847,6 +847,7 @@ class FamilyTracker {
 		}
 			print "nothing to add\n";
 	}
+}
 	
 
 // Query that is used to load all the students in classes
@@ -976,8 +977,6 @@ function GetAllData() {
   if (!mysql_selectdb($databasename, $connection))
     showerror();
 
-
-  echo "I made it to main\n";
 
   $dictStudents = CreateDictionary($connection);
   return $dictStudents;
