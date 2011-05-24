@@ -471,78 +471,7 @@ function ConvertTeacherToObject() {
   }
 }
 
-class FamilyTracker {
-	const facility = 1;
-	const prevYear = 0;
-	const currYear = 1;
-	
-	public $year=null;
-	public $family = null;
-	public $previousYear = null;
-	public $currentYear =null;
-	public $tuition =null;
-	
-	public static $objArray = Array ();
 
-	private static function firstTimeCall() {
-		if (!empty(self::$objArray)) return;
-		$query = "select * from FamilyTracker";
-		$result = VidDb::query($query);
-		while ($row = mysql_fetch_alias_array($result)) {
-			$key = $row["FamilyTracker.family"];
-			if (!array_key_exists($key, self::$objArray)) self::$objArray[$key] = new self($row);
-		}
-	}
-	
-	public static function GetItemById($key) {
-	 	self::firstTimeCall();
-	 	return self::$objArray[$key];
-	 }	
-	
-	
-	public function __construct($row) {
-		$this->year = $row["FamilyTracker.year"];
-		$this->family= $row["FamilyTracker.family"];
-		$this->previousYear= $row["FamilyTracker.previousYear"];
-		$this->currentYear = $row["FamilyTracker.currentYear"];
-		$this->tuition = $row["FamilyTracker.tuition"];
-	}
-	
-
-	private static function createInsertString($familyID, $prevStatus, $currStatus) {
-		return " (" . self::currYear . ", $familyID, $prevStatus, $currStatus, 0)";		
-	} 
-	
-	public static function UpdateFamilyTracker() {
-		self::firstTimeCall();
-
-		$insert = array();
-		foreach ( Family::GetRegisteredFamilies(self::facility, self::prevYear) as $family) {
-			if (empty(self::$objArray[$family->id])) {
-				$insert[] = self::createInsertString($family->id
-				, EnumFamilyTracker::enum('registered')
-				,EnumFamilyTracker::enum('pendingRegistration'));
-				self::$objArray[$family->id] = 1;
-			}
-		}
-
-		foreach ( Family::GetWaitlistFamilies() as $family) {
-			if (empty(self::$objArray[$family->id])) {
-				$insert[] = self::createInsertString($family->id
-				, EnumFamilyTracker::enum('waitlist')
-				,EnumFamilyTracker::enum('pendingRegistration'));
-				self::$objArray[$family->id] = 1;
-			}
-		}
-		
-		if (count($insert) > 0) {
-		print "count of insert is " . count($insert) . "\n";
-		$result = VidDb::query("insert into FamilyTracker values " . implode (", ", $insert));
-		} else {
-		}
-			print "nothing to add\n";
-	}
-	
 	public static function loadPayments () {
 		self::firstTimeCall();
 		$filename = "/tmp/2011.csv";
