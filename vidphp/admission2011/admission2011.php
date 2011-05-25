@@ -177,7 +177,7 @@ $students = GetAllData();
 
 // ExistingFamilies($students);
 //NewFamiliesOrientation();
-
-PostOrientation(Family::GetItemById(344));
+$entry = GetSingleIntArgument();
+PostOrientation(Family::GetItemById($entry));
 
 ?>

@@ -444,7 +444,7 @@ function classUtilizationReport() {
 }
 
 
-function emailListForVasudha() {
+function emailListForVasudhaStudents() {
 	 foreach (Student::RegisteredStudents()  as $student) {
 	 	 $fields = Array();
 		 $fields[] = $student->id;
@@ -456,6 +456,18 @@ function emailListForVasudha() {
 		 print implode (", ", $fields) . "\n";
 	 }
 }
+
+function emailListForVasudhaRegdParents() {
+	 foreach (Family::GetRegisteredFamilies(1, 0)  as $family) {
+	 	 $fields = Array();
+		 $fields[] = $family->id;
+		 $fields[] = $family->parentsName();
+		 $fields[] = $family->mother->email;
+		 $fields[] = $family->father->email;		 
+		 print implode (", ", $fields) . "\n";
+	 }
+}
+
 
 function testExcelThing() {
 	$workbook = new VidBook();
@@ -472,43 +484,44 @@ function ConvertTeacherToObject() {
 }
 
 
-	public static function loadPayments () {
-		self::firstTimeCall();
-		$filename = "/tmp/2011.csv";
-		if (($handle = fopen($filename, "r")) !== FALSE) {
-			$header = fgetcsv($handle, 0, ",");
-			$header = fgetcsv($handle, 0, ",");
-			$i=1;
-			while ((list($family,$Check , $base, $new , $DVD , $CD , $PB , $Bag , $Ann , $Total ,$foo, $Ch1 , $Ch2 , $Ch3 )
-			= fgetcsv($handle, 0, ",")) !== FALSE) {
-				if (!empty($family)) {
+function loadPayments () {
+	//FamilyTracker::firstTimeCall();
+	$filename = "/tmp/2011.csv";
+	if (($handle = fopen($filename, "r")) !== FALSE) {
+		$header = fgetcsv($handle, 0, ",");
+		$header = fgetcsv($handle, 0, ",");
+		$i=1;
+		while ((list($family,$Check , $base, $new , $DVD , $CD , $PB , $Bag , $Ann , $Total ,$foo, $Ch1 , $Ch2 , $Ch3 )
+		= fgetcsv($handle, 0, ",")) !== FALSE) {
+			if (!empty($family)) {
 					
-					$tuition = str_replace('$', "", $base) + str_replace("$", "", $new);
-					$tracker = self::GetItemById($family);
-					if (empty($tracker)) throw new Exception("family $family not found in tracker, weird");
+				$tuition = str_replace('$', "", $base) + str_replace("$", "", $new);
+				$tracker = FamilyTracker::GetItemById($family);
+				if (empty($tracker)) throw new Exception("family $family not found in tracker, weird");
 					
-					if ($tracker->tuition != $tuition) {
-						$sql = "update FamilyTracker set tuition = $tuition, currentYear = " .  EnumFamilyTracker::enum('registered');
-						$sql .= " where family = $family and year= " . self::currYear . ";\n";
-						$result = VidDb::query($sql);	
-						print $i++ . "$sql \n";
-					} else {
-						print "Tuition is correct for $family, $base, $new, $tuition, $tracker->tuition\n";
-					}
-						
+				if ($tracker->tuition != $tuition) {
+					$sql = "update FamilyTracker set tuition = $tuition, currentYear = " .  EnumFamilyTracker::enum('registered');
+					$sql .= " where family = $family and year= " . FamilyTracker::currYear . ";\n";
+					$result = VidDb::query($sql);
+					print $i++ . "$sql \n";
+				} else {
+					print "Tuition is correct for $family, $base, $new, $tuition, $tracker->tuition\n";
 				}
+
 			}
 		}
 	}
-
 }
 
-FamilyTracker::updateFamilyTracker();
-FamilyTracker::loadPayments();
+
+FamilyTracker::ReportPending();
+//loadPayments();
+exit;
+emailListForVasudhaRegdParents();
 //ConvertTeacherToObject();
 //testExcelThing();
 //classUtilizationReport();
-//emailListForVasudha();
+//
 
 //	GetAllData();
 // EmailCheck("manoj");

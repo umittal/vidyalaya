@@ -650,8 +650,14 @@ class Family {
 	
 	public function GetRegisteredFamilies($facility, $year){
 		$list = array();
+		$done = array();
 		foreach(Enrollment::GetAllEnrollmentForFacilitySession($facility, $year) as $enrollment) {
-			$list[] = $enrollment->student->family;
+			$familyId = $enrollment->student->family->id;
+			if (empty($done[$familyId])) {
+				$list[] = $enrollment->student->family;	
+			}
+			$done[$familyId] = 1;
+			
 		}
 		return $list;
 	}
@@ -804,7 +810,11 @@ class FamilyTracker {
 	 	return self::$objArray[$key];
 	 }	
 	
-	
+	public static function GetAll() {
+		self::firstTimeCall();
+		return self::$objArray;
+	}
+
 	public function __construct($row) {
 		$this->year = $row["FamilyTracker.year"];
 		$this->family= $row["FamilyTracker.family"];
@@ -846,6 +856,33 @@ class FamilyTracker {
 		} else {
 		}
 			print "nothing to add\n";
+	}
+	
+	public static function ReportPending() {
+		$i=1;
+		foreach (self::GetAll() as $tracker) {
+			if ($tracker->currentYear != EnumFamilyTracker::enum('pendingRegistration')) continue;
+			
+			$family = Family::GetItemById ($tracker->family);
+			
+			$fields = Array();
+			$fields[] = $i++;
+		 	$fields[] = $family->id;
+		 	$fields[] = $tracker->previousYear == EnumFamilyTracker::enum('waitlist') ? $family->priority_date : "Registered";
+		 	$fields[] = $family->phone;
+		 	$fields[] = $family->parentsName();
+		 	$fields[] = $family->mother->email;
+		 	$fields[] = $family->father->email;
+		 	
+		 	$fields[] = $family->mother->workPhone;
+		 	$fields[] = $family->mother->cellPhone;
+		 	
+		 	$fields[] = $family->father->workPhone;
+		 	$fields[] = $family->father->cellPhone;
+		 	
+		 	print implode (", ", $fields) . "\n";
+		 	
+		}
 	}
 }
 	

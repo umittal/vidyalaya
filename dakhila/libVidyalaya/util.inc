@@ -41,6 +41,30 @@ function preg_grep_keys ($pattern, $input, $flags=0) {
   return $vals;
 }
 
+function GetSingleIntArgument() {
+	$sapi = php_sapi_name();
+	switch ( $sapi ) {
+
+		case "cli":
+
+				
+			if( $_SERVER["argc"] != 2) die ("sorry, i can only handle one argument right now\n");
+			$line = trim($_SERVER["argv"][1]);
+			if ($line == "q") break;
+			$entry =intval($line);
+			if ($entry == 0 ) {
+				die( "found: $line, expecting an integer\n\n");
+				break;
+			}
+			return $entry;
+			break;
+
+		default:
+			die ("do not know how to handle $sapi yet\n");
+	}
+
+}
+
 Class Calendar {
 	const BaseYear = 2010
 	, Today = 1
@@ -125,6 +149,17 @@ class EnumFamilyTracker {
     		$value =constant($tocheck);
     		if (empty($value)) throw new Exception("value $value for $string, $tocheck not found in EnumFamilyTracker"); 
         return $value;
+    }
+    
+    public static function NameFromId($id) {
+    	switch ($id) {
+    		case self::registered: return "registered";
+    		case self::waitlist: return "waitlist";
+    		case self::pendingRegistration: return "pendingRegistration";
+    		case self::movingAway: return "movingAway";
+    		case self::notInterested: return "notInterested";
+    		case self::nextYear: return "nextYear";
+    	}
     }
 }
 
