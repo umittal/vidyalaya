@@ -484,40 +484,12 @@ function ConvertTeacherToObject() {
 }
 
 
-function loadPayments () {
-	//FamilyTracker::firstTimeCall();
-	$filename = "/tmp/2011.csv";
-	if (($handle = fopen($filename, "r")) !== FALSE) {
-		$header = fgetcsv($handle, 0, ",");
-		$header = fgetcsv($handle, 0, ",");
-		$i=1;
-		while ((list($family,$Check , $base, $new , $DVD , $CD , $PB , $Bag , $Ann , $Total ,$foo, $Ch1 , $Ch2 , $Ch3 )
-		= fgetcsv($handle, 0, ",")) !== FALSE) {
-			if (!empty($family)) {
-					
-				$tuition = str_replace('$', "", $base) + str_replace("$", "", $new);
-				$tracker = FamilyTracker::GetItemById($family);
-				if (empty($tracker)) throw new Exception("family $family not found in tracker, weird");
-					
-				if ($tracker->tuition != $tuition) {
-					$sql = "update FamilyTracker set tuition = $tuition, currentYear = " .  EnumFamilyTracker::enum('registered');
-					$sql .= " where family = $family and year= " . FamilyTracker::currYear . ";\n";
-					$result = VidDb::query($sql);
-					print $i++ . "$sql \n";
-				} else {
-					print "Tuition is correct for $family, $base, $new, $tuition, $tracker->tuition\n";
-				}
-
-			}
-		}
-	}
-}
-
-
-FamilyTracker::ReportPending();
-//loadPayments();
+//FamilyTracker::UpdateFamilyTracker();
+FamilyTracker::loadPayments();
+//FamilyTracker::ReportPending();
+//
 exit;
-emailListForVasudhaRegdParents();
+//emailListForVasudhaRegdParents();
 //ConvertTeacherToObject();
 //testExcelThing();
 //classUtilizationReport();

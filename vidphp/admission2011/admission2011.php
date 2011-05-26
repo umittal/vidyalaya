@@ -172,6 +172,53 @@ function NewFamiliesOrientation() {
 	}
 }
 
+function sendReminders() {
+	foreach (FamilyTracker::GetAll() as $tracker) {
+		if ($tracker->currentYear != EnumFamilyTracker::enum('pendingRegistration')) continue;
+		Reminder($tracker->family, $tracker->previousYear);
+		die ("no reason to live\n");
+	}
+}
+
+function Reminder($familyId, $prev) {
+	$family = Family::GetItemById($familyId);
+	$mail = SetupMail();
+	
+	//SetFamilyAddress($mail, $family);
+	$mail->AddAddress("voting@vidyalaya.us", $family->father->fullName());
+
+	$mail->Subject = "Gentle Reminder, Family $family->id";
+  $salutation = "<p>Dear " . $family->parentsName() . ",";
+  
+  if ($prev == EnumFamilyTracker::enum('waitlist')) {
+  	$salutation = "<p>Priority Date " . $family->priority_date;
+  	$body = <<<BODY_WAITING
+  	waitlist
+BODY_WAITING;
+  } else {
+  	$body = <<<BODY_REGD
+  	registered
+BODY_REGD;
+  }
+  
+  $checklist = <<<CHECKLIST
+  check list
+CHECKLIST;
+  $mail->Body = $salutation . $body. $checklist;
+  $mail->AltBody = "This is the body when user views in plain text format"; //Text Body
+
+  	print "Family id: $family->id, Name: " . $family->parentsName() . "\n";
+  
+
+  if(!$mail->Send()) {
+    echo "Mailer Error: " . $mail->ErrorInfo . "\n";
+  }  else {
+    echo "Message has been sent\n";
+  }
+}
+
+sendReminders();
+exit;
 
 $students = GetAllData();
 
