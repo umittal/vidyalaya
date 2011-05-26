@@ -175,8 +175,11 @@ function NewFamiliesOrientation() {
 function sendReminders() {
 	foreach (FamilyTracker::GetAll() as $tracker) {
 		if ($tracker->currentYear != EnumFamilyTracker::enum('pendingRegistration')) continue;
+
+		if ($tracker->previousYear == EnumFamilyTracker::enum('waitlist')) {
 		Reminder($tracker->family, $tracker->previousYear);
 		die ("no reason to live\n");
+		}
 	}
 }
 
@@ -187,23 +190,30 @@ function Reminder($familyId, $prev) {
 	//SetFamilyAddress($mail, $family);
 	$mail->AddAddress("voting@vidyalaya.us", $family->father->fullName());
 
-	$mail->Subject = "Gentle Reminder, Family $family->id";
+	$mail->Subject = "Gentle Reminder, Family- $family->id";
   $salutation = "<p>Dear " . $family->parentsName() . ",";
   
   if ($prev == EnumFamilyTracker::enum('waitlist')) {
-  	$salutation = "<p>Priority Date " . $family->priority_date;
+    //  	$salutation .= "<p>Priority Date " . $family->priority_date;
   	$body = <<<BODY_WAITING
-  	waitlist
+	  <p>We are sending you this reminder because you had sent a request to join Vidyalaya on $family->priority_date. We have sent you the registration material but have not heard back from you. Please complete and mail your registration at the earliest. We will clear our wait list on June 5 and any request received after that will be assigned a new priority date. If you are not able to find your registration material, please let us know and we will send you the email again. If you have decided not to enroll this year for some reason, please do let us know so we can stop sending you reminders.
+
 BODY_WAITING;
   } else {
   	$body = <<<BODY_REGD
-  	registered
+
+	  <p>We had sent you an email on April 26 with the registration material. The deadline was May 14 but we have not heard from you. We look forward to working with you again next year. Please mail your application at the earliest so we can start working on putting the school together. If for some reason, you are unable to join, please let us know and we will stop sending you reminders. We hope to collect all remaining applications by June 5. It may be difficult to guarantee a spot after that.
+
 BODY_REGD;
   }
   
   $checklist = <<<CHECKLIST
-  check list
+    <p>Before you submit your registration papers, please make sure that the amount on the check is correct and the family ID is written on it. We request Registration Form (one per family) and Medical Forms (one per student) back. All pages must be signed and dated at the bottom. Please do not forget to put volunteering codes in the Registration Form.
+
+  <p>The completed paperwork can be mailed to PO BOX 775, Morris Plain, NJ 07950.
+
 CHECKLIST;
+
   $mail->Body = $salutation . $body. $checklist;
   $mail->AltBody = "This is the body when user views in plain text format"; //Text Body
 
@@ -217,8 +227,9 @@ CHECKLIST;
   }
 }
 
-//sendReminders();
-//exit;
+
+sendReminders();
+exit;
 
 $students = GetAllData();
 
