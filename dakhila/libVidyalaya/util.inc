@@ -142,6 +142,7 @@ class EnumFamilyTracker {
 	const movingAway = 4;
 	const notInterested = 5;
 	const nextYear=6;
+	const tooExpensive=7;
 
     public function enum($string){
     	
@@ -159,6 +160,7 @@ class EnumFamilyTracker {
     		case self::movingAway: return "movingAway";
     		case self::notInterested: return "notInterested";
     		case self::nextYear: return "nextYear";
+    		case self::tooExpensive: return "tooExpensive";
     	}
     }
 }

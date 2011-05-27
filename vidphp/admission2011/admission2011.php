@@ -28,7 +28,7 @@ function SetupMail() {
 
 // set the TO address field of mail to family's email address
 function SetFamilyAddress(&$mail, $family) {
-//	$mail->AddAddress("umesh@vidyalaya.us", "Testing post orientation"); 	return;
+  //	$mail->AddAddress("umesh@vidyalaya.us", "Testing post orientation"); 	return;
 	
   foreach (explode(";", $family->mother->email) as $toAddress) {
     if (!empty($toAddress)) {
@@ -176,9 +176,10 @@ function sendReminders() {
 	foreach (FamilyTracker::GetAll() as $tracker) {
 		if ($tracker->currentYear != EnumFamilyTracker::enum('pendingRegistration')) continue;
 
-		if ($tracker->previousYear == EnumFamilyTracker::enum('waitlist')) {
+#		if ($tracker->previousYear == EnumFamilyTracker::enum('waitlist')) {
+		if ($tracker->family > 347) {
 		Reminder($tracker->family, $tracker->previousYear);
-		die ("no reason to live\n");
+#		die ("no reason to live\n");
 		}
 	}
 }
@@ -187,8 +188,8 @@ function Reminder($familyId, $prev) {
 	$family = Family::GetItemById($familyId);
 	$mail = SetupMail();
 	
-	//SetFamilyAddress($mail, $family);
-	$mail->AddAddress("voting@vidyalaya.us", $family->father->fullName());
+	SetFamilyAddress($mail, $family);
+	//	$mail->AddAddress("voting@vidyalaya.us", $family->father->fullName());
 
 	$mail->Subject = "Gentle Reminder, Family- $family->id";
   $salutation = "<p>Dear " . $family->parentsName() . ",";
