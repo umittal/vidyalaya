@@ -42,6 +42,7 @@ print '
 <tr><td><a href="php/dataViewer.php?command=Family&familyId=47">Family Detail</tr>
 <tr><td><a href="php/dataViewer.php?command=Registration&familyId=47">Registration Form</tr>
 <tr><td><a href="php/dataViewer.php?command=MedicalForm&studentId=1446">Medical Form</tr>
+<tr><td><a href="php/dataViewer.php?command=RegistrationSummary">2011 Registration Summary</tr>
 </table>
 ';
 

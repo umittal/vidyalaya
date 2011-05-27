@@ -786,13 +786,13 @@ class FamilyTracker {
 	const facility = 1;
 	const prevYear = 0;
 	const currYear = 1;
-	
+
 	public $year=null;
 	public $family = null;
 	public $previousYear = null;
 	public $currentYear =null;
 	public $tuition =null;
-	
+
 	public static $objArray = Array ();
 
 	private static function firstTimeCall() {
@@ -804,12 +804,12 @@ class FamilyTracker {
 			if (!array_key_exists($key, self::$objArray)) self::$objArray[$key] = new self($row);
 		}
 	}
-	
+
 	public static function GetItemById($key) {
-	 	self::firstTimeCall();
-	 	return self::$objArray[$key];
-	 }	
-	
+		self::firstTimeCall();
+		return self::$objArray[$key];
+	}
+
 	public static function GetAll() {
 		self::firstTimeCall();
 		return self::$objArray;
@@ -822,12 +822,12 @@ class FamilyTracker {
 		$this->currentYear = $row["FamilyTracker.currentYear"];
 		$this->tuition = $row["FamilyTracker.tuition"];
 	}
-	
+
 
 	private static function createInsertString($familyID, $prevStatus, $currStatus) {
-		return " (" . self::currYear . ", $familyID, $prevStatus, $currStatus, 0)";		
-	} 
-	
+		return " (" . self::currYear . ", $familyID, $prevStatus, $currStatus, 0)";
+	}
+
 	public static function UpdateFamilyTracker() {
 		self::firstTimeCall();
 
@@ -849,15 +849,15 @@ class FamilyTracker {
 				self::$objArray[$family->id] = 1;
 			}
 		}
-		
+
 		if (count($insert) > 0) {
-		print "count of insert is " . count($insert) . "\n";
-		$result = VidDb::query("insert into FamilyTracker values " . implode (", ", $insert));
+			print "count of insert is " . count($insert) . "\n";
+			$result = VidDb::query("insert into FamilyTracker values " . implode (", ", $insert));
 		} else {
 		}
-			print "nothing to add\n";
+		print "nothing to add\n";
 	}
-	
+
 	private static function  verifyParent($family, $child) {
 		print "I was here\n";
 		$student = Student::GetItemById($child);
@@ -867,68 +867,67 @@ class FamilyTracker {
 			print "parent child ok: family $family, child $child\n";
 		}
 	}
-	
+
 	public static function loadPayments () {
-	//FamilyTracker::firstTimeCall();
-	$filename = "/tmp/2011.csv";
-	if (($handle = fopen($filename, "r")) !== FALSE) {
-		$header = fgetcsv($handle, 0, ",");
-		$header = fgetcsv($handle, 0, ",");
-		$i=1;
-		while ((list($family,$Check , $base, $new , $DVD , $CD , $PB , $Bag , $Ann , $Total ,$foo, $ch1 , $ch2 , $ch3 )
-		= fgetcsv($handle, 0, ",")) !== FALSE) {
-			if (!empty($family)) {
-					
-				$tuition = str_replace('$', "", $base) + str_replace("$", "", $new);
-				$tracker = FamilyTracker::GetItemById($family);
-				if (empty($tracker)) throw new Exception("family $family not found in tracker, weird");
-					
-				if ($tracker->tuition != $tuition) {
-					$sql = "update FamilyTracker set tuition = $tuition, currentYear = " .  EnumFamilyTracker::enum('registered');
-					$sql .= " where family = $family and year= " . FamilyTracker::currYear . ";\n";
-					$result = VidDb::query($sql);
-					print $i++ . "$sql \n";
-				} else {
-					print "Tuition is correct for $family, $base, $new, $tuition, $tracker->tuition\n";
+		//FamilyTracker::firstTimeCall();
+		$filename = "/tmp/2011.csv";
+		if (($handle = fopen($filename, "r")) !== FALSE) {
+			$header = fgetcsv($handle, 0, ",");
+			$header = fgetcsv($handle, 0, ",");
+			$i=1;
+			while ((list($family,$Check , $base, $new , $DVD , $CD , $PB , $Bag , $Ann , $Total ,$foo, $ch1 , $ch2 , $ch3 )
+			= fgetcsv($handle, 0, ",")) !== FALSE) {
+				if (!empty($family)) {
+						
+					$tuition = str_replace('$', "", $base) + str_replace("$", "", $new);
+					$tracker = FamilyTracker::GetItemById($family);
+					if (empty($tracker)) throw new Exception("family $family not found in tracker, weird");
+						
+					if ($tracker->tuition != $tuition) {
+						$sql = "update FamilyTracker set tuition = $tuition, currentYear = " .  EnumFamilyTracker::enum('registered');
+						$sql .= " where family = $family and year= " . FamilyTracker::currYear . ";\n";
+						$result = VidDb::query($sql);
+						print $i++ . "$sql \n";
+					} else {
+						print "Tuition is correct for $family, $base, $new, $tuition, $tracker->tuition\n";
+					}
+					if (!empty($ch1)) self::verifyParent($family, $ch1);
+					if (!empty($ch2)) self::verifyParent($family, $ch2);
+					if (!empty($ch3)) self::verifyParent($family, $ch3);
+
 				}
-				if (!empty($ch1)) self::verifyParent($family, $ch1);
-				if (!empty($ch2)) self::verifyParent($family, $ch2);
-				if (!empty($ch3)) self::verifyParent($family, $ch3);
-				
 			}
 		}
 	}
-}
-	
-	
+
+
 	public static function ReportPending() {
 		$i=1;
 		foreach (self::GetAll() as $tracker) {
 			if ($tracker->currentYear != EnumFamilyTracker::enum('pendingRegistration')) continue;
-			
+				
 			$family = Family::GetItemById ($tracker->family);
-			
+				
 			$fields = Array();
 			$fields[] = $i++;
-		 	$fields[] = $family->id;
-		 	$fields[] = $tracker->previousYear == EnumFamilyTracker::enum('waitlist') ? $family->priority_date : "Registered";
-		 	$fields[] = $family->phone;
-		 	$fields[] = $family->parentsName();
-		 	$fields[] = $family->mother->email;
-		 	$fields[] = $family->father->email;
-		 	
-		 	$fields[] = $family->mother->workPhone;
-		 	$fields[] = $family->mother->cellPhone;
-		 	
-		 	$fields[] = $family->father->workPhone;
-		 	$fields[] = $family->father->cellPhone;
-		 	
-		 	print implode (", ", $fields) . "\n";
-		 	
+			$fields[] = $family->id;
+			$fields[] = $tracker->previousYear == EnumFamilyTracker::enum('waitlist') ? $family->priority_date : "Registered";
+			$fields[] = $family->phone;
+			$fields[] = $family->parentsName();
+			$fields[] = $family->mother->email;
+			$fields[] = $family->father->email;
+
+			$fields[] = $family->mother->workPhone;
+			$fields[] = $family->mother->cellPhone;
+
+			$fields[] = $family->father->workPhone;
+			$fields[] = $family->father->cellPhone;
+
+			print implode (", ", $fields) . "\n";
 		}
 	}
 }
-	
+
 
 // Query that is used to load all the students in classes
 function CreateDatabaseQueryRegisteredStudents() {

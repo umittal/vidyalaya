@@ -486,7 +486,8 @@ function ConvertTeacherToObject() {
 
 //FamilyTracker::UpdateFamilyTracker();
 //FamilyTracker::loadPayments();
-FamilyTracker::ReportPending();
+//FamilyTracker::ReportPending();
+FamilyTracker::TrackerSummary();
 //
 exit;
 //emailListForVasudhaRegdParents();

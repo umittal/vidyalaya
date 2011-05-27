@@ -143,6 +143,7 @@ class EnumFamilyTracker {
 	const notInterested = 5;
 	const nextYear=6;
 	const tooExpensive=7;
+	const sportsConflict=8;
 
     public function enum($string){
     	
@@ -161,6 +162,8 @@ class EnumFamilyTracker {
     		case self::notInterested: return "notInterested";
     		case self::nextYear: return "nextYear";
     		case self::tooExpensive: return "tooExpensive";
+    		case self::sportsConflict: return "sportsConflict";
+    		default: return "Unknown $id";
     	}
     }
 }

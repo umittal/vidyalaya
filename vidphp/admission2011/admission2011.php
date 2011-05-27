@@ -228,9 +228,8 @@ CHECKLIST;
   }
 }
 
-
-sendReminders();
-exit;
+//sendReminders();
+//exit;
 
 $students = GetAllData();
 

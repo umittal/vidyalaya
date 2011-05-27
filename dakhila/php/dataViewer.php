@@ -52,10 +52,10 @@ switch ($command) {
 		break;
 		
 		
-		case "MedicalForm":
+	case "MedicalForm":
 		$studentId=$_GET["studentId"];
 		if ($studentId =="") $studentId="1446";
-		
+
 		foreach ($students as $id => $student) {
 			if ($student->id == $studentId) {
 				DisplayStudentMedicalInformationV2($template, $student);
@@ -63,6 +63,21 @@ switch ($command) {
 		}
 		$html= $template->get();
 		break;
+
+	case "RegistrationSummary":
+		$sql = "select previousYear, currentYear, count(*) from FamilyTracker where year = 1 group by previousYear, currentYear";
+		$result = VidDb::query($sql);
+		print "<html><body><table>\n";
+		while ($row = mysql_fetch_array($result)) {
+			print "<tr><td>";
+			print EnumFamilyTracker::NameFromId($row[0]) . "</td><td> " . EnumFamilyTracker::NameFromId($row[1]) .
+			"</td><td> " . $row[2] ;
+
+			print "</td></tr>\n";
+		}
+		print "\n</table></body></html>";		
+		break;
+
 	default:
 		$html = "<p>Please specify a valid command for the data you want to see";
 }
