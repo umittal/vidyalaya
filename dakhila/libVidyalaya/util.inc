@@ -155,14 +155,14 @@ class EnumFamilyTracker {
     
     public static function NameFromId($id) {
     	switch ($id) {
-    		case self::registered: return "registered";
-    		case self::waitlist: return "waitlist";
-    		case self::pendingRegistration: return "pendingRegistration";
-    		case self::movingAway: return "movingAway";
-    		case self::notInterested: return "notInterested";
-    		case self::nextYear: return "nextYear";
-    		case self::tooExpensive: return "tooExpensive";
-    		case self::sportsConflict: return "sportsConflict";
+    		case self::registered: return "Registered";
+    		case self::waitlist: return "Waitlist";
+    		case self::pendingRegistration: return "Pending";
+    		case self::movingAway: return "Moved Out";
+    		case self::notInterested: return "Not Interested";
+    		case self::nextYear: return "Next Year";
+    		case self::tooExpensive: return "Too Expensive";
+    		case self::sportsConflict: return "Sports Conflict";
     		default: return "Unknown $id";
     	}
     }
