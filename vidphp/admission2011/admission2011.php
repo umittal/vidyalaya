@@ -176,11 +176,11 @@ function sendReminders() {
 	foreach (FamilyTracker::GetAll() as $tracker) {
 		if ($tracker->currentYear != EnumFamilyTracker::enum('pendingRegistration')) continue;
 
-#		if ($tracker->previousYear == EnumFamilyTracker::enum('waitlist')) {
-		if ($tracker->family > 347) {
-		Reminder($tracker->family, $tracker->previousYear);
-#		die ("no reason to live\n");
-		}
+//		if ($tracker->previousYear != EnumFamilyTracker::enum('waitlist')) {
+if ($tracker->family==472)
+			Reminder($tracker->family, $tracker->previousYear);
+//			die ("no reason to live\n");
+	//}
 	}
 }
 
@@ -191,27 +191,40 @@ function Reminder($familyId, $prev) {
 	SetFamilyAddress($mail, $family);
 	//	$mail->AddAddress("voting@vidyalaya.us", $family->father->fullName());
 
-	$mail->Subject = "Gentle Reminder, Family- $family->id";
+	$mail->Subject = "Admission Reminder, Family- $family->id";
   $salutation = "<p>Dear " . $family->parentsName() . ",";
   
   if ($prev == EnumFamilyTracker::enum('waitlist')) {
     //  	$salutation .= "<p>Priority Date " . $family->priority_date;
   	$body = <<<BODY_WAITING
-	  <p>We are sending you this reminder because you had sent a request to join Vidyalaya on $family->priority_date. We have sent you the registration material but have not heard back from you. Please complete and mail your registration at the earliest. We will clear our wait list on June 5 and any request received after that will be assigned a new priority date. If you are not able to find your registration material, please let us know and we will send you the email again. If you have decided not to enroll this year for some reason, please do let us know so we can stop sending you reminders.
+	  <p>We are sending you this reminder because you had sent a request to join Vidyalaya on $family->priority_date. 
+	  We have sent you the registration material but have not heard back from you. 
+	  
+	  <p> 
+	  We will clear our wait list today and any request received after that will be assigned a new priority date. 
+	  Please let us know today if you are mailing your forms soon. 
 
 BODY_WAITING;
   } else {
   	$body = <<<BODY_REGD
 
-	  <p>We had sent you an email on April 26 with the registration material. The deadline was May 14 but we have not heard from you. We look forward to working with you again next year. Please mail your application at the earliest so we can start working on putting the school together. If for some reason, you are unable to join, please let us know and we will stop sending you reminders. We hope to collect all remaining applications by June 5. It may be difficult to guarantee a spot after that.
+	  <p>We had sent you an email on April 26 with the registration material. The deadline was May 14 but we have 
+	  not received your registration papers. 
+	  <p> 
+	  We would like to close the registration process now. If for some reason, you are unable to join, please 
+	  drop us a line and we will stop sending you reminders. Please also let us know if you are mailing your forms.  
 
 BODY_REGD;
   }
   
   $checklist = <<<CHECKLIST
-    <p>Before you submit your registration papers, please make sure that the amount on the check is correct and the family ID is written on it. We request Registration Form (one per family) and Medical Forms (one per student) back. All pages must be signed and dated at the bottom. Please do not forget to put volunteering codes in the Registration Form.
+    <p>Before you submit your registration papers, please make sure that the amount on the check is correct and the 
+    family ID is written on it. We request Registration Form (one per family) and Medical Forms (one per student) back. 
+    All pages must be signed and dated at the bottom. Please do not forget to put volunteering codes in the Registration Form.
 
   <p>The completed paperwork can be mailed to PO BOX 775, Morris Plain, NJ 07950.
+  <p>Umesh Mittal <br>
+  Admissions
 
 CHECKLIST;
 
@@ -227,6 +240,55 @@ CHECKLIST;
     echo "Message has been sent\n";
   }
 }
+
+function OrientationCheck() {
+	$filename = "orientation1.txt";
+	if (($handle = fopen($filename, "r")) !== FALSE) {
+		while ((list($familyid,$Check)=
+		fgetcsv($handle, 0, ",")) !== FALSE) {
+			if (!empty($Check)) continue;
+			$family = Family::GetItemById($familyid);
+			$currentYear = FamilyTracker::CurrentYearStatus ($family->id);
+			if ($currentYear == 3){
+				$mail = SetupMail();
+				print "$family->id, " .  $family->parentsName() . "\n";
+				continue;
+				SetFamilyAddress($mail, $family);
+				//$mail->AddAddress("voting@vidyalaya.us", $family->father->fullName());
+				$mail->Subject = "Vidyalaya Orientation Followup, Family- $family->id";
+				$salutation = "<p>Dear " . $family->parentsName() . ",";
+				$body = <<<BODY_WAITING
+	  <p>It was nice meeting you at our Orientation on May 17, 2011. Our records indicate that we have not yet received 
+	  your registration form. <p> If you have decided 
+	  not to enroll, please let us know so we can stop following up with you.
+	  <p>
+	  Thank you,
+	  <p>
+	  Umesh MIttal<br>
+	  Admissions
+
+BODY_WAITING;
+
+				
+				$mail->Body = $salutation . $body;
+				$mail->AltBody = "This is the body when user views in plain text format"; //Text Body
+
+				 
+				print "$family->id, " .  $family->parentsName() . "\n";
+				continue;
+				if(!$mail->Send()) {
+					echo "Mailer Error: " . $mail->ErrorInfo . "\n";
+				}  else {
+					echo "Message has been sent\n";
+					
+				}
+			}
+		}
+
+	}
+}
+
+//OrientationCheck(); exit();
 
 //sendReminders();
 //exit;

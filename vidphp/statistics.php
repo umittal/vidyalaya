@@ -484,8 +484,8 @@ function ConvertTeacherToObject() {
 }
 
 
-FamilyTracker::UpdateFamilyTracker();
-//FamilyTracker::loadPayments();
+//FamilyTracker::UpdateFamilyTracker();
+FamilyTracker::loadPayments();
 //FamilyTracker::ReportPending();
 //FamilyTracker::TrackerSummary();
 //

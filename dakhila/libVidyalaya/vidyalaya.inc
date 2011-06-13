@@ -92,6 +92,7 @@ class Student {
   public $gender=null;
   public $dateOfBirth=null;
   public $email=null;
+  public $cellPhone=null;
   public $IsEnrolled = false;
   public $family = null;
   public $registration=null;
@@ -197,6 +198,7 @@ class Student {
     $this->lastName = $row["Students2003.LAST_NAME"];
     $this->gender = $row["Students2003.GENDER"];
     $this->email = $row["Students2003.EMAIL"];
+    $this->cellPhone = $row["Students2003.cellphone"];
 
 
     $dob = $row["Students2003.DOB"];
@@ -794,11 +796,12 @@ class FamilyTracker {
 	public $tuition =null;
 
 	public static $objArray = Array ();
+	public static $students = Array ();
 
 	private static function firstTimeCall() {
 		if (!empty(self::$objArray)) return;
 		$query = "select * from FamilyTracker";
-		$result = VidDb::query($query);
+		$result  = VidDb::query($query);
 		while ($row = mysql_fetch_alias_array($result)) {
 			$key = $row["FamilyTracker.family"];
 			if (!array_key_exists($key, self::$objArray)) self::$objArray[$key] = new self($row);
@@ -813,6 +816,11 @@ class FamilyTracker {
 	public static function GetAll() {
 		self::firstTimeCall();
 		return self::$objArray;
+	}
+	
+	public static function CurrentYearStatus ($family){
+		self::firstTimeCall();
+		return self::$objArray[$family]->currentYear;
 	}
 
 	public function __construct($row) {
@@ -859,12 +867,13 @@ class FamilyTracker {
 	}
 
 	private static function  verifyParent($family, $child) {
-		print "I was here\n";
+		//print "I was here\n";
 		$student = Student::GetItemById($child);
+		self::$students[$child] = $student;
 		if ($student->family->id != $family) {
 			print "parent error: family $family, child $child, family should be " . $student->family->id . "\n";
 		} else {
-			print "parent child ok: family $family, child $child\n";
+			//print "parent child ok: family $family, child $child\n";
 		}
 	}
 
@@ -875,28 +884,75 @@ class FamilyTracker {
 			$header = fgetcsv($handle, 0, ",");
 			$header = fgetcsv($handle, 0, ",");
 			$i=1;
+			$totalTuition=0;
+			$done=array();
+			$fileTuition = array();
 			while ((list($family,$Check , $base, $new , $DVD , $CD , $PB , $Bag , $Ann , $Total ,$foo, $ch1 , $ch2 , $ch3 )
 			= fgetcsv($handle, 0, ",")) !== FALSE) {
 				if (!empty($family)) {
-						
+
 					$tuition = str_replace('$', "", $base) + str_replace("$", "", $new);
-					$tracker = FamilyTracker::GetItemById($family);
-					if (empty($tracker)) throw new Exception("family $family not found in tracker, weird");
-						
-					if ($tracker->tuition != $tuition) {
-						$sql = "update FamilyTracker set tuition = $tuition, currentYear = " .  EnumFamilyTracker::enum('registered');
-						$sql .= " where family = $family and year= " . FamilyTracker::currYear . ";\n";
-						$result = VidDb::query($sql);
-						print $i++ . "$sql \n";
-					} else {
-						print "Tuition is correct for $family, $base, $new, $tuition, $tracker->tuition\n";
-					}
+					$totalTuition += $tuition;
+					
+					
+					if (empty($fileTuition[$family]))  $fileTuition[$family] = 0;
+					$fileTuition[$family]  += $tuition;
+
 					if (!empty($ch1)) self::verifyParent($family, $ch1);
 					if (!empty($ch2)) self::verifyParent($family, $ch2);
 					if (!empty($ch3)) self::verifyParent($family, $ch3);
 
 				}
 			}
+			
+			foreach ($fileTuition as $family => $tuition) {
+				$tracker = FamilyTracker::GetItemById($family);
+				if (empty($tracker)) throw new Exception("family $family not found in tracker, weird");
+				if ($tracker->tuition != $tuition) {
+					$sql = "update FamilyTracker set tuition = $tuition, currentYear = " .  EnumFamilyTracker::enum('registered');
+					$sql .= " where family = $family and year= " . FamilyTracker::currYear . ";\n";
+					$result = VidDb::query($sql);
+					print $i++ . "$sql \n";
+					
+				} 
+				$done[$family] = 1;
+			}
+				
+			
+			foreach(FamilyTracker::GetAll() as $tracker) {
+				$family = $tracker->family;
+				if ($tracker->tuition != 0) {
+					if  ($done[$family] != 1) {
+						print "check family " . $tracker->family . "\n";
+					}
+						
+				}
+			}
+			
+			$sql="select sum(tuition) from FamilyTracker where year= " . FamilyTracker::currYear;
+			$result = VidDb::query($sql);
+			$row = mysql_fetch_array($result);
+			$databaseTuition = $row[0];
+			$tuitionCheck = $databaseTuition == $totalTuition ? "OK" : "FAIL";
+			print "Total Tuition in file = " . $totalTuition . ", Database = " . $databaseTuition . ", Check: $tuitionCheck" . "\n";
+			
+			$lang = array();
+			$grade = array();
+			foreach (self::$students as $student) {
+				$level = $student->GradeAt(Calendar::RegistrationSession);
+				if ($level > 9) $level = 9;
+				if ($level != "KG")
+				empty($lang[$student->languagePreference]) ? $lang[$student->languagePreference]=1 : $lang[$student->languagePreference]++;
+				empty($grade[$level]) ? $grade[$level]= 1 : $grade[$level]++ ;
+			}
+			foreach ($lang as $key => $value) {
+				print "Language: $key, Count: $value\n";
+			}
+			foreach ($grade as $key => $value) {
+				print "Grade: $key, Count: $value\n";
+			}
+			
+			print "Count of Students = " . count(self::$students) . "\n";
 		}
 	}
 

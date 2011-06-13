@@ -32,7 +32,7 @@ function trimOffEnd( $off, $str ) {
 
 function preg_grep_keys ($pattern, $input, $flags=0) {
 
-  $keys = preg_grep("/{$pattern}/", array_keys($input), $flags);
+  $keys = preg_grep("/{$pattern}/i", array_keys($input), $flags);
   $vals = array();
 
   foreach ($keys as $key) {
