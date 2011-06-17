@@ -243,12 +243,14 @@ CHECKLIST;
 
 function OrientationCheck() {
 	$filename = "orientation1.txt";
+	$count = array();
 	if (($handle = fopen($filename, "r")) !== FALSE) {
 		while ((list($familyid,$Check)=
 		fgetcsv($handle, 0, ",")) !== FALSE) {
 			if (!empty($Check)) continue;
 			$family = Family::GetItemById($familyid);
 			$currentYear = FamilyTracker::CurrentYearStatus ($family->id);
+			empty($count[$currentYear]) ? $count[$currentYear]=1 : $count[$currentYear]++;
 			if ($currentYear == 3){
 				$mail = SetupMail();
 				print "$family->id, " .  $family->parentsName() . "\n";
@@ -284,9 +286,300 @@ BODY_WAITING;
 				}
 			}
 		}
+		foreach ($count as $key => $value) {
+			print EnumFamilyTracker::NameFromId($key) . ", $value\n";
+		}
 
 	}
 }
+
+class Mail {
+	public static function SetupMail() {
+
+		$email = "Admission2011@vidyalaya.us";
+		$name = "Vidyalaya Admissions";
+
+		$mail = new PHPMailer(false);
+		$mail->IsSMTP(); // send via SMTP
+		$mail->SMTPAuth = true; // turn on SMTP authentication
+		$mail->Username = $email; // SMTP username
+		$mail->Password = "Praveen38"; // SMTP password
+		$mail->From = $email;
+		$mail->FromName = $name;
+		$mail->AddReplyTo($email,$name);
+		$mail->IsHTML(true); // send as HTML
+		$mail->WordWrap = 50; // set word wrap
+
+		return $mail;
+	}
+
+	// set the TO address field of mail to family's email address
+	public static function SetFamilyAddress(&$mail, $family, $test) {
+		//	$mail->AddAddress("umesh@vidyalaya.us", "Testing post orientation"); 	return;
+
+		foreach (explode(";", $family->mother->email) as $toAddress) {
+			if (!empty($toAddress)) {
+				print "I will send to ". $family->id . ": Mother: " . $family->mother->fullName() . ": " .  $toAddress . "\n";
+				$mail->AddAddress($toAddress, $family->mother->fullName());
+			}
+
+		};
+
+		foreach (explode(";", $family->father->email) as $toAddress) {
+			if (!empty($toAddress)) {
+				print "I will send to ". $family->id . ": Father: " . $family->father->fullName() . ": " .  $toAddress . "\n";
+				$mail->AddAddress($toAddress, $family->father->fullName());
+			}
+
+		}
+
+	}
+
+}
+
+class Admission {
+	const DataFile = "/tmp/2011.csv";
+	
+	public static function  mailFamily($family, $subject, $body, $test) {
+		$mail = Mail::SetupMail();
+		Mail::SetFamilyAddress($mail, $family, $test);
+		$mail->Subject = $subject;
+
+		$salutation = "<p>Dear " . $family->parentsName() . ",";
+		$footer = "<p>Umesh Mittal<br>Admissions</p>";
+
+		$mail->Body = $salutation . $body . $footer;
+		$mail->AltBody = "This is the body when user views in plain text format"; //Text Body
+		
+		if(!$mail->Send()) {
+			echo "Mailer Error: Family: $family->id: " . $mail->ErrorInfo . "\n";
+		}  else {
+			echo "Message has been sent, Family: $family->id:\n";	
+		}
+	}
+
+	public static function itemDelivery() {
+		$totalCD = array();
+		$totalPB = array();
+		$totalBag = array();
+		$totalFamily = array();
+		
+		if (($handle = fopen(self::DataFile, "r")) !== FALSE) {
+			$header = fgetcsv($handle, 0, ",");
+			$header = fgetcsv($handle, 0, ",");
+			$i=1;
+			$totalTuition=0;
+			$done=array();
+			$fileTuition = array();
+			while ((list($family,$Check , $base, $new , $DVD , $CD , $PB , $Bag , $Ann , $Total ,$foo, $ch1 , $ch2 , $ch3 )
+			= fgetcsv($handle, 0, ",")) !== FALSE) {
+				if (!empty($family)) {
+					$CD = str_replace('$', "",$CD);
+					$PB = str_replace('$', "",$PB);
+					$Bag = str_replace('$', "",$Bag);
+
+					if (empty($totalFamily[$family])) {
+						$totalFamily[$family] =0;
+						$totalCD[$family] = 0;
+						$totalPB[$family] = 0;
+						$totalBag[$family] = 0;
+					}
+					$totalFamily[$family] +=$CD+$PB+$Bag;
+					$totalCD[$family] += $CD;
+					$totalPB[$family] += $PB;
+					$totalBag[$family] += $Bag;
+						
+				}
+			}
+		}
+
+		$grandTotal = 0;
+		foreach ($totalFamily as $family => $total) {
+			if ($total == 0 ) continue;
+			print "$family, $totalCD[$family], $totalPB[$family], $totalBag[$family], $totalFamily[$family]\n";
+			$grandTotal += $total;
+		}
+		print "Grand Total = $grandTotal\n";
+	}
+}
+
+class TwoYearEnrollment {
+	public $language=null;
+	public $languageLevel=null;
+	public $languageSection=null;
+
+	public $cultureLevel=null;
+	public $cultureSection=null;
+	
+	public function updateFromEnrollment($enrollment) {
+		$department = $enrollment->class->course->department;
+
+		if ($department == Department::Culture) {
+			$this->cultureLevel = $enrollment->class->course->level;
+			$this->cultureSection = $enrollment->class->section;
+				
+		} else {
+			$this->language =  $enrollment->class->course->department;
+			$this->languageLevel  = $enrollment->class->course->level;
+			$this->languageSection = $enrollment->class->section;
+				
+		}
+	}
+
+	public function updateFromStudent($student) {
+		$this->language = $student->languagePreference;
+		$this->cultureLevel = $student->GradeAt(Calendar::RegistrationSession);
+	}
+	
+	public function csv() {
+		$fields = Array();
+		$fields[] = Department::NameFromId($this->language);
+		$fields[] = $this->languageLevel;
+		$fields[] = $this->languageSection;
+		$fields[] = $this->cultureLevel;
+		$fields[] = $this->cultureSection;
+		return implode (", ", $fields);
+	}
+}
+
+
+class TwoYearLayout {
+	public $previousYear = null;
+	public $thisYear = null;
+	public $status=null;
+
+	const Leaving = "Leaving";
+	const NewStudent = "New";
+	
+	private static $objArray = Array ();
+
+	private static function firstTimeCall() {
+		if (!empty(self::$objArray)) return;
+		self::prevYearFromDatabase();
+		self::currentYearFromFile();
+		self::updateStatus();
+	}
+
+	public static function GetItemById($key) {
+		self::firstTimeCall();
+		return self::$objArray[$key];
+	}
+	
+	public static function GetAll() {
+		self::firstTimeCall();
+		return self::$objArray;
+	}
+	
+	private static function updateStatus() {
+		foreach (self::$objArray as $twoyear) {
+			if ($twoyear->previousYear->language == null) {
+				if ($twoyear->thisYear->language != null) $twoyear->status = self::NewStudent;
+			} else {
+				if ($twoyear->thisYear->language == null) {
+					$twoyear->status = self::Leaving;
+					continue;
+				} 
+				if ($twoyear->previousYear->language == Department::Kindergarten) {
+					$twoyear->status ="Continuing";
+				} else {
+					$twoyear->status = $twoyear->previousYear->language == $twoyear->thisYear->language ? "Continuing" : "Change";
+				}
+			}
+		}
+		
+	}
+
+	private static function prevYearFromDatabase () {
+		foreach (Enrollment::GetAllEnrollmentForFacilitySession(1,0) as $enrollment) {
+			if (empty(self::$objArray[$enrollment->student->id])) self::$objArray[$enrollment->student->id] = new TwoYearLayout();
+			$twoyear = self::GetItemById($enrollment->student->id);
+			$twoyear->previousYear->updateFromEnrollment($enrollment);
+		}
+	}
+
+	private static function updateNewStudent($studentId) {
+		$student = Student::GetItemById($studentId);
+		if (empty($student)) print "student not found for id ==$studentId==";
+		if (empty(self::$objArray[$studentId])) self::$objArray[$studentId] = new TwoYearLayout();
+		$twoyear = self::GetItemById($studentId);
+		$twoyear->thisYear->updateFromStudent($student); 
+	}
+
+	private static function currentYearFromFile() {
+		$filename = "/tmp/2011.csv";
+		if (($handle = fopen($filename, "r")) !== FALSE) {
+			$header = fgetcsv($handle, 0, ",");
+			$header = fgetcsv($handle, 0, ",");
+			$i=1;
+			$totalTuition=0;
+			$done=array();
+			$fileTuition = array();
+			while ((list($family,$Check , $base, $new , $DVD , $CD , $PB , $Bag , $Ann , $Total ,$foo, $ch1 , $ch2 , $ch3 )
+			= fgetcsv($handle, 0, ",")) !== FALSE) {
+				if (!empty($family)) {
+					if (!empty($ch1)) self::updateNewStudent($ch1);
+					if (!empty($ch2)) self::updateNewStudent($ch2);
+					if (!empty($ch3)) self::updateNewStudent($ch3);
+				}
+			}
+		}
+	}
+
+	public static  function twoyearstudents() {
+		self::firstTimeCall();
+		
+		$feeRequired = Array();
+		$newRegFee = Array();
+		
+		foreach (self::$objArray as $studentid => $twoYear) {
+			$student = Student::GetItemById($studentid);
+			$familyid = $student->family->id;
+			
+			$fields = Array();
+			$fields[] = $studentid;
+			$fields[] = $familyid;
+			$fields[] = $twoYear->previousYear->csv();
+			$fields[] = $twoYear->thisYear->csv();
+			$fields[] = $twoYear->status;
+			$fields[] = EnumFamilyTracker::NameFromId(FamilyTracker::CurrentYearStatus($familyid));
+			$fields[] = $student->fullName();
+			
+//			print implode (", ", $fields) . "\n";
+			
+			if ($twoYear->status != self::Leaving) {
+				if(empty($feeRequired[$familyid])) {
+					$feeRequired[$familyid] = 450;
+					$newRegFee[$familyid] = 0;
+				} else {
+					$feeRequired[$familyid] = 550;
+				}
+				
+				if ($twoYear->status == self::NewStudent) $newRegFee[$familyid] += 50; 
+			}
+		}
+		
+		
+		// check if fee is paid fully
+		foreach ($feeRequired as $familyid=>$require) {
+			$require += $newRegFee[$familyid];
+			$tracker = FamilyTracker::GetItemById($familyid);
+			$family = Family::GetItemById($familyid);
+			if ($require != $tracker->tuition) {
+				print "Family: $familyid, Require: $require, Paid: $tracker->tuition, " . $family->parentsName() . "\n";
+			}
+		}
+		
+	}
+	
+	private function __construct() { 
+		$this->previousYear = new TwoYearEnrollment();
+		$this->thisYear = new TwoYearEnrollment();
+		$this->status = "unknown";
+	}
+}
+
+Admission::itemDelivery(); exit();
+//TwoYearLayout::twoyearstudents(); exit();
 
 //OrientationCheck(); exit();
 
