@@ -237,4 +237,59 @@ function DisplayStudentMedicalInformationV2(&$template, $student) {
 }
 
 
+function DisplayCourseCatalog(&$template) {
+	Layout($template);
+	$template->addBlockFile('RESULT', 'F_RESULT', 'CourseCatalog.tpl');
+	$template->touchBlock('F_RESULT');
+	
+	foreach (CourseCatalog::GetAll() as $course) {
+		$templateName="COURSE";
+		$template->setCurrentBlock($templateName);
+		$template->setVariable("ID", $course->id);
+		$template->setVariable("DEPARTMENT", Department::NameFromId($course->department));
+		$template->setVariable("LEVEL", $course->level);
+		$template->setVariable("SHORT", $course->short);
+		$template->setVariable("FULL", $course->full);
+		
+		$template->parseCurrentBlock();
+	}
+
+}
+
+function DisplayAvailableClass($template, $year, $facility) {
+	Layout($template);
+	$template->addBlockFile('RESULT', 'F_RESULT', 'AvailableClass.tpl');
+	$template->touchBlock('F_RESULT');
+	
+	$classCount = array();
+	foreach (Enrollment::GetAllEnrollmentForFacilitySession($facility, $year) as $item) {
+		if (empty($classCount[$item->class->id])) $classCount[$item->class->id]=0;
+		$classCount[$item->class->id]++;
+	}
+	
+	foreach (AvailableClass::GetAllYear($year) as $item) {
+		$templateName="CLASS";
+		$template->setCurrentBlock($templateName);
+		$template->setVariable("ID", $item->id);
+		
+		$template->setVariable("DEPARTMENT", Department::NameFromId( $item->course->department));
+		$template->setVariable("LEVEL", $item->course->level);
+		$template->setVariable("SHORT", $item->course->short);
+		
+		//$template->setVariable("FULL", $item->course->full);
+		$template->setVariable("SECTION", $item->section);
+		$template->setVariable("YEAR", $item->year+2010);
+		$template->setVariable("ROOM", $item->room->roomNumber);
+		
+		$template->setVariable("START", $item->startTime);
+		$template->setVariable("END", $item->endTime);
+		
+		$count = empty($classCount[$item->id]) ? 0 :$classCount[$item->id];
+		$template->setVariable("COUNT", $count);
+		 
+		$template->parseCurrentBlock();
+	}
+}
+
+
 ?>

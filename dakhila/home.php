@@ -44,6 +44,7 @@ print '
 <tr><td><a href="php/dataViewer.php?command=MedicalForm&studentId=1446">Medical Form</tr>
 <tr><td><a href="php/dataViewer.php?command=RegistrationSummary">2011 Registration Summary</tr>
 <tr><td><a href="php/dataViewer.php?command=CourseCatalog">Course Catalog</tr>
+<tr><td><a href="php/dataViewer.php?command=AvailableCourse&facility=2&year=2011">Available Courses</tr>
 </table>
 ';
 

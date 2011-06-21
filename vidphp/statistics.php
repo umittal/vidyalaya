@@ -436,8 +436,8 @@ function utilTesting() {
 
 function classUtilizationReport() {
 
-//	$utilization = RoomUtilization::utilization(1, 0);
-	$utilization = RoomUtilization::utilizationDept(1, 0, Department::Culture);
+	$utilization = RoomUtilization::utilization(2, 1);
+//	$utilization = RoomUtilization::utilizationDept(1, 0, Department::Culture);
 //	$utilization = RoomUtilization::listStudentsDept(1, 0, Department::Culture);
 
 //	print "count of enrolled is " . count($utilization) . "\n";
@@ -484,16 +484,15 @@ function ConvertTeacherToObject() {
 }
 
 
-//FamilyTracker::UpdateFamilyTracker();
-//FamilyTracker::loadPayments();
-//FamilyTracker::ReportPending();
-//FamilyTracker::TrackerSummary();
+//FamilyTracker::UpdateFamilyTracker(); exit();
+//FamilyTracker::loadPayments();exit();
+FamilyTracker::ReportPending();exit();
+//FamilyTracker::TrackerSummary();exit();
 //
-exit;
 //emailListForVasudhaRegdParents();
 //ConvertTeacherToObject();
 //testExcelThing();
-//classUtilizationReport();
+classUtilizationReport();
 //
 
 //	GetAllData();

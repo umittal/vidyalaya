@@ -63,7 +63,22 @@ switch ($command) {
 		}
 		$html= $template->get();
 		break;
+		
+	case "CourseCatalog":
+		DisplayCourseCatalog($template);
+		$html= $template->get();
+		break;		
 
+	case "AvailableCourse":
+		$year=$_GET["year"];
+		if ($year =="") $year=Calendar::CurrentYear();
+		$facility=$_GET["facility"];
+		if ($facility =="") $facility=Facility::PHHS;
+		
+		DisplayAvailableClass($template, $year, $facility);
+		$html= $template->get();
+		break;		
+		
 	case "RegistrationSummary":
 		$sql = <<< SQLREGISTRATIONSUMMAY
 		  select previousYear, currentYear, count(*) 

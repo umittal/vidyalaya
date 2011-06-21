@@ -294,7 +294,7 @@ BODY_WAITING;
 }
 
 class Mail {
-	public static function SetupMail() {
+	private static function SetupMail() {
 
 		$email = "Admission2011@vidyalaya.us";
 		$name = "Vidyalaya Admissions";
@@ -314,8 +314,12 @@ class Mail {
 	}
 
 	// set the TO address field of mail to family's email address
-	public static function SetFamilyAddress(&$mail, $family, $test) {
-		//	$mail->AddAddress("umesh@vidyalaya.us", "Testing post orientation"); 	return;
+	private static function SetFamilyAddress(&$mail, $family, $production) {
+		if ($production == 0 ) {
+			$mail->AddAddress("voting@vidyalaya.us", "Testing email");
+			return;
+		}
+
 
 		foreach (explode(";", $family->mother->email) as $toAddress) {
 			if (!empty($toAddress)) {
@@ -335,27 +339,58 @@ class Mail {
 
 	}
 
-}
-
-class Admission {
-	const DataFile = "/tmp/2011.csv";
-	
-	public static function  mailFamily($family, $subject, $body, $test) {
-		$mail = Mail::SetupMail();
-		Mail::SetFamilyAddress($mail, $family, $test);
-		$mail->Subject = $subject;
-
-		$salutation = "<p>Dear " . $family->parentsName() . ",";
+	public static function  mailFamilyFromAdmission($family, $subject, $body, $production) {
 		$footer = "<p>Umesh Mittal<br>Admissions</p>";
+		self::mailFamily($family, $subject, $body, $production, $footer);
+	}
 
+	public static function  mailFamily($family, $subject, $body, $production, $footer) {
+		if ($production == 0) $subject = "[Test] $subject";
+
+		$mail = self::SetupMail();
+		self::SetFamilyAddress($mail, $family, $production);
+
+		$mail->Subject = $subject;
+		$salutation = "<p>Dear " . $family->parentsName() . ",";
 		$mail->Body = $salutation . $body . $footer;
+
 		$mail->AltBody = "This is the body when user views in plain text format"; //Text Body
 		
 		if(!$mail->Send()) {
 			echo "Mailer Error: Family: $family->id: " . $mail->ErrorInfo . "\n";
 		}  else {
-			echo "Message has been sent, Family: $family->id:\n";	
+			echo "Message has been sent, Family: $family->id:\n";
 		}
+	}
+
+
+}
+
+class Admission {
+	const DataFile = "/tmp/2011.csv";
+
+	private static function sendItemEmail($familyId, $cd, $pb, $bag) {
+		
+		$family = Family::GetItemById($familyId);
+		$body = <<<ITEMEMAIL
+		<p>As part of the registration process, you ordered the following items. 
+		Please collect it from us at Picnic tomorrow, Sunday June 19, 2011. Please also bring a printout of this email, 
+		if possible.
+		<p>
+ITEMEMAIL;
+
+		$counter = 1;
+		$table = "<table>\n";
+		if ($cd!= 0) $table .= "<tr><td>". $counter++ . ". </td><td>Prayer CD</td><td>\$$cd</td></tr>\n";
+		if ($pb!= 0) $table .= "<tr><td>". $counter++ . ". </td><td>Prayer Book</td><td>\$$pb</td></tr>\n";
+		if ($bag!= 0) $table .= "<tr><td>". $counter++ . ". </td><td>Book Bag</td><td>\$$bag</td></tr>\n";
+		$total = $bag+$cd+$pb;
+		$table .= "<tr><td>&nbsp;</td><td>Total</td><td> \$$total</td></tr>\n";
+		$table .= "</table>\n";
+		$subject = "Additional Item Fulfillment, Family- $family->id";
+
+//		print $table;
+		Mail::mailFamilyFromAdmission($family, $subject, $body . $table, 1);
 	}
 
 	public static function itemDelivery() {
@@ -363,7 +398,7 @@ class Admission {
 		$totalPB = array();
 		$totalBag = array();
 		$totalFamily = array();
-		
+
 		if (($handle = fopen(self::DataFile, "r")) !== FALSE) {
 			$header = fgetcsv($handle, 0, ",");
 			$header = fgetcsv($handle, 0, ",");
@@ -388,20 +423,22 @@ class Admission {
 					$totalCD[$family] += $CD;
 					$totalPB[$family] += $PB;
 					$totalBag[$family] += $Bag;
-						
+
 				}
 			}
 		}
 
 		$grandTotal = 0;
-		foreach ($totalFamily as $family => $total) {
+		foreach ($totalFamily as $familyId => $total) {
 			if ($total == 0 ) continue;
-			print "$family, $totalCD[$family], $totalPB[$family], $totalBag[$family], $totalFamily[$family]\n";
+			print "$familyId, $totalCD[$familyId], $totalPB[$familyId], $totalBag[$familyId], $totalFamily[$familyId]\n";
+//			self::sendItemEmail($familyId, $totalCD[$familyId], $totalPB[$familyId], $totalBag[$familyId]);
 			$grandTotal += $total;
 		}
 		print "Grand Total = $grandTotal\n";
 	}
 }
+
 
 class TwoYearEnrollment {
 	public $language=null;
@@ -429,6 +466,7 @@ class TwoYearEnrollment {
 	public function updateFromStudent($student) {
 		$this->language = $student->languagePreference;
 		$this->cultureLevel = $student->GradeAt(Calendar::RegistrationSession);
+		if ($this->cultureLevel > 9) $this->cultureLevel = 9;
 	}
 	
 	public function csv() {
@@ -450,13 +488,16 @@ class TwoYearLayout {
 
 	const Leaving = "Leaving";
 	const NewStudent = "New";
+	const Continuing = "Continuing";
+	const Change = "Change";
 	
 	private static $objArray = Array ();
 
 	private static function firstTimeCall() {
 		if (!empty(self::$objArray)) return;
-		self::prevYearFromDatabase();
+		self::currentYearFromDatabase();
 		self::currentYearFromFile();
+		self::prevYearFromDatabase();
 		self::updateStatus();
 	}
 
@@ -480,9 +521,10 @@ class TwoYearLayout {
 					continue;
 				} 
 				if ($twoyear->previousYear->language == Department::Kindergarten) {
-					$twoyear->status ="Continuing";
+					$twoyear->status =self::Continuing;
 				} else {
-					$twoyear->status = $twoyear->previousYear->language == $twoyear->thisYear->language ? "Continuing" : "Change";
+					$twoyear->status = $twoyear->previousYear->language == $twoyear->thisYear->language ? 
+					self::Continuing : self::Change;
 				}
 			}
 		}
@@ -490,19 +532,32 @@ class TwoYearLayout {
 	}
 
 	private static function prevYearFromDatabase () {
-		foreach (Enrollment::GetAllEnrollmentForFacilitySession(1,0) as $enrollment) {
+		foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake,2010) as $enrollment) {
 			if (empty(self::$objArray[$enrollment->student->id])) self::$objArray[$enrollment->student->id] = new TwoYearLayout();
 			$twoyear = self::GetItemById($enrollment->student->id);
 			$twoyear->previousYear->updateFromEnrollment($enrollment);
 		}
 	}
+	
+	private static function currentYearFromDatabase () {
+		foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS,2011) as $enrollment) {
+			if (empty(self::$objArray[$enrollment->student->id])) self::$objArray[$enrollment->student->id] = new TwoYearLayout();
+			$twoyear = self::GetItemById($enrollment->student->id);
+			//print "setting this year value for $enrollment->student->id\n";
+			$twoyear->thisYear->updateFromEnrollment($enrollment);
+		}
+	}
+	
 
 	private static function updateNewStudent($studentId) {
 		$student = Student::GetItemById($studentId);
 		if (empty($student)) print "student not found for id ==$studentId==";
-		if (empty(self::$objArray[$studentId])) self::$objArray[$studentId] = new TwoYearLayout();
-		$twoyear = self::GetItemById($studentId);
-		$twoyear->thisYear->updateFromStudent($student); 
+		if (empty(self::$objArray[$studentId])) {
+			
+			self::$objArray[$studentId] = new TwoYearLayout();
+			$twoyear = self::GetItemById($studentId);
+			$twoyear->thisYear->updateFromStudent($student);
+		}
 	}
 
 	private static function currentYearFromFile() {
@@ -524,13 +579,9 @@ class TwoYearLayout {
 			}
 		}
 	}
-
-	public static  function twoyearstudents() {
+	
+	public static function twoYearCsv () {
 		self::firstTimeCall();
-		
-		$feeRequired = Array();
-		$newRegFee = Array();
-		
 		foreach (self::$objArray as $studentid => $twoYear) {
 			$student = Student::GetItemById($studentid);
 			$familyid = $student->family->id;
@@ -544,7 +595,73 @@ class TwoYearLayout {
 			$fields[] = EnumFamilyTracker::NameFromId(FamilyTracker::CurrentYearStatus($familyid));
 			$fields[] = $student->fullName();
 			
-//			print implode (", ", $fields) . "\n";
+			print implode (", ", $fields) . "\n";
+		}
+	}
+	
+	public static function assignClass() {
+		self::firstTimeCall();
+		$count = 0;
+		foreach (self::$objArray as $studentid => $twoYear) {
+			$student = Student::GetItemById($studentid);
+				
+			if ($twoYear->thisYear->languageLevel != null) continue;
+			if ($twoYear->status == self::Leaving) continue;
+				
+			$count++;
+				
+			if($student->GradeAt(Calendar::RegistrationSession) == "KG") {
+				$class = AvailableClass::findAvailableClass(2011, Department::Kindergarten, 0, null);
+				if ($class ==null) {
+					print "Error:KG not found for year 2011\n";
+				} else {
+					print "insert into Enrollment set student = $student->id, availableClass = $class->id;\n";
+				}
+				continue;
+			}
+				
+			// all others require culture and language. Let us do culture first
+			$level = $twoYear->thisYear->cultureLevel;
+			$class = AvailableClass::findAvailableClass(2011, Department::Culture, $level, null);
+			if ($class ==null) {
+				print "Error:Culture level $level not found for year 2011\n";
+			} else {
+				print "insert into Enrollment set student = $student->id, availableClass = $class->id;\n";
+			}
+			
+			// for language, we have new, change and continuing
+			
+			$department = $twoYear->thisYear->language;
+			if ($twoYear->status == self::Continuing) {
+				//assign same level as last year
+				$level = $twoYear->previousYear->languageLevel;;
+				if ($level == 0) $level=1;
+			} else {
+				$level = 1; 
+			}
+			$class = AvailableClass::findAvailableClass(2011, $department, $level, null);
+			if ($class ==null) {
+				print "Error:Department $department,  level $level not found for year 2011\n";
+			} else {
+				print "insert into Enrollment set student = $student->id, availableClass = $class->id;\n";
+			}
+			
+				
+				
+			print "$count: $studentid needs to be enrolled";
+			print "\n";
+		}
+	}
+
+	public static  function checkFeePaid() {
+		self::firstTimeCall();
+		
+		$feeRequired = Array();
+		$newRegFee = Array();
+		
+		foreach (self::$objArray as $studentid => $twoYear) {
+			$student = Student::GetItemById($studentid);
+			$familyid = $student->family->id;
 			
 			if ($twoYear->status != self::Leaving) {
 				if(empty($feeRequired[$familyid])) {
@@ -578,8 +695,11 @@ class TwoYearLayout {
 	}
 }
 
-Admission::itemDelivery(); exit();
-//TwoYearLayout::twoyearstudents(); exit();
+//Admission::itemDelivery(); exit();
+//TwoYearLayout::checkFeePaid(); exit();
+//TwoYearLayout::assignClass(); exit();
+TwoYearLayout::twoYearCsv(); exit();
+
 
 //OrientationCheck(); exit();
 

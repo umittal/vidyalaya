@@ -288,7 +288,7 @@ class Course {
   }
   
   private static function GetLevelFromPraveenSymbol($symbol, $description, $lc) {
-  	if ($lc = "c") $symbol = $description;
+  	if ($lc == "c") $symbol = $description;
   	  	if (empty($symbol)) return 0;
   	if (beginswith($symbol, "KG")) return 0;
   	if (strlen($symbol) < 2) {
@@ -332,7 +332,7 @@ class CourseCatalog {
 	public $full = null;
 	
 	public static function GetCourseCatalogFromCourse($course) {
-		//print "Debug: Going to look for $course->department, $course->level\n";
+		print "Debug: Going to look for $course->department, $course->level\n";
 	 	self::firstTimeCall();
 		foreach (self::$objArray as $coursecatalog ) {
 			if (($coursecatalog->department == $course->department) && ($coursecatalog->level == $course->level))
@@ -355,8 +355,13 @@ class CourseCatalog {
 //		print "debug: trying to find $key in coursecatalog\n";
 	 	return self::$objArray[$key];
 	 }	
+
+	 public static function GetAll() {
+		self::firstTimeCall();
+		return self::$objArray;
+	}
 	 
-	public static $objArray = Array ();
+	private static $objArray = Array ();
 
 	private static function ReadRow($row) {
 		$key = $row["CourseCatalog.id"];
@@ -372,6 +377,13 @@ class CourseCatalog {
 		$this->short = $row["CourseCatalog.short"];
 		$this->full = $row["CourseCatalog.full"];
 
+	}
+	
+	public static function findAvailableCourse($department, $level) {
+		foreach (self::GetAll() as $item) {
+			if ($item->department == $department && $item->level == $level) return $item;
+		}
+		return null;
 	}
 
 }
@@ -403,6 +415,22 @@ class AvailableClass {
 	 	self::firstTimeCall();
 	 	return self::$objArray[$key];
 	 }	
+	 
+	public static function GetAll() {
+		self::firstTimeCall();
+		return self::$objArray;
+	}
+	
+	public static function GetAllYear($year) {
+		if ($year >= 2010) $year -= 2010;
+		self::firstTimeCall();
+		$availableYear = array();
+		foreach (self::GetAll() as $item) {
+			if($item->year == $year) $availableYear[$item->id] = $item;
+		}
+		return $availableYear;
+	}
+	
 	 
 	private static $objArray = Array ();
 
@@ -454,6 +482,73 @@ class AvailableClass {
 		return self::findAvailableClassFromCourse($course);
 	}
 	
+	public static function findAvailableClass($year, $department, $level, $section) {
+		if ($year >= 2010) $year-= 2010;
+//		print "Looking for course, dept: $department, level: $level      ";
+		$course = CourseCatalog::findAvailableCourse($department, $level);
+		
+		if ($course == null) {
+//			print "not found\n";
+			return null;
+		} else {
+//			print "found $course->id\n";
+		}
+
+//		print "looking for course: $course->id, section: $section, year: $year\n";
+		foreach (self::GetAllYear($year) as $item) {
+			//print "comparing id $item->id, course=$item->course, course id = $course->id \n";
+			// if section is null, find the first available
+			if ($section == null) {
+				if ($item->course->id == $course->id) return $item;
+			} else {
+				if ($item->course->id == $course->id && $item->section == $section) return $item;
+			}
+		}
+		print "not found\n";
+		//nothing found
+		return null;
+	}
+	
+}
+
+// ************** 
+class Facility{
+	public $id=null;
+	
+	const Eastlake = 1;
+	const PHHS = 2;
+
+	private static function firstTimeCall() {
+		if (!empty(self::$objArray)) return;
+		$query = "select * from Facilities";
+		$result = VidDb::query($query);
+		while ($row = mysql_fetch_alias_array($result)) {
+			self::ReadRow($row);
+		}
+	}
+	
+	public static function GetItemById($key) {
+	 	self::firstTimeCall();
+	 	return self::$objArray[$key];
+	 }	
+	
+	public static function GetAll() {
+		self::firstTimeCall();
+		return self::$objArray;
+	}
+	
+	 private  static $objArray = Array ();
+
+	private static function ReadRow($row) {
+		$key = $row["Facilities.id"];
+		if (!array_key_exists($key, self::$objArray)) 
+			self::$objArray[$key] = new self($row);
+		return self::$objArray[$key];
+	}
+
+	public function __construct($row) {
+		$this->id = $row["Facilities.id"];
+	}
 }
 
 // ************** 
@@ -511,6 +606,7 @@ class Enrollment{
 	public $disciplineGrade =null;
 		
 	public static function GetAllEnrollmentForFacilitySession($facility, $year) {
+		if ($year >= 2010) $year -= 2010;
 		$query = "select * 
 		from Enrollment
 			inner join AvailableClass on Enrollment.availableClass = AvailableClass.id
@@ -1103,18 +1199,31 @@ function CreateDictionary($connection) {
 
 // Main function called by outside world
 function GetAllData() {
-  $hostname = "vidyalaya.db.4718809.hostedresource.com";
-  $databasename = "vidyalaya";
-  $username = "vidyalaya";
-  $password = "Praveen38";
-  if (!$connection = @ mysql_connect($hostname, $username, $password))
-    die("Cannot connect using hostname=$hostname, user=$username, password=$password\n");
-  if (!mysql_selectdb($databasename, $connection))
-    showerror();
+	$sapi = php_sapi_name();
+	switch ( $sapi ) {
+		case "cli":
+			print "Big Data Looup";
+			break;
+	}
+
+	$hostname = "vidyalaya.db.4718809.hostedresource.com";
+	$databasename = "vidyalaya";
+	$username = "vidyalaya";
+	$password = "Praveen38";
+	if (!$connection = @ mysql_connect($hostname, $username, $password))
+	die("Cannot connect using hostname=$hostname, user=$username, password=$password\n");
+	if (!mysql_selectdb($databasename, $connection))
+	showerror();
 
 
-  $dictStudents = CreateDictionary($connection);
-  return $dictStudents;
+	$dictStudents = CreateDictionary($connection);
+
+	switch ( $sapi ) {
+		case "cli":
+			print "... Completed\n";
+			break;
+	}
+			return $dictStudents;
 }
 
 ?>

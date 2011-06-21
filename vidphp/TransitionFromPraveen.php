@@ -98,10 +98,10 @@ class CourseTeacher {
 
 }
 
-CourseTeacher::ConvertTeacherToObject();
+//CourseTeacher::ConvertTeacherToObject();
 
-//$object = new TransitionFromPraveen();
+$object = new TransitionFromPraveen();
 
-//$object->InsertAvalableEnrollment();
+$object->InsertAvalableEnrollment();
 
 ?>
