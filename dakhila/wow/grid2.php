@@ -1,8 +1,12 @@
 <?php
-require_once "libVidyalaya/db.inc";
-require_once "libVidyalaya/vidyalaya.inc";
 
-require_once '../jqsuite/jq-config.php';
+$rootDir = $_SERVER["DOCUMENT_ROOT"] . "/dakhila";
+require "$rootDir/libVidyalaya/db.inc";
+require "$rootDir/libVidyalaya/vidyalaya.inc";
+
+
+$jqDir = $_SERVER["DOCUMENT_ROOT"] . "/jqsuite";
+require_once "$jqDir/jq-config.php";
 // include the jqGrid Class
 require_once ABSPATH."php/jqGrid.php";
 // include the driver class
@@ -51,7 +55,7 @@ $grid->setPrimaryKeyId('id');
 $grid->setColModel();
 // Enable navigator
 
-$grid->setUrl('jqgridviewer.php');
+$grid->setUrl('grid2.php?command=availablegrid');
 
 $grid->setColProperty(
 		      "Start", array( 
@@ -108,7 +112,8 @@ $grid->setNavOptions('navigator', array("excel"=>false,"add"=>false,"edit"=>fals
 // Activate single search
 $grid->setNavOptions('search',array("multipleSearch"=>false));
 // Enjoy
-
+error_log("i am rendering grid from grid2.php");
 $grid->renderGrid('#grid','#pager',true, null, null, true,true);
+
 
 ?>

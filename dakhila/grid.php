@@ -6,7 +6,6 @@
 
 	<link rel="stylesheet" type="text/css" media="screen" href="/jqsuite/themes/redmond/jquery-ui-1.8.2.custom.css" />
 	<link rel="stylesheet" type="text/css" media="screen" href="/jqsuite/themes/ui.jqgrid.css" />
-	<link rel="stylesheet" href="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/site.css" type="text/css" media="screen print" />
 
 	<script src="/jqsuite/js/jquery.js" type="text/javascript"></script>
 	<script src="/jqsuite/js/i18n/grid.locale-en.js" type="text/javascript"></script>
@@ -14,11 +13,24 @@
 
 </head>
 <body>
+    Group By: <select id="chngroup"> 
+        <option value="Dept">Dept</option> 
+        <option value="Room">Room</option> 
+        <option value="clear">Remove Grouping</option>     
+        </select><br/> 
+      <div> 
 
-  <!-- BEGIN PAGETITLE -->
-  <title>{TITLE}</title>
-  <!-- END PAGETITLE -->
-</head>
+      <?php 
 
-<body>
-<div class="wrapper">
+
+
+        require_once "/var/www/dakhila/libVidyalaya/GridFactory.inc";
+
+
+
+?>
+
+</div>
+
+</body>
+</html>

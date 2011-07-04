@@ -11,23 +11,13 @@ return $count;
 }
 
 
-require "../authentication.inc"; 
+$rootDir = $_SERVER["DOCUMENT_ROOT"] . "/dakhila";
 require_once "HTML/Template/ITX.php";
 require_once "$rootDir/libVidyalaya/db.inc";
 require_once "$rootDir/libVidyalaya/vidyalaya.inc";
 
-if (!$connection = @ mysql_connect($hostname, $username, $password))
-  die("Cannot connect");
-if (!mysql_selectdb($databasename, $connection))
-  showerror();
+VidSession::sessionAuthenticate();
 
-session_start();
-if (!isset($_SESSION["count"])) {
-	$_SESSION["count"]=0;
-	$_SESSION["start"]= time();
-}
-// Connect to an authenticated session or relocate to logout.php
-sessionAuthenticate();
 $students = GetAllData();
 
 // Template stuff
@@ -82,7 +72,6 @@ $template->parseCurrentBlock();
 
 //Output the web page
 $template->show();
-
 
 
 ?>

@@ -13,7 +13,7 @@
 
 
 <h1>Student List by Classes</h1>
-<p><a href="studentListByLanguage.php">Language</a>, <a href="studentListByCulture.php">Culture</a></p>
+<p><a href="/dakhila/php/dataViewer2.php?command=home">Home</a>, <a href="studentListByLanguage.php">Language</a>, <a href="studentListByCulture.php">Culture</a></p>
 	  <div id="itsthetable">
 	  <table>
 	  <thead><tr><th scope="col">#<th>Class</tr></thead>

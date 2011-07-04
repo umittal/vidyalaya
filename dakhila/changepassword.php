@@ -1,16 +1,7 @@
 <?php
-require "authentication.inc";
 require "libVidyalaya/db.inc";
 
-session_start();
-
-// Connect to an authenticated session or relocate to logout.php
-sessionAuthenticate();
-
-if (!$connection = @ mysql_connect($hostname, $username, $password))
-  die("Cannot connect");
-if (!mysql_selectdb($databasename, $connection))
-  showerror();
+VidSession::sessionAuthenticate();
 
 // Clean the data collected from the user
 $oldPassword = mysqlclean($_POST, "oldPassword", 10, $connection);

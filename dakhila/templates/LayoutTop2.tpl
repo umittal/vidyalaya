@@ -2,23 +2,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Vidyalaya</title>
 
 	<link rel="stylesheet" type="text/css" media="screen" href="/jqsuite/themes/redmond/jquery-ui-1.8.2.custom.css" />
 	<link rel="stylesheet" type="text/css" media="screen" href="/jqsuite/themes/ui.jqgrid.css" />
 	<link rel="stylesheet" href="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/site.css" type="text/css" media="screen print" />
+
+	<title>Vidyalaya {TITLE}</title>
 
 	<script src="/jqsuite/js/jquery.js" type="text/javascript"></script>
 	<script src="/jqsuite/js/i18n/grid.locale-en.js" type="text/javascript"></script>
 	<script src="/jqsuite/js/jquery.jqGrid.min.js" type="text/javascript"></script>
 
 </head>
-<body>
-
-  <!-- BEGIN PAGETITLE -->
-  <title>{TITLE}</title>
-  <!-- END PAGETITLE -->
-</head>
 
 <body>
+
 <div class="wrapper">

@@ -1,22 +1,11 @@
 <?php
-require "../authentication.inc";
+$rootDir = $_SERVER["DOCUMENT_ROOT"] . "/dakhila";
 require_once "HTML/Template/ITX.php";
 require_once "$rootDir/libVidyalaya/db.inc";
 require_once "$rootDir/libVidyalaya/vidyalaya.inc";
 require_once "$rootDir/libVidyalaya/HtmlFactory.inc";
 
-if (!$connection = @ mysql_connect($hostname, $username, $password))
-  die("Cannot connect");
-if (!mysql_selectdb($databasename, $connection))
-  showerror();
-
-session_start();
-if (!isset($_SESSION["count"])) {
-	$_SESSION["count"]=0;
-	$_SESSION["start"]= time();
-}
-// Connect to an authenticated session or relocate to logout.php
-sessionAuthenticate();
+VidSession::sessionAuthenticate();
 
 $template = new HTML_Template_ITX("../templates");
 
@@ -116,6 +105,7 @@ SQLREGISTRATIONSUMMAY;
 			print "Total </td><td align=right> " . $total;
 			print "</td></tr>\n";
 		print "\n</table></body></html>";		
+		$html=""; // to avoid error at the bottom.
 		break;
 
 	default:

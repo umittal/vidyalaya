@@ -16,7 +16,7 @@
       onsubmit="{SUBMITACTION}">
 </form>
 <h1>Family Listing</h1>
-<p><a href="/dakhila/php/studentListByLanguage.php">Language</a>, <a href="/htdocs/php/studentListByCulture.php">Culture</a></p>
+<p><a href="/dakhila/php/dataViewer2.php?command=home">Home</a>, <a href="/dakhila/php/studentListByLanguage.php">Language</a>, <a href="/htdocs/php/studentListByCulture.php">Culture</a></p>
 
 	  <div id="itsthetable">
 	  <table>

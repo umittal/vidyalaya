@@ -93,6 +93,49 @@ function DisplayFamilyTemplate (&$template, $family, $students) {
 
 }
 
+function DisplayFamilyTemplateV3 (&$template, $family) {
+
+	$templateName="PARENTS";
+	$template->setCurrentBlock($templateName);
+
+	$template->setVariable("MF", "Father");
+	$template->setVariable("NAME", $family->father->fullName());
+	$template->setVariable("EMAIL", $family->father->email);
+	$template->setVariable("WORK", $family->father->workPhone);
+	$template->setVariable("CELL", $family->father->cellPhone);
+	$template->setVariable("ISCONTACTABLE", YesNoMap($family->father->IsContactable));
+	$template->parseCurrentBlock();
+
+	$template->setVariable("MF", "Mother");
+	$template->setVariable("EMAIL", $family->mother->email);
+	$template->setVariable("WORK", $family->mother->workPhone);
+	$template->setVariable("CELL", $family->mother->cellPhone);
+	$template->setVariable("NAME", $family->mother->fullName());
+	$template->setVariable("ISCONTACTABLE", YesNoMap($family->mother->IsContactable));
+	$template->parseCurrentBlock();
+
+	foreach ($family->Children() as  $student) {
+	  DisplayChildren($template, $student);
+	}
+
+	$templateName="HOME";
+	$template->setCurrentBlock($templateName);
+	$line2 = $family->address->addr2;
+	if (! empty($line2)) {
+		$template->setVariable("LINE2", ", ". $line2);
+	}
+	$template->setVariable("ID", $family->id);
+	$template->setVariable("LINE1", $family->address->addr1);
+	$template->setVariable("CITY", $family->address->city);
+	$template->setVariable("STATE", $family->address->state);
+	$template->setVariable("ZIP", $family->address->zipcode);
+	$template->setVariable("HOMEPHONE", $family->phone);
+	$category = $family->category->name;
+	if ($family->category->id == 5) $category = $category . ", Date: " . $family->priority_date;
+	$template->setVariable("CATEGORY", $category );
+	$template->parseCurrentBlock();
+}
+
 
 function DisplayChildren(&$template, $student) {
 	$templateName="CHILDREN";
@@ -154,9 +197,15 @@ function DisplayFamilyV2(&$template, $family, $students) {
 	DisplayFamilyTemplate($template, $family, $students);
 }
 
+function DisplayFamilyV3(&$template, $family) {
+	$template->addBlockFile('RESULT', 'F_RESULT', 'FamilyDetail.tpl');
+	$template->touchBlock('F_RESULT');
+	DisplayFamilyTemplateV3($template, $family);
+}
+
 
 // ******** Registration Form
-function DisplayRegistrationTemplate (&$template, $family, $students) {
+function DisplayRegistrationTemplate (&$template, $family) {
 
 	$templateName="HOME";
 	$template->setCurrentBlock($templateName);
@@ -206,7 +255,12 @@ function DisplayRegistration(&$template, $family, $students) {
 	Layout($template);
 	$template->addBlockFile('RESULT', 'F_RESULT', 'Registration.tpl');
 	$template->touchBlock('F_RESULT');
-	DisplayRegistrationTemplate($template, $family, $students);
+	DisplayRegistrationTemplate($template, $family);
+}
+function DisplayRegistrationV2(&$template, $family) {
+	$template->addBlockFile('RESULT', 'F_RESULT', 'Registration.tpl');
+	$template->touchBlock('F_RESULT');
+	DisplayRegistrationTemplate($template, $family);
 }
 
 
@@ -236,9 +290,16 @@ function DisplayStudentMedicalInformationV2(&$template, $student) {
 
 }
 
+function DisplayStudentMedicalInformationV3(&$template, $student) {
+	$template->addBlockFile('RESULT', 'F_RESULT', 'MedicalInformation.tpl');
+	$template->touchBlock('F_RESULT');
+	
+	DisplayStudentMedicatlInformationTemplate($template, $student);
+
+}
+
 
 function DisplayCourseCatalog(&$template) {
-	Layout($template);
 	$template->addBlockFile('RESULT', 'F_RESULT', 'CourseCatalog.tpl');
 	$template->touchBlock('F_RESULT');
 	

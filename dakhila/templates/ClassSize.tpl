@@ -13,6 +13,7 @@
 
 
 <h1>Class Size & Room</h1>
+<p><a href="/dakhila/php/dataViewer2.php?command=home">Home</a>, <a href="studentListByLanguage.php">Language</a>, <a href="studentListByCulture.php">Culture</a></p>
 	  <div id="itsthetable">
 	  <table>
 	  <caption>Language Classes</caption>

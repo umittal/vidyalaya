@@ -1,16 +1,9 @@
 <?php
-require "../authentication.inc"; 
+$rootDir = $_SERVER["DOCUMENT_ROOT"] . "/dakhila";
 require_once "HTML/Template/ITX.php";
 require "$rootDir/libVidyalaya/db.inc";
 
-if (!$connection = @ mysql_connect($hostname, $username, $password))
-  die("Cannot connect");
-if (!mysql_selectdb($databasename, $connection))
-  showerror();
-
-session_start();
-// Connect to an authenticated session or relocate to logout.php
-sessionAuthenticate();
+VidSession::sessionAuthenticate();
 
 $template = new HTML_Template_ITX("$rootDir/templates");
 $template->loadTemplatefile("StudentListByLanguage.tpl", true, true);
@@ -21,9 +14,8 @@ where status=1 and
       ss_cult_next = CultureGrades.id
 order by last_name, first_name
 ";
+$result = VidDb::query($query);
 
-if (!($result = mysql_query($query, $connection)))
-   showerror();
 
 while ($row = mysql_fetch_array($result, MYSQL_NUM)) {
       $languageList[$row[0]] .= $row[2] . " " . $row[1]. ", ";
@@ -38,8 +30,7 @@ order by Description
 
 $templateName="LANGUAGE";
 
-if (!($result = mysql_query($query, $connection)))
-   showerror();
+$result = VidDb::query($query);
 
 $item=1;
 while ($row = mysql_fetch_array($result, MYSQL_NUM)) {

@@ -1,16 +1,9 @@
 <?php
-require "../authentication.inc"; 
+$rootDir = $_SERVER["DOCUMENT_ROOT"] . "/dakhila";
 require_once "HTML/Template/ITX.php";
 require "$rootDir/libVidyalaya/db.inc";
 
-if (!$connection = @ mysql_connect($hostname, $username, $password))
-  die("Cannot connect");
-if (!mysql_selectdb($databasename, $connection))
-  showerror();
-
-session_start();
-// Connect to an authenticated session or relocate to logout.php
-sessionAuthenticate();
+VidSession::sessionAuthenticate();
 
 $template = new HTML_Template_ITX("../templates");
 $template->loadTemplatefile("ClassSize.tpl", true, true);
@@ -31,8 +24,7 @@ group by Room
 order by Description
 ";
 
-if (!($result = mysql_query($query, $connection)))
-   showerror();
+$result = VidDb::query($query);
 
 $templateName="LANGUAGE";
 $total=0;
@@ -64,9 +56,7 @@ where ss_cult_next=CultureGrades.id and continuing <>2 and status=1
 group by Room
 order by Description";
 
-if (!($result = mysql_query($query, $connection)))
-   showerror();
-
+$result = VidDb::query($query);
 $templateName="CULTURE";
 
 while ($row = mysql_fetch_array($result, MYSQL_NUM)) {
