@@ -166,6 +166,13 @@ class Student {
   public function fullName() {
   	return $this->firstName . " " . $this->lastName;
   }
+  
+  public function CellEmail() {
+  	$fields = array();
+  	if (!empty($this->cellPhone)) $fields[] = "Cell:" . $this->cellPhone;
+  	if (!empty($this->email)) $fields[] = "email:" . $this->email;
+  	return implode ($fields, ",");
+  }
 
   public function parentsName() {
   	return $this->family->parentsName();
@@ -599,21 +606,51 @@ class Rooms{
 }
 
 // Enrolled students 
+// ************** 
 class Enrollment{
 	public $student=null;
 	public $class = null;
 	public $academicGrade = null;
 	public $disciplineGrade =null;
+
+	// return all families in an availableclass
+	public static function GetFamilies($class) {
+	  $families = array();
+	  $query = "select * from Enrollment where availableClass=$class";
+
+	  $result = VidDb::query($query);
+	  while ($row = mysql_fetch_alias_array($result)) {
+	    $item = new self($row);
+#	    $student = Student::GetItemById($item->student);
+	    $families[] = $item->student->family;
+	  }
+	  return $families;
+	}
+	
+	public static function GetEnrollmentForClass ($class) {
+		$enrollmentArray = Array();
+		$query = "select * 
+		from Enrollment
+		where availableClass = $class
+		";
+		
+		$result = VidDb::query($query);
+		while ($row = mysql_fetch_alias_array($result)) {
+			$enrollmentArray[] = new self($row);
+		}
+		
+		return $enrollmentArray;
+	}
 		
 	public static function GetAllEnrollmentForFacilitySession($facility, $year) {
 		if ($year >= 2010) $year -= 2010;
+		$enrollmentArray = Array();
 		$query = "select * 
 		from Enrollment
 			inner join AvailableClass on Enrollment.availableClass = AvailableClass.id
 			inner join Rooms on AvailableClass.room = Rooms.id
 		where AvailableClass.year = $year and Rooms.facility = $facility
 		";
-		$enrollmentArray = Array();
 		
 		$result = VidDb::query($query);
 		while ($row = mysql_fetch_alias_array($result)) {
@@ -838,6 +875,14 @@ class Parents {
   public function fullName() {
     return $this->firstName . " " . $this->lastName;
   }
+  
+  public  function  WorkCellEmail() {
+  	$fields = array();
+  	if (!empty($this->workPhone)) $fields[] = "W:" . $this->workPhone;
+  	if (!empty($this->cellPhone)) $fields[] = "C:" . $this->cellPhone;
+  	if (!empty($this->email)) $fields[] = "email:" . $this->email;
+  	return implode ($fields, ",");
+  	  }
 
   private static $objArray = Array ();
   public static function GetParent($row, $mf) {

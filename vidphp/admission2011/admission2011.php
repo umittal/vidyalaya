@@ -368,6 +368,9 @@ class Mail {
 
 class Admission {
 	const DataFile = "/tmp/2011.csv";
+	const OrientationFile = "/home/umesh/workspace/vidphp/admission2011/orientation1.txt";
+	const assesssmentFile = "/home/umesh/workspace/vidphp/admission2011/assessment.csv";
+
 
 	private static function sendItemEmail($familyId, $cd, $pb, $bag) {
 		
@@ -437,6 +440,48 @@ ITEMEMAIL;
 		}
 		print "Grand Total = $grandTotal\n";
 	}
+	
+	public static function classParentsEmail($class) {
+	  foreach (Enrollment::GetFamilies($class) as $family) {
+	    print "$family->id, " . $family->mother->email. ", " . $family->father->email . "\n";
+#	    print "$family->id, ". "$family->mother->email," . " $family->father->email" . " \n";
+	  }
+
+	}
+	
+	private static $rosterid = null;
+	private static $rosterfh = null;
+
+	private static function RosterStudent($student) {
+		fwrite(self::$rosterfh,  "\n" . self::$rosterid++ . ",  $student->id, " .  $student->fullName() . ", " . $student->GenderName() );
+		fwrite(self::$rosterfh, "(Age: " . (int)$student->AgeAt(Calendar::CurrentSession) . ", Grade: ". $student->Grade() . "), " . $student->CellEmail() . "\n");
+		fwrite(self::$rosterfh, "   Home, " . $student->family->phone . ", " .  $student->family->address->city . "\n");
+		
+		fwrite(self::$rosterfh, "   Mother, " . $student->family->mother->fullName() . ", " . $student->family->mother->WorkCellEmail() . "\n");
+		fwrite(self::$rosterfh, "   Father, " . $student->family->father->fullName() . ", " . $student->family->father->WorkCellEmail() . "\n");
+	}
+	
+	private static function RosterClass($class) {
+		$filename = "/home/umesh/enrollment/" . $class->id . "-" . $class->short() . ".txt";
+		self::$rosterfh = fopen($filename, "w");
+		echo "$filename\n";
+		//fwrite(self::$rosterfh,  "\n**********************\n");
+		fwrite(self::$rosterfh, "Class: " . $class->short() . "\n");
+		fwrite(self::$rosterfh, "Room: " . "Facility: " . "\n");
+		fwrite(self::$rosterfh, "Teachers: " . "\n"); 
+		foreach (Enrollment::GetEnrollmentForClass($class->id)  as $item) {
+			self::RosterStudent ($item->student);
+		}
+		fclose(self::$rosterfh);
+	}
+	
+	public static function Roster($year) {
+		foreach (AvailableClass::GetAllYear($year) as $class) {
+			self::$rosterid = 1;
+			self::$rosterfh = null;
+			self::RosterClass($class);
+		}
+	}
 }
 
 
@@ -469,14 +514,14 @@ class TwoYearEnrollment {
 		if ($this->cultureLevel > 9) $this->cultureLevel = 9;
 	}
 	
-	public function csv() {
-		$fields = Array();
+	public function csv($fields) {
+//		$fields = Array();
 		$fields[] = Department::NameFromId($this->language);
 		$fields[] = $this->languageLevel;
 		$fields[] = $this->languageSection;
 		$fields[] = $this->cultureLevel;
 		$fields[] = $this->cultureSection;
-		return implode (", ", $fields);
+//		return implode (", ", $fields);
 	}
 }
 
@@ -485,19 +530,29 @@ class TwoYearLayout {
 	public $previousYear = null;
 	public $thisYear = null;
 	public $status=null;
+	public $assessment=null;
 
 	const Leaving = "Leaving";
 	const NewStudent = "New";
+	const Orientation = "Orientation"; // Family attended Orientation
 	const Continuing = "Continuing";
 	const Change = "Change";
 	
+	const LeavingStudentsFile = "/tmp/leaving.csv";
+	const EnrolledStudentsFile = "/tmp/enrolled.csv";
+	
 	private static $objArray = Array ();
+	private static $orientation = Array();
+	
+
 
 	private static function firstTimeCall() {
 		if (!empty(self::$objArray)) return;
 		self::currentYearFromDatabase();
 		self::currentYearFromFile();
 		self::prevYearFromDatabase();
+		self::orientationList();
+		self::loadAssessment();
 		self::updateStatus();
 	}
 
@@ -512,22 +567,29 @@ class TwoYearLayout {
 	}
 	
 	private static function updateStatus() {
-		foreach (self::$objArray as $twoyear) {
-			if ($twoyear->previousYear->language == null) {
-				if ($twoyear->thisYear->language != null) $twoyear->status = self::NewStudent;
-			} else {
-				if ($twoyear->thisYear->language == null) {
-					$twoyear->status = self::Leaving;
-					continue;
-				} 
-				if ($twoyear->previousYear->language == Department::Kindergarten) {
-					$twoyear->status =self::Continuing;
-				} else {
-					$twoyear->status = $twoyear->previousYear->language == $twoyear->thisYear->language ? 
-					self::Continuing : self::Change;
-				}
-			}
+	  foreach (self::$objArray as $studentid => $twoyear) {
+	    if ($twoyear->previousYear->language == null) {
+	      if ($twoyear->thisYear->language != null) {
+		$twoyear->status = self::NewStudent;
+		$studnet = Student::GetItemById($studentid);
+		$familyId = $studnet->family->id;
+		if (!empty(self::$orientation[$familyId])) {
+		  $twoyear->status = self::Orientation;
 		}
+	      }
+	    } else {
+	      if ($twoyear->thisYear->language == null) {
+		$twoyear->status = self::Leaving;
+		continue;
+	      } 
+	      if ($twoyear->previousYear->language == Department::Kindergarten) {
+		$twoyear->status =self::Continuing;
+	      } else {
+		$twoyear->status = $twoyear->previousYear->language == $twoyear->thisYear->language ? 
+		  self::Continuing : self::Change;
+	      }
+	    }
+	  }
 		
 	}
 
@@ -580,25 +642,72 @@ class TwoYearLayout {
 		}
 	}
 	
+	private static function loadAssessment() {
+		$filename = Admission::assesssmentFile;
+		$count = array();
+		if (($handle = fopen($filename, "r")) !== FALSE) {
+			while ((list($studentId,$recommendation)=
+			fgetcsv($handle, 0, ",")) !== FALSE) {
+				if (empty(self::$objArray[$studentId])) {
+					print "Studnet $studentId not found in twoyear array, look into it\n";
+				}
+				$twoyear = self::GetItemById($studentId);
+				$twoyear->assessment = $recommendation;
+			}
+		}
+	}
+
+	private static function orientationList() {
+	  $filename = Admission::OrientationFile;
+	  $count = array();
+	  if (($handle = fopen($filename, "r")) !== FALSE) {
+	    while ((list($familyid,$Check)=
+		    fgetcsv($handle, 0, ",")) !== FALSE) {
+	      self::$orientation[$familyid] = 1;
+	    }
+	  }
+
+	  // update the static array
+	}
+	
 	public static function twoYearCsv () {
+		$enrolledHandle = fopen(self::EnrolledStudentsFile, "w") or die ("cannot open file " . self::EnrolledStudentsFile);
+		$leavingHandle = fopen(self::LeavingStudentsFile, "w") or die ("cannot open file " . self::LeavingStudentsFile);
 		self::firstTimeCall();
 		foreach (self::$objArray as $studentid => $twoYear) {
 			$student = Student::GetItemById($studentid);
 			$familyid = $student->family->id;
-			
+			$currFamilyStatus = EnumFamilyTracker::NameFromId(FamilyTracker::CurrentYearStatus($familyid));
+			$fileHandle = null;
+				
 			$fields = Array();
 			$fields[] = $studentid;
 			$fields[] = $familyid;
-			$fields[] = $twoYear->previousYear->csv();
-			$fields[] = $twoYear->thisYear->csv();
-			$fields[] = $twoYear->status;
-			$fields[] = EnumFamilyTracker::NameFromId(FamilyTracker::CurrentYearStatus($familyid));
+			//			$fields[] = $twoYear->previousYear->csv();
+				
+			if ($twoYear->status != self::Leaving) {
+				$fileHandle = $enrolledHandle;
+
+				//				$fields[] = $twoYear->thisYear->csv();
+				$twoYear->thisYear->csv(&$fields);
+				$fields[] = $twoYear->status;
+				$fields[] = $twoYear->assessment;
+			} else {
+
+				$fileHandle = $leavingHandle;
+				$twoYear->previousYear->csv(&$fields);
+				$fields[] = $currFamilyStatus;
+			}
 			$fields[] = $student->fullName();
-			
-			print implode (", ", $fields) . "\n";
+				
+			if ($twoYear->status == self::Continuing) $twoYear->previousYear->csv(&$fields);
+				
+			fputcsv($fileHandle, $fields);
 		}
+
+		fclose($enrolledHandle); fclose($leavingHandle);
 	}
-	
+
 	public static function assignClass() {
 		self::firstTimeCall();
 		$count = 0;
@@ -695,7 +804,9 @@ class TwoYearLayout {
 	}
 }
 
+Admission::Roster(2011); exit();
 //Admission::itemDelivery(); exit();
+//Admission::classParentsEmail(67); Admission::classParentsEmail(65); exit();
 //TwoYearLayout::checkFeePaid(); exit();
 //TwoYearLayout::assignClass(); exit();
 TwoYearLayout::twoYearCsv(); exit();
