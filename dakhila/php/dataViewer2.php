@@ -105,6 +105,7 @@ LOGIN;
 <tr><td><a href="dataViewer2.php?command=RegistrationSummary">2011 Registration Summary</tr>
 <tr><td><a href="dataViewer2.php?command=CourseCatalog">Course Catalog</tr>
 <tr><td><a href="dataViewer2.php?command=AvailableCourse&facility=2&year=2011">Available Courses</tr>
+<tr><td><a href="dataViewer2.php?command=ClassRoster&classId=75">Class Roster</tr>
 <tr><td><a href="/dakhila/wow/grid.php">Available Courses V2</tr>
 </table>
 
@@ -226,6 +227,13 @@ SQLREGISTRATIONSUMMAY;
       DisplayAvailableClass($this->template, $year, $facility);
       print $this->template->get();
       break;		
+      
+      case "ClassRoster":
+		$classId=$_GET["classId"];
+		if ($classId =="") $classId=75;
+		DisplayClassRoster($this->template, $classId);
+		print $this->template->get();
+		break;	
 
     default:
       $html = "<p>Please specify a valid command for the data you want to see";

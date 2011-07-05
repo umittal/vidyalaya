@@ -191,7 +191,7 @@ function DisplayChildren(&$template, $student) {
 }
 
 function DisplayFamilyV2(&$template, $family, $students) {
-	Layout($template);
+	
 	$template->addBlockFile('RESULT', 'F_RESULT', 'FamilyDetail.tpl');
 	$template->touchBlock('F_RESULT');
 	DisplayFamilyTemplate($template, $family, $students);
@@ -252,7 +252,7 @@ function DisplayRegistrationChildren(&$template, $student) {
 }
 
 function DisplayRegistration(&$template, $family, $students) {
-	Layout($template);
+	
 	$template->addBlockFile('RESULT', 'F_RESULT', 'Registration.tpl');
 	$template->touchBlock('F_RESULT');
 	DisplayRegistrationTemplate($template, $family);
@@ -282,7 +282,7 @@ function DisplayStudentMedicatlInformationTemplate($template, $student) {
 
 
 function DisplayStudentMedicalInformationV2(&$template, $student) {
-	Layout($template);
+	
 	$template->addBlockFile('RESULT', 'F_RESULT', 'MedicalInformation.tpl');
 	$template->touchBlock('F_RESULT');
 	
@@ -317,8 +317,9 @@ function DisplayCourseCatalog(&$template) {
 
 }
 
+// ****************************
+// Available Class
 function DisplayAvailableClass($template, $year, $facility) {
-	Layout($template);
 	$template->addBlockFile('RESULT', 'F_RESULT', 'AvailableClass.tpl');
 	$template->touchBlock('F_RESULT');
 	
@@ -352,5 +353,42 @@ function DisplayAvailableClass($template, $year, $facility) {
 	}
 }
 
+// ****************************
+// Available Class
+
+function DisplayClassRoster($template, $classId) {
+		$template->addBlockFile('RESULT', 'F_RESULT', 'ClassRoster.tpl');
+	$template->touchBlock('F_RESULT');
+	foreach (Enrollment::GetEnrollmentForClass($classId)  as $item) {
+		$student = $item->student;
+		$templateName="ROSTERITEM";
+		$template->setCurrentBlock($templateName);
+
+		$template->setVariable("SFIRST", $student->firstName);
+		$template->setVariable("SLAST", $student->lastName);
+		$template->setVariable("SEMAIL", $student->email);
+		$template->setVariable("AGE", (int)$student->AgeAt(Calendar::CurrentSession));
+		$template->setVariable("GRADE", $student->Grade());
+		
+		//print "student = $student->id\n";
+		
+		$parent = $student->family->mother;
+		$template->setVariable("PFIRST", $parent->firstName);
+		$template->setVariable("PLAST", $parent->lastName);
+		$template->setVariable("PEMAIL", $parent->email);
+		$template->setVariable("PHONE", $student->family->phone);
+		
+		$template->parseCurrentBlock();
+		
+		$parent= $student->family->father;
+		$template->setCurrentBlock($templateName);
+
+		$template->setVariable("PFIRST", $parent->firstName);
+		$template->setVariable("PLAST", $parent->lastName);
+		$template->setVariable("PEMAIL", $parent->email);
+				
+		$template->parseCurrentBlock();
+	}
+}
 
 ?>

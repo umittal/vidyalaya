@@ -68,6 +68,13 @@ switch ($command) {
 		$html= $template->get();
 		break;		
 		
+	case "ClassRoster":
+		$year=$_GET["classId"];
+		if ($classId =="") $classId=75;
+		DisplayClassRoster($classId);
+		$html= $template->get();
+		break;	
+		
 	case "RegistrationSummary":
 		$sql = <<< SQLREGISTRATIONSUMMAY
 		  select previousYear, currentYear, count(*) 
