@@ -5,6 +5,8 @@ require_once "$libDir/db.inc";
 require_once "$libDir/vidyalaya.inc";
 
 require("../../Classes/PHPMailer_v5.1/class.phpmailer.php");
+$dompdfDir = "../../dompdf2";
+require_once("$dompdfDir/dompdf_config.inc.php");
 
 
 function SetupMail() {
@@ -366,6 +368,103 @@ class Mail {
 
 }
 
+class Evaluation {
+	const TopDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2010-11/evaluation";
+	const ReadDir  = "/home/umesh/Dropbox/Vidyalaya-Roster/2010-11/evaluation/input";
+	const WriteDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2010-11/evaluation/report";
+	
+	private static $txt;
+	private static $html;
+	private static $pdf;
+	
+	private static function HtmlToPdf($html) {
+	$html = str_replace('&nbsp;', '<span style="color:#fff;">x</span>',$html);
+	$dompdf = new DOMPDF();
+	$dompdf->load_html($html);
+	$dompdf->render();	
+	return $dompdf->output();
+	}
+	
+	private static function PrintThreeFiles($id) {
+		$txtName = self::WriteDir . "/txt/$id" . ".txt";
+		file_put_contents("$txtName", self::$txt);
+		
+		$htmlName = self::WriteDir . "/html/$id" . ".html";
+		file_put_contents("$htmlName", self::$html);
+		
+		$pdfName = self::WriteDir . "/pdf/$id" . ".pdf";
+		file_put_contents("$pdfName", self::HtmlToPdf(self::$html));
+	}
+	
+	private static function shortToLong($short) {
+		switch (strtoupper($short)) {
+			case "N": return "Needs Improvement";
+			break;
+			case "S": return "Satisfactory";
+			break;
+			case "E": return "Excellent";
+			case "N/A": case "NA": return "Not Evaluated";
+			
+			default: return $short;			;
+			break;
+		}
+	}
+
+	private static function WriteStudentAssessment($category, $header, $row) {
+		//				self::$htmlfh = fopen($filename, "w");
+		$count = count($row);
+		if ($count < 3) continue;
+		$student = $row[1];
+		$name = $row[2];
+		self::$txt =  "$student ($name)\n";
+		self::$html = "<table><tr><td>Session</td><td>2010-11</td></tr>\n";
+		self::$html .= "<tr><td>ID</td><td>$student</td></tr>\n";
+		self::$html .= "<tr><td>Name</td><td>$name</td></tr>\n";
+		self::$html .= "</table><p>\n";
+		
+		$closeTable = 0;
+		self::$html .= "<table>\n";
+		for ($i=3; $i < $count; $i++) {
+			if (!empty($category[$i])) {
+				self::$txt .= "Category: $category[$i]\n";
+				self::$html .= "<tr><td colspan=2>&nbsp;</li></td></tr>\n";
+				self::$html .= "<tr><td colspan=2><b>Category: $category[$i]</b></li></td></tr>\n";
+			}
+			$evaluation = self::shortToLong($row[$i]);
+			self::$txt .= $header[$i] . "," . $evaluation  . "\n";
+			self::$html .= "<tr><td> $header[$i] </td><td> <i>$evaluation</i>   </td></tr>\n";
+		}
+		
+		self::$html .= "</table>\n<p>";
+		
+		
+		self::PrintThreeFiles($student);
+	}
+
+	public static function ProcessOneFile($directory, $file) {
+		echo "$directory/$file\n";
+		if (($handle = fopen("$directory/$file", "r")) !== FALSE) {
+			$evalCategory = fgetcsv($handle, 0, ",");
+			$evalHeaading = fgetcsv($handle, 0, ",");
+			while (($list = fgetcsv($handle, 0, ",")) !== FALSE) {
+				self::WriteStudentAssessment($evalCategory, $evalHeaading, $list);
+			}
+		}
+	}
+
+	public  static function ProcessAllFiles() {
+		$directory = self::ReadDir; // figure out a way for the caller to override it
+		if ($handle = opendir($directory)) {
+			while (false !== ($file = readdir($handle))) {
+				if ($file != "." && $file != ".." && preg_match("/csv$/i", $file)) {
+					self::ProcessOneFile($directory, $file);
+				}
+			}
+			closedir($handle);
+		}
+	}
+}
+
 class Admission {
 	const DataFile = "/tmp/2011.csv";
 	const OrientationFile = "/home/umesh/workspace/vidphp/admission2011/orientation1.txt";
@@ -480,6 +579,23 @@ ITEMEMAIL;
 			self::$rosterid = 1;
 			self::$rosterfh = null;
 			self::RosterClass($class);
+		}
+	}
+	
+	public static function RosterFromFile ($filename) {
+		self::$rosterid = 1;
+		self::$rosterfh = fopen("$filename.out", "w");
+		if (($handle = fopen($filename, "r")) !== FALSE) {
+			while ((list($studentid, $rest )= fgetcsv($handle, 0, "\t")) !== FALSE) {
+				if (empty($studentid)) continue;
+				$student = Student::GetItemById($studentid);
+				if (empty($student)) {
+					print "student not found for $studentid\n";
+				} else {
+					self::RosterStudent ($student);
+				}
+				
+			}
 		}
 	}
 }
@@ -804,12 +920,14 @@ class TwoYearLayout {
 	}
 }
 
-Admission::Roster(2011); exit();
+Evaluation::ProcessAllFiles(); exit();
+//Admission::RosterFromFile("/tmp/aa"); exit();
+//Admission::Roster(2011); exit();
 //Admission::itemDelivery(); exit();
 //Admission::classParentsEmail(67); Admission::classParentsEmail(65); exit();
 //TwoYearLayout::checkFeePaid(); exit();
 //TwoYearLayout::assignClass(); exit();
-TwoYearLayout::twoYearCsv(); exit();
+//TwoYearLayout::twoYearCsv(); exit();
 
 
 //OrientationCheck(); exit();
