@@ -433,6 +433,9 @@ class Evaluation {
 			$evaluation = self::shortToLong($row[$i]);
 			self::$txt .= $header[$i] . "," . $evaluation  . "\n";
 			self::$html .= "<tr><td> $header[$i] </td><td> <i>$evaluation</i>   </td></tr>\n";
+			if (preg_match("/suggested level for 2011/i", $header[$i])) {
+				print "$student, $row[$i]\n";
+			}
 		}
 		
 		self::$html .= "</table>\n<p>";
@@ -468,7 +471,7 @@ class Evaluation {
 class Admission {
 	const DataFile = "/tmp/2011.csv";
 	const OrientationFile = "/home/umesh/workspace/vidphp/admission2011/orientation1.txt";
-	const assesssmentFile = "/home/umesh/workspace/vidphp/admission2011/assessment.csv";
+	const assesssmentFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/data/assessment.csv";
 
 
 	private static function sendItemEmail($familyId, $cd, $pb, $bag) {
@@ -920,14 +923,14 @@ class TwoYearLayout {
 	}
 }
 
-Evaluation::ProcessAllFiles(); exit();
+//Evaluation::ProcessAllFiles(); exit();
 //Admission::RosterFromFile("/tmp/aa"); exit();
 //Admission::Roster(2011); exit();
 //Admission::itemDelivery(); exit();
 //Admission::classParentsEmail(67); Admission::classParentsEmail(65); exit();
 //TwoYearLayout::checkFeePaid(); exit();
 //TwoYearLayout::assignClass(); exit();
-//TwoYearLayout::twoYearCsv(); exit();
+TwoYearLayout::twoYearCsv(); exit();
 
 
 //OrientationCheck(); exit();
