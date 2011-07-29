@@ -5,8 +5,6 @@ require_once "$libDir/db.inc";
 require_once "$libDir/vidyalaya.inc";
 
 require("../../Classes/PHPMailer_v5.1/class.phpmailer.php");
-$dompdfDir = "../../dompdf2";
-require_once("$dompdfDir/dompdf_config.inc.php");
 
 
 function SetupMail() {
@@ -364,6 +362,32 @@ class Mail {
 			echo "Message has been sent, Family: $family->id:\n";
 		}
 	}
+	
+	public static function  mailEvaluation($studentId, $html, $production) {
+		$student = Student::GetItemById($studentId);
+		$family = $student->family;
+		
+		$subject = "Language Evaluation 2010-11: " . $student->fullName();
+		if ($production == 0) $subject = "[Test] $subject";
+
+		$mail = self::SetupMail();
+		self::SetFamilyAddress($mail, $family, $production);
+		$mail->Subject = $subject;
+		$mail->Body = $html;
+
+		$filename = "/tmp/evalution-" . $studentId. ".pdf";
+		file_put_contents($filename, HtmlToPdf($html));
+		  $mail->AddAttachment($filename); // attachment
+		
+		$mail->AltBody = "This is the body when user views in plain text format"; //Text Body
+		
+		if(!$mail->Send()) {
+			echo "Mailer Error: Family: $family->id: " . $mail->ErrorInfo . "\n";
+		}  else {
+			echo "Message has been sent, Family: $family->id:\n";
+		}
+	}
+	
 
 
 }
@@ -377,13 +401,6 @@ class Evaluation {
 	private static $html;
 	private static $pdf;
 	
-	private static function HtmlToPdf($html) {
-	$html = str_replace('&nbsp;', '<span style="color:#fff;">x</span>',$html);
-	$dompdf = new DOMPDF();
-	$dompdf->load_html($html);
-	$dompdf->render();	
-	return $dompdf->output();
-	}
 	
 	private static function PrintThreeFiles($id) {
 		$txtName = self::WriteDir . "/txt/$id" . ".txt";
@@ -393,7 +410,7 @@ class Evaluation {
 		file_put_contents("$htmlName", self::$html);
 		
 		$pdfName = self::WriteDir . "/pdf/$id" . ".pdf";
-		file_put_contents("$pdfName", self::HtmlToPdf(self::$html));
+		file_put_contents("$pdfName", HtmlToPdf(self::$html));
 	}
 	
 	private static function shortToLong($short) {
@@ -409,18 +426,58 @@ class Evaluation {
 			break;
 		}
 	}
+	
+	private static function VidyalayaHeader() {
+		$header = <<<EOT
+		<html>
+		<head>
+		 <STYLE type="text/css">
+   H3.section {border-width: 1; border: solid; text-align: center; width: 50%}
+   table {border-collapse:collapse; margin-left:30px;}
+   tr.left{ border-left: 5px dashed red;}
+   td{padding-left:15px;}
+ </STYLE>
+		
+		</head>
+		<body>
+		<a href=""><img src="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/images/Vheader2.jpg"
+		width="800" height="80" 
+		alt="vidyalaya logo"/></a>
+EOT;
+	return $header;
+	}
 
 	private static function WriteStudentAssessment($category, $header, $row) {
 		//				self::$htmlfh = fopen($filename, "w");
 		$count = count($row);
 		if ($count < 3) continue;
-		$student = $row[1];
+		$studentId = $row[1];
+		$student = Student::GetItemById($studentId);
 		$name = $row[2];
-		self::$txt =  "$student ($name)\n";
-		self::$html = "<table><tr><td>Session</td><td>2010-11</td></tr>\n";
-		self::$html .= "<tr><td>ID</td><td>$student</td></tr>\n";
+		self::$txt =  "$studentId ($name)\n";
+		self::$html = self::VidyalayaHeader();
+		self::$html .= "<h3 class=section>Enrollment History</h3>\n";
+		self::$html .= "<table>\n";
+		self::$html .= "<tr><td>ID</td><td>$studentId</td></tr>\n";
 		self::$html .= "<tr><td>Name</td><td>$name</td></tr>\n";
-		self::$html .= "</table><p>\n";
+		self::$html .= "<tr><td>Parents</td><td>" . $student->parentsName() . "</td></tr>\n";
+		// Get Enrollemnet details
+		$history = Enrollment::GetLanguageHistory($studentId);
+		$year = null;
+		foreach ($history as $item) {
+			$year = $item->class->year + 2010;
+			self::$txt .=  $item->class->session . "	"	. $item->class->short() . "\n";
+			self::$html .= "<tr><td>" . $item->class->session . "</td><td>" . $item->class->short() . "</td></tr>\n";
+		}
+		if ($year != 2011) {
+			self::$txt .=  "2011-12	Not Enrolled\n";
+			self::$html .= "<tr><td>" . "2011-12" . "</td><td>" . "<i>Not Enrolled</i>" . "</td></tr>\n";
+		}
+		
+		if (empty($year)) die ("No history found for student id $studentId\n");
+		self::$html .= "</table>\n";
+		
+		self::$html .= "<p><h3 class=section>Evaluation 2010-11</h3>\n";
 		
 		$closeTable = 0;
 		self::$html .= "<table>\n";
@@ -431,17 +488,24 @@ class Evaluation {
 				self::$html .= "<tr><td colspan=2><b>Category: $category[$i]</b></li></td></tr>\n";
 			}
 			$evaluation = self::shortToLong($row[$i]);
-			self::$txt .= $header[$i] . "," . $evaluation  . "\n";
-			self::$html .= "<tr><td> $header[$i] </td><td> <i>$evaluation</i>   </td></tr>\n";
+			self::$txt .= "\n" . $header[$i] . "," . $evaluation  . "\n";
 			if (preg_match("/suggested level for 2011/i", $header[$i])) {
-				print "$student, $row[$i]\n";
+				//self::$html .= "<tr><td colspan=2>&nbsp;</li></td></tr>\n";
+				print "$studentId, $row[$i]\n";
+			} else {
+				self::$html .= "<tr class=left><td> $header[$i] </td><td> <i>$evaluation</i>   </td></tr>\n";
 			}
 		}
 		
-		self::$html .= "</table>\n<p>";
+		self::$html .= "</table>\n";
+		self::$html .= "</body>\n</html>\n";
 		
 		
-		self::PrintThreeFiles($student);
+		self::PrintThreeFiles($studentId);
+		if ($studentId != 1452) return;
+		//$subject="Language Evaluation 2010-11, " . $student->fullName();
+		Mail::mailEvaluation($studentId, self::$html, 0);
+//		Mail::mailFamilyFromAdmission($student->family, $subject, self::$html, 0);
 	}
 
 	public static function ProcessOneFile($directory, $file) {
@@ -469,7 +533,7 @@ class Evaluation {
 }
 
 class Admission {
-	const DataFile = "/tmp/2011.csv";
+	const DataFile = "/home/umesh/Dropbox/Vidyalaya-Management/Administration/2011.csv";
 	const OrientationFile = "/home/umesh/workspace/vidphp/admission2011/orientation1.txt";
 	const assesssmentFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/data/assessment.csv";
 
@@ -734,7 +798,7 @@ class TwoYearLayout {
 		$student = Student::GetItemById($studentId);
 		if (empty($student)) print "student not found for id ==$studentId==";
 		if (empty(self::$objArray[$studentId])) {
-			
+			print "I am here for student $studentId, found in current year from file\n";
 			self::$objArray[$studentId] = new TwoYearLayout();
 			$twoyear = self::GetItemById($studentId);
 			$twoyear->thisYear->updateFromStudent($student);
@@ -742,7 +806,7 @@ class TwoYearLayout {
 	}
 
 	private static function currentYearFromFile() {
-		$filename = "/tmp/2011.csv";
+		$filename = "/home/umesh/Dropbox/Vidyalaya-Management/Administration/2011.csv";
 		if (($handle = fopen($filename, "r")) !== FALSE) {
 			$header = fgetcsv($handle, 0, ",");
 			$header = fgetcsv($handle, 0, ",");
@@ -899,7 +963,7 @@ class TwoYearLayout {
 					$feeRequired[$familyid] = 550;
 				}
 				
-				if ($twoYear->status == self::NewStudent) $newRegFee[$familyid] += 50; 
+				if ($twoYear->status == self::NewStudent || $twoYear->status == self::Orientation ) $newRegFee[$familyid] += 50; 
 			}
 		}
 		
@@ -923,14 +987,14 @@ class TwoYearLayout {
 	}
 }
 
-//Evaluation::ProcessAllFiles(); exit();
+Evaluation::ProcessAllFiles(); exit();
 //Admission::RosterFromFile("/tmp/aa"); exit();
 //Admission::Roster(2011); exit();
 //Admission::itemDelivery(); exit();
 //Admission::classParentsEmail(67); Admission::classParentsEmail(65); exit();
 //TwoYearLayout::checkFeePaid(); exit();
 //TwoYearLayout::assignClass(); exit();
-TwoYearLayout::twoYearCsv(); exit();
+//TwoYearLayout::twoYearCsv(); exit();
 
 
 //OrientationCheck(); exit();

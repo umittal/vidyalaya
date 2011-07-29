@@ -1,6 +1,8 @@
 <?php
 
 require_once "vidyalaya.inc";
+$dompdfDir = "../../dompdf2";
+require_once("$dompdfDir/dompdf_config.inc.php");
 
 // returns true if $str begins with $sub
 function beginsWith( $str, $sub ) {
@@ -64,6 +66,15 @@ function GetSingleIntArgument() {
 	}
 
 }
+
+function HtmlToPdf($html) {
+	$html = str_replace('&nbsp;', '<span style="color:#fff;">x</span>',$html);
+	$dompdf = new DOMPDF();
+	$dompdf->load_html($html);
+	$dompdf->render();
+	return $dompdf->output();
+}
+
 
 Class Calendar {
 	const BaseYear = 2010
@@ -145,6 +156,7 @@ class EnumFamilyTracker {
 	const tooExpensive=7;
 	const sportsConflict=8;
 	const graduating=9;
+	const pendingInvitation=10;
 
     public function enum($string){
     	
@@ -165,6 +177,8 @@ class EnumFamilyTracker {
     		case self::tooExpensive: return "Too Expensive";
     		case self::sportsConflict: return "Sports Conflict";
     		case self::graduating: return "All Graduating";
+    		case self::pendingInvitation: return "To be invited";
+    		
     		default: return "Unknown $id";
     	}
     }

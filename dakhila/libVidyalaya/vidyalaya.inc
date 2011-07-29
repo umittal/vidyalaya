@@ -399,6 +399,7 @@ class CourseCatalog {
 class AvailableClass {
 	public $id=null;
 	public $year = null;
+	public $session = null;
 	public $course= null;
 	public $section=null;
 	public $room = null;
@@ -451,6 +452,7 @@ class AvailableClass {
 	public function __construct($row) {
 		$this->id = $row["AvailableClass.id"];
 		$this->year= $row["AvailableClass.year"];
+		$this->session = sprintf("%s-%s",  $this->year+2010 , $this->year+11);
 		$this->course = CourseCatalog::GetItemById($row["AvailableClass.course"]);
 		$this->section = $row["AvailableClass.section"];
 		$this->room = Rooms::GetItemById($row["AvailableClass.room"]);
@@ -627,12 +629,8 @@ class Enrollment{
 	  return $families;
 	}
 	
-	public static function GetEnrollmentForClass ($class) {
+	private static function ArrayFromQuery($query) {
 		$enrollmentArray = Array();
-		$query = "select * 
-		from Enrollment
-		where availableClass = $class
-		";
 		
 		$result = VidDb::query($query);
 		while ($row = mysql_fetch_alias_array($result)) {
@@ -641,22 +639,37 @@ class Enrollment{
 		
 		return $enrollmentArray;
 	}
-		
+	
+	public static function GetEnrollmentForClass ($class) {
+		$query = "select * 
+		from Enrollment
+		where availableClass = $class
+		";
+		return self::ArrayFromQuery($query);
+	}
+	
+	public static function GetLanguageHistory($studentId) {
+		$query = "
+		select * from Enrollment
+		left join AvailableClass on Enrollment.availableClass = AvailableClass.id
+		left join CourseCatalog on AvailableClass.course = CourseCatalog.id
+		where Enrollment.student = $studentId
+			and CourseCatalog.department <> " . Department::Culture . "
+		order by AvailableClass.year
+		";
+		return self::ArrayFromQuery($query);
+	}
+
 	public static function GetAllEnrollmentForFacilitySession($facility, $year) {
 		if ($year >= 2010) $year -= 2010;
-		$enrollmentArray = Array();
+		
 		$query = "select * 
 		from Enrollment
 			inner join AvailableClass on Enrollment.availableClass = AvailableClass.id
 			inner join Rooms on AvailableClass.room = Rooms.id
 		where AvailableClass.year = $year and Rooms.facility = $facility
 		";
-		
-		$result = VidDb::query($query);
-		while ($row = mysql_fetch_alias_array($result)) {
-			$enrollmentArray[] = new self($row);
-		}
-		return $enrollmentArray;
+		return self::ArrayFromQuery($query);	
 	}
 	
 	public function __construct($row) {
@@ -1020,7 +1033,7 @@ class FamilyTracker {
 
 	public static function loadPayments () {
 		//FamilyTracker::firstTimeCall();
-		$filename = "/tmp/2011.csv";
+		$filename = "/home/umesh/Dropbox/Vidyalaya-Management/Administration/2011.csv";
 		if (($handle = fopen($filename, "r")) !== FALSE) {
 			$header = fgetcsv($handle, 0, ",");
 			$header = fgetcsv($handle, 0, ",");
