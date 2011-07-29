@@ -6,8 +6,8 @@ require_once "$libDir/vidyalaya.inc";
 require_once "HTML/Template/ITX.php";
 require_once "$libDir/HtmlFactory.inc";
 
-$dompdfDir = "../dompdf2";
-require_once("$dompdfDir/dompdf_config.inc.php");
+//$dompdfDir = "../dompdf2";
+//require_once("$dompdfDir/dompdf_config.inc.php");
 
 function GetEnrolledStudentCountForFamily($id, $students) {
 	$count=0;
