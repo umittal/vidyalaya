@@ -294,6 +294,29 @@ BODY_WAITING;
 }
 
 class Mail {
+	private static function SetupMailCommon($email, $name, $password) {
+		$mail = new PHPMailer(false);
+		$mail->IsSMTP(); // send via SMTP
+		$mail->SMTPAuth = true; // turn on SMTP authentication
+		$mail->Username = $email; // SMTP username
+		$mail->Password = $password; // SMTP password
+		$mail->From = $email;
+		$mail->FromName = $name;
+		$mail->AddReplyTo($email,$name);
+		$mail->IsHTML(true); // send as HTML
+		$mail->WordWrap = 50; // set word wrap
+
+		return $mail;
+		
+	}
+	private static function SetupMailAdmissions() {
+		return self::SetupMailCommon("Admission2011@vidyalaya.us", "Vidyalaya Admissions", "Praveen38");
+	}
+	
+	private static function SetupMailSPA() {
+		return self::SetupMailCommon("spa@vidyalaya.us", "Student and Parent Affairs", "vasudha");
+	}
+	
 	private static function SetupMail() {
 
 		$email = "Admission2011@vidyalaya.us";
@@ -367,13 +390,29 @@ class Mail {
 		$student = Student::GetItemById($studentId);
 		$family = $student->family;
 		
+		$footer = "<p>Student and Parent Affairs (SPA)<br>by Umesh Mittal</p>";	
 		$subject = "Language Evaluation 2010-11: " . $student->fullName();
 		if ($production == 0) $subject = "[Test] $subject";
 
-		$mail = self::SetupMail();
+		$mail = self::SetupMailSPA();
 		self::SetFamilyAddress($mail, $family, $production);
 		$mail->Subject = $subject;
-		$mail->Body = $html;
+		$salutation = "<p>Dear " . $family->parentsName() . ",";
+		
+		$name = $student->fullName();
+		
+		$body = <<<EOT
+		<P>Attached please find the language evaluation report of $name for year 2010-11. Also please find the class assignment
+		the next session if you have registered. We want to take this opporutnity to thank the teachers for their voluntary 
+		contribution.
+		<p>Should you have any questions or concerns, please respond to this email at the earliest. All placement issues 
+		will be addressed before the School opens in September. SPA will coordinate with Teachers to address your concerns.
+		<P>Regards,
+		  
+EOT;
+		
+		$mail->Body = $salutation . $body . $footer;
+		
 
 		$filename = "/tmp/evalution-" . $studentId. ".pdf";
 		file_put_contents($filename, HtmlToPdf($html));
@@ -386,6 +425,8 @@ class Mail {
 		}  else {
 			echo "Message has been sent, Family: $family->id:\n";
 		}
+		
+		unlink($filename);
 	}
 	
 
@@ -428,23 +469,21 @@ class Evaluation {
 	}
 	
 	private static function VidyalayaHeader() {
-		$header = <<<EOT
+		$timestamp = date("r");
+		$htmlHeader = <<<EOT
 		<html>
 		<head>
-		 <STYLE type="text/css">
-   H3.section {border-width: 1; border: solid; text-align: center; width: 50%}
-   table {border-collapse:collapse; margin-left:30px;}
-   tr.left{ border-left: 5px dashed red;}
-   td{padding-left:15px;}
- </STYLE>
+		<link rel="stylesheet" href="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/site.css" 
+			type="text/css" media="screen print" /> 
 		
 		</head>
 		<body>
 		<a href=""><img src="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/images/Vheader2.jpg"
 		width="800" height="80" 
 		alt="vidyalaya logo"/></a>
+		<p class=smallFont> $timestamp </p>
 EOT;
-	return $header;
+	return $htmlHeader;
 	}
 
 	private static function WriteStudentAssessment($category, $header, $row) {
@@ -454,20 +493,24 @@ EOT;
 		$studentId = $row[1];
 		$student = Student::GetItemById($studentId);
 		$name = $row[2];
+		
+		// Studnet Information DIsplay
 		self::$txt =  "$studentId ($name)\n";
 		self::$html = self::VidyalayaHeader();
-		self::$html .= "<h3 class=section>Enrollment History</h3>\n";
-		self::$html .= "<table>\n";
+		self::$html .= "<div class=section>Student</div>\n";
+		self::$html .= "<table class=evaluation>\n";
 		self::$html .= "<tr><td>ID</td><td>$studentId</td></tr>\n";
-		self::$html .= "<tr><td>Name</td><td>$name</td></tr>\n";
-		self::$html .= "<tr><td>Parents</td><td>" . $student->parentsName() . "</td></tr>\n";
+		self::$html .= "<tr><td>Name</td><td></td><td>$name</td></tr>\n";
+		self::$html .= "<tr><td>Parents</td><td></td><td>" . $student->parentsName() . "</td></tr>\n";
+		self::$html .= "<tr><td>Teachers</td><td></td><td>" . $student->registration->language->teachers . "</td></tr>\n";
 		// Get Enrollemnet details
 		$history = Enrollment::GetLanguageHistory($studentId);
 		$year = null;
 		foreach ($history as $item) {
 			$year = $item->class->year + 2010;
 			self::$txt .=  $item->class->session . "	"	. $item->class->short() . "\n";
-			self::$html .= "<tr><td>" . $item->class->session . "</td><td>" . $item->class->short() . "</td></tr>\n";
+			self::$html .= "<tr><td>" . $item->class->session . "</td><td>" . $item->class->short() . "</td>";
+			self::$html .= "<td>" . $item->class->course->full . "</td></tr>\n";
 		}
 		if ($year != 2011) {
 			self::$txt .=  "2011-12	Not Enrolled\n";
@@ -477,23 +520,23 @@ EOT;
 		if (empty($year)) die ("No history found for student id $studentId\n");
 		self::$html .= "</table>\n";
 		
-		self::$html .= "<p><h3 class=section>Evaluation 2010-11</h3>\n";
-		
 		$closeTable = 0;
-		self::$html .= "<table>\n";
+		
+		// Evaluation Display
+		self::$html .= "<div class=section>Language Evaluation (2010-11)</div>\n";
+		self::$html .= "<table class=evaluation>\n";
 		for ($i=3; $i < $count; $i++) {
+			if (empty($header[$i])) continue;
 			if (!empty($category[$i])) {
 				self::$txt .= "Category: $category[$i]\n";
-				self::$html .= "<tr><td colspan=2>&nbsp;</li></td></tr>\n";
-				self::$html .= "<tr><td colspan=2><b>Category: $category[$i]</b></li></td></tr>\n";
+				self::$html .= "<tr><td colspan=2 class=category><b>$category[$i]</b></li></td></tr>\n";
 			}
 			$evaluation = self::shortToLong($row[$i]);
-			self::$txt .= "\n" . $header[$i] . "," . $evaluation  . "\n";
 			if (preg_match("/suggested level for 2011/i", $header[$i])) {
-				//self::$html .= "<tr><td colspan=2>&nbsp;</li></td></tr>\n";
-				print "$studentId, $row[$i]\n";
+				print "$studentId, $row[$i]\n"; // Dispaly it once, to move to file
 			} else {
-				self::$html .= "<tr class=left><td> $header[$i] </td><td> <i>$evaluation</i>   </td></tr>\n";
+				self::$txt .= "\n" . $header[$i] . "," . $evaluation  . "\n";
+				self::$html .= "<tr><td class=left> $header[$i] </td><td> <i>$evaluation</i>   </td></tr>\n";
 			}
 		}
 		
@@ -503,9 +546,8 @@ EOT;
 		
 		self::PrintThreeFiles($studentId);
 		if ($studentId != 1452) return;
-		//$subject="Language Evaluation 2010-11, " . $student->fullName();
 		Mail::mailEvaluation($studentId, self::$html, 0);
-//		Mail::mailFamilyFromAdmission($student->family, $subject, self::$html, 0);
+
 	}
 
 	public static function ProcessOneFile($directory, $file) {
