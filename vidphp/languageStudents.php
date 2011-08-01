@@ -9,7 +9,7 @@ include_once  'db.inc';
 include_once 'vidyalaya.inc';
 
 /** PHPExcel */
-include 'PHPExcel.php';
+include 'PHPExcel/PHPExcel.php';
 
 /** PHPExcel_Writer_Excel2007 */
 include 'PHPExcel/Writer/Excel2007.php';

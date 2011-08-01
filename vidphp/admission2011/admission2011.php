@@ -6,6 +6,11 @@ require_once "$libDir/vidyalaya.inc";
 
 require("../../Classes/PHPMailer_v5.1/class.phpmailer.php");
 
+/** PHPExcel */
+//require_once  "PHPExcel/PHPExcel.php";
+require_once  "PHPExcel/PHPExcel/IOFactory.php";
+//require_once  'PHPExcel/PHPExcel/Writer/Excel2007.php';
+
 
 function SetupMail() {
 
@@ -390,7 +395,7 @@ class Mail {
 		$student = Student::GetItemById($studentId);
 		$family = $student->family;
 		
-		$footer = "<p>Student and Parent Affairs (SPA)<br>by Umesh Mittal</p>";	
+		$footer = "<p>Asmita Mistry<br>On behalf of the Language Curriculum Team</p>";	
 		$subject = "Language Evaluation 2010-11: " . $student->fullName();
 		if ($production == 0) $subject = "[Test] $subject";
 
@@ -402,13 +407,19 @@ class Mail {
 		$name = $student->fullName();
 		
 		$body = <<<EOT
-		<P>Attached please find the language evaluation report of $name for year 2010-11. Also please find the class assignment
-		the next session if you have registered. We want to take this opporutnity to thank the teachers for their voluntary 
-		contribution.
-		<p>Should you have any questions or concerns, please respond to this email at the earliest. All placement issues 
-		will be addressed before the School opens in September. SPA will coordinate with Teachers to address your concerns.
-		<P>Regards,
-		  
+		
+		<p>Attached please find the language evaluation report for $name for the 2010-11 school year. 
+		Also please find the class assignment for the upcoming school year if you have already registered. 
+		We also want to take this opportunity to thank the teachers for their voluntary contribution.
+
+		<p>Should you have any questions or concerns, please respond to this email at the 
+		earliest. All placement issues will be addressed before the school opens in September. 
+		Please forward any questions or comments to spa@vidyalaya.us.  The SPA team will 
+		coordinate with the Language Curriculum Team to address your concerns.
+
+<p>Have a great summer!
+
+<p>Regards,
 EOT;
 		
 		$mail->Body = $salutation . $body . $footer;
@@ -479,7 +490,7 @@ class Evaluation {
 		</head>
 		<body>
 		<a href=""><img src="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/images/Vheader2.jpg"
-		width="800" height="80" 
+		width="700" height="70" 
 		alt="vidyalaya logo"/></a>
 		<p class=smallFont> $timestamp </p>
 EOT;
@@ -579,6 +590,7 @@ class Admission {
 	const OrientationFile = "/home/umesh/workspace/vidphp/admission2011/orientation1.txt";
 	const assesssmentFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/data/assessment.csv";
 
+	const BaseDir = "/home/umesh/Dropbox/Vidyalaya-Roster";
 
 	private static function sendItemEmail($familyId, $cd, $pb, $bag) {
 		
@@ -705,6 +717,79 @@ ITEMEMAIL;
 				}
 				
 			}
+		}
+	}
+	
+	private static function AttendanceSheetFill($class) {
+		$inputFileName = "/tmp/attendance2011.xlsx";
+		$activeSheetIndex=0;
+		$row =4;
+
+		/**  Identify the type of $inputFileName  **/
+//		$inputFileType =PHPExcel_IOFactory::identify($inputFileName);
+		/**  Create a new Reader of the type that has been identified  **/
+//		$objReader = PHPExcel_IOFactory::createReader($inputFileType);
+		/**  Load $inputFileName to a PHPExcel Object  **/
+//		$objPHPExcel = $objReader->load($inputFileName);
+		$objPHPExcel = PHPExcel_IOFactory::load($inputFileName);
+		$objPHPExcel->setActiveSheetIndex($activeSheetIndex);
+		$objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
+		$objPHPExcel->getActiveSheet()->setShowGridlines(false);
+		$objPHPExcel->getActiveSheet()->setRightToLeft(FALSE);
+		
+//		$objPHPExcel->getProperties()->setCreator("Umesh Mittal");
+//		$objPHPExcel->getProperties()->setLastModifiedBy("Umesh Mittal");
+//		$objPHPExcel->getProperties()->setTitle("Students");
+//		$objPHPExcel->getProperties()->setSubject("Vidyalaya Students");
+//		$objPHPExcel->getProperties()->setDescription("List of Vidyalaya Students by Classes");
+		
+		
+
+		$objPHPExcel->getActiveSheet()->setTitle($class->short());
+		$objPHPExcel->getActiveSheet()->getCell("B2")->setValue($class->short());
+			
+		$objPHPExcel->getActiveSheet()->getRowDimension("1")->setVisible(TRUE);
+		$objPHPExcel->getActiveSheet()->getRowDimension("2")->setVisible(TRUE);
+		$objPHPExcel->getActiveSheet()->getRowDimension("3")->setVisible(TRUE);
+		foreach(Enrollment::GetEnrollmentForClass ($class->id) as $item) {
+			$cellValue=sprintf("B%d", $row);
+			$objPHPExcel->getActiveSheet()->getCell($cellValue)->setValue($item->student->id);
+			$cellValue=sprintf("C%d", $row);
+			$objPHPExcel->getActiveSheet()->getCell($cellValue)->setValue($item->student->fullName());
+			$objPHPExcel->getActiveSheet()->getRowDimension($row)->setVisible(TRUE);
+			$row++;
+		}
+		$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
+		$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setVisible(true);
+		$objPHPExcel->getActiveSheet()->getColumnDimension('B')->setVisible(TRUE);
+		$objPHPExcel->getActiveSheet()->getColumnDimension('B')->setVisible(TRUE);
+		$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setVisible(TRUE);
+		$objPHPExcel->getActiveSheet()->getColumnDimension('D')->setVisible(TRUE);
+
+		return $objPHPExcel;
+	}
+	
+	public static function AttendanceSheet($year) {
+		foreach (AvailableClass::GetAllYear($year) as $class) {
+			$excelDir = self::BaseDir . "/" . $class->session . "/attendance/" . 
+			Department::NameFromId($class->course->department) . "/excel/";
+			$pdfDir=str_replace("excel", "pdf", $excelDir);
+			if (!file_exists($excelDir) && !mkdir($excelDir, 0777, true)) die ("error creating directory $excelDir");
+			if (!file_exists($pdfDir) && !mkdir($pdfDir, 0777, true)) die ("error creating directory $pdfDir");
+			
+			$excelFile=$excelDir . $class->short() . ".xlsx";
+			$pdfFile=$excelDir . $class->short() . ".pdf";
+			print "$excelFile, $pdfFile \n";
+			
+//			continue;
+			$objPHPExcel = self::AttendanceSheetFill($class);
+
+			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'PDF');
+//			$objWriter->save($pdfFile);
+
+			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+			$objWriter->save($excelFile);
+			echo date('H:i:s') . " Peak memory usage: " . (memory_get_peak_usage(true) / 1024 / 1024) . " MBrn\no";
 		}
 	}
 }
@@ -1029,7 +1114,9 @@ class TwoYearLayout {
 	}
 }
 
-Evaluation::ProcessAllFiles(); exit();
+
+Admission::AttendanceSheet(2011); exit();
+//Evaluation::ProcessAllFiles(); exit();
 //Admission::RosterFromFile("/tmp/aa"); exit();
 //Admission::Roster(2011); exit();
 //Admission::itemDelivery(); exit();
