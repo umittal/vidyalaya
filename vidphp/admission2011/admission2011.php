@@ -520,7 +520,7 @@ EOT;
 		foreach ($history as $item) {
 			$year = $item->class->year + 2010;
 			self::$txt .=  $item->class->session . "	"	. $item->class->short() . "\n";
-			self::$html .= "<tr><td>" . $item->class->session . "</td><td>" . $item->class->short() . "</td>";
+			self::$html .= "<tr><td>" . $item->class->session . "</td><td>" . $item->class->shortWithoutSection() . "</td>";
 			self::$html .= "<td>" . $item->class->course->full . "</td></tr>\n";
 		}
 		if ($year != 2011) {
@@ -1115,8 +1115,8 @@ class TwoYearLayout {
 }
 
 
-Admission::AttendanceSheet(2011); exit();
-//Evaluation::ProcessAllFiles(); exit();
+//Admission::AttendanceSheet(2011); exit();
+Evaluation::ProcessAllFiles(); exit();
 //Admission::RosterFromFile("/tmp/aa"); exit();
 //Admission::Roster(2011); exit();
 //Admission::itemDelivery(); exit();

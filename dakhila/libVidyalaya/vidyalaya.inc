@@ -417,7 +417,11 @@ class AvailableClass {
 
 	public function short() {
 	       return empty($this->section) ? $this->course->short : $this->course->short . $this->section;
+	}	
+	public function shortWithoutSection() {
+	       return empty($this->section) ? $this->course->short : $this->course->short;
 	}		
+	
 
 	public static function GetItemById($key) {
 	 	self::firstTimeCall();
