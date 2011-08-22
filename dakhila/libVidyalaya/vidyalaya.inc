@@ -527,6 +527,9 @@ class AvailableClass {
 // ************** 
 class Facility{
 	public $id=null;
+	public $name=null;
+	public $address=null;
+	public $zip=null;
 	
 	const Eastlake = 1;
 	const PHHS = 2;
@@ -539,7 +542,7 @@ class Facility{
 			self::ReadRow($row);
 		}
 	}
-	
+
 	public static function GetItemById($key) {
 	 	self::firstTimeCall();
 	 	return self::$objArray[$key];
@@ -561,6 +564,9 @@ class Facility{
 
 	public function __construct($row) {
 		$this->id = $row["Facilities.id"];
+		$this->name = $row["Facilities.name"];
+		$this->address = $row["Facilities.address"];
+		$this->zip = $row["Facilities.zip"];
 	}
 }
 
@@ -605,7 +611,7 @@ class Rooms{
 
 	public function __construct($row) {
 		$this->id = $row["Rooms.id"];
-		$this->facility= $row["Rooms.facility"];
+		$this->facility= Facility::GetItemById($row["Rooms.facility"]);
 		$this->roomNumber = $row["Rooms.room"];
 		$this->capacity = $row["Rooms.capacity"];
 	}
@@ -618,6 +624,15 @@ class Enrollment{
 	public $class = null;
 	public $academicGrade = null;
 	public $disciplineGrade =null;
+
+	public static function CompareStudentName($a, $b) {
+	  if ($a->student->id == $b->student->id) return 0;
+	  if ($a->student->lastName < $b->student->lastName) return -1;
+	  if ($a->student->lastName > $b->student->lastName) return 1;
+	  if ($a->student->firstName < $b->student->firstName) return -1;
+	  if ($a->student->firstName > $b->student->firstName) return 1;
+	  return 0;
+	}
 
 	// return all families in an availableclass
 	public static function GetFamilies($class) {
@@ -641,6 +656,7 @@ class Enrollment{
 			$enrollmentArray[] = new self($row);
 		}
 		
+	        usort ($enrollmentArray, "self::CompareStudentName");
 		return $enrollmentArray;
 	}
 	

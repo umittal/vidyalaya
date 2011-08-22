@@ -330,26 +330,28 @@ function DisplayAvailableClass($template, $year, $facility) {
 	}
 	
 	foreach (AvailableClass::GetAllYear($year) as $item) {
+	  $count = empty($classCount[$item->id]) ? 0 :$classCount[$item->id];
+	  if ($count==0) continue;
 		$templateName="CLASS";
 		$template->setCurrentBlock($templateName);
-		$template->setVariable("ID", $item->id);
-		
+
+		$classLink=sprintf("<a href=\"/dakhila/php/dataViewer2.php?command=ClassRoster&classId=%s\">%s</a>", $item->id, $item->id);
+     		$template->setVariable("ID", $classLink);
 		$template->setVariable("DEPARTMENT", Department::NameFromId( $item->course->department));
-		$template->setVariable("LEVEL", $item->course->level);
-		$template->setVariable("SHORT", $item->course->short);
-		
-		//$template->setVariable("FULL", $item->course->full);
-		$template->setVariable("SECTION", $item->section);
-		$template->setVariable("YEAR", $item->year+2010);
+		$template->setVariable("SHORT", $item->short());
 		$template->setVariable("ROOM", $item->room->roomNumber);
-		
-		$template->setVariable("START", $item->startTime);
-		$template->setVariable("END", $item->endTime);
-		
-		$count = empty($classCount[$item->id]) ? 0 :$classCount[$item->id];
 		$template->setVariable("COUNT", $count);
 		 
 		$template->parseCurrentBlock();
+
+		//		$template->setVariable("LEVEL", $item->course->level);
+		//$template->setVariable("FULL", $item->course->full);
+		//		$template->setVariable("SECTION", $item->section);
+		//		$template->setVariable("YEAR", $item->year+2010);
+		//		$template->setVariable("START", $item->startTime);
+		//		$template->setVariable("END", $item->endTime);
+		
+
 	}
 }
 
@@ -357,38 +359,48 @@ function DisplayAvailableClass($template, $year, $facility) {
 // Available Class
 
 function DisplayClassRoster($template, $classId) {
-		$template->addBlockFile('RESULT', 'F_RESULT', 'ClassRoster.tpl');
-	$template->touchBlock('F_RESULT');
-	foreach (Enrollment::GetEnrollmentForClass($classId)  as $item) {
-		$student = $item->student;
-		$templateName="ROSTERITEM";
-		$template->setCurrentBlock($templateName);
+  $template->addBlockFile('RESULT', 'F_RESULT', 'ClassRoster.tpl');
+  $template->touchBlock('F_RESULT');
 
-		$template->setVariable("SFIRST", $student->firstName);
-		$template->setVariable("SLAST", $student->lastName);
-		$template->setVariable("SEMAIL", $student->email);
-		$template->setVariable("AGE", (int)$student->AgeAt(Calendar::CurrentSession));
-		$template->setVariable("GRADE", $student->Grade());
-		
-		//print "student = $student->id\n";
-		
-		$parent = $student->family->mother;
-		$template->setVariable("PFIRST", $parent->firstName);
-		$template->setVariable("PLAST", $parent->lastName);
-		$template->setVariable("PEMAIL", $parent->email);
-		$template->setVariable("PHONE", $student->family->phone);
-		
-		$template->parseCurrentBlock();
-		
-		$parent= $student->family->father;
-		$template->setCurrentBlock($templateName);
+  $class = AvailableClass::GetItemById($classId);
+  $template->setCurrentBlock("ROSTERHEAD");
+  $template->setVariable("SESSION", $class->session);
+  $template->setVariable("SHORT", $class->short());
+  $template->setVariable("LONG", $class->course->full);
+  $template->setVariable("ROOM", $class->room->roomNumber);
+  $template->setVariable("FACILITY", $class->room->facility->name);
+  $template->setVariable("TEACHERS", "to be developed");
+  $template->parseCurrentBlock();
 
-		$template->setVariable("PFIRST", $parent->firstName);
-		$template->setVariable("PLAST", $parent->lastName);
-		$template->setVariable("PEMAIL", $parent->email);
+  foreach (Enrollment::GetEnrollmentForClass($classId)  as $item) {
+    $student = $item->student;
+    $template->setCurrentBlock("MOTHERROW");
+
+    $template->setVariable("SFIRST", $student->firstName);
+    $template->setVariable("SLAST", $student->lastName);
+    $template->setVariable("SEMAIL", $student->email);
+    $template->setVariable("AGE", (int)$student->AgeAt(Calendar::CurrentSession));
+    $template->setVariable("GRADE", $student->Grade());
+		
+    $parent = $student->family->mother;
+    $template->setVariable("PFIRST", $parent->firstName);
+    $template->setVariable("PLAST", $parent->lastName);
+    $template->setVariable("PEMAIL", $parent->email);
+    $template->setVariable("PHONE", $student->family->phone);
+		
+    $template->parseCurrentBlock();
+		
+    $parent= $student->family->father;
+    $template->setCurrentBlock("FATHERROW");
+
+    $template->setVariable("PFIRST", $parent->firstName);
+    $template->setVariable("PLAST", $parent->lastName);
+    $template->setVariable("PEMAIL", $parent->email);
 				
-		$template->parseCurrentBlock();
-	}
+    $template->parseCurrentBlock();
+    $template->setCurrentBlock("ROSTERROW");
+    $template->parseCurrentBlock();
+  }
 }
 
 ?>

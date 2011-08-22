@@ -13,7 +13,7 @@ case "login":
   $dataviewer->login();
   break;
 default:
-  $dataviewer->DoIt($command);
+ $dataviewer->DoIt($command);
 
 }
 

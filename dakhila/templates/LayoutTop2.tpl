@@ -3,15 +3,15 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-	<link rel="stylesheet" type="text/css" media="screen" href="/jqsuite/themes/redmond/jquery-ui-1.8.2.custom.css" />
-	<link rel="stylesheet" type="text/css" media="screen" href="/jqsuite/themes/ui.jqgrid.css" />
+	<link rel="stylesheet" href="/dakhila/css/blue/style.css" type="text/css" id="" media="print, projection, screen" />
 	<link rel="stylesheet" href="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/site.css" type="text/css" media="screen print" />
 
 	<title>Vidyalaya {TITLE}</title>
 
-	<script src="/jqsuite/js/jquery.js" type="text/javascript"></script>
-	<script src="/jqsuite/js/i18n/grid.locale-en.js" type="text/javascript"></script>
-	<script src="/jqsuite/js/jquery.jqGrid.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+	<script type="text/javascript" src="/dakhila/js/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="/dakhila/js/jquery.uitablefilter.js"></script>
+
 
 </head>
 
