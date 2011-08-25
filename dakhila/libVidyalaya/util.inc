@@ -1,7 +1,7 @@
 <?php
 
 require_once "vidyalaya.inc";
-$dompdfDir = "../../dompdf2";
+$dompdfDir = realpath(dirname(__FILE__)."/../../dompdf2");
 require_once("$dompdfDir/dompdf_config.inc.php");
 
 // returns true if $str begins with $sub

@@ -9,7 +9,7 @@
 </table>
 <!-- END ROSTERHEAD -->
 
-<table id="rowspan" cellspacing="0" class="tablesorter" RULES=GROUPS FRAME=BOX>
+<table id="rowspan" cellspacing="0" class="tablesorter">
 <colgroup span=5><colgroup span=4>
 <thead>
 <tr><th colspan=5>Students</th><th colspan=4>Parents</th></tr>
@@ -19,12 +19,12 @@
 </thead>
 <!-- BEGIN ROSTERROW -->
 <tbody>
-<tr>
 <!-- BEGIN MOTHERROW -->
+<tr>
 <td rowspan=2>{SFIRST}</td><td rowspan=2>{SLAST}</td><td rowspan=2>{AGE}</td><td rowspan=2>{GRADE}</td><td rowspan=2>{SEMAIL}</td><td>{PFIRST}</td><td>{PLAST}</td><td>{PHONE}</td><td>{PEMAIL}</td></tr>
 <!-- END MOTHERROW -->
 <!-- BEGIN FATHERROW -->
-<td>{PFIRST}</td><td>{PLAST}</td><td>{PHONE}</td><td>{PEMAIL}</td></tr>
+<tr style="border-bottom: thin solid  black;"><td>{PFIRST}</td><td>{PLAST}</td><td>{PHONE}</td><td>{PEMAIL}</td></tr>
 <!-- END FATHERROW -->
 </tbody>
 <!-- END ROSTERROW -->

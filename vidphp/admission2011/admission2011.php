@@ -682,7 +682,7 @@ ITEMEMAIL;
 	}
 	
 	private static function RosterClass($class) {
-		$filename = "/home/umesh/enrollment/" . $class->id . "-" . $class->short() . ".txt";
+		$filename = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/roster/txt/" .  $class->short() . ".txt";
 		self::$rosterfh = fopen($filename, "w");
 		echo "$filename\n";
 		//fwrite(self::$rosterfh,  "\n**********************\n");
@@ -1116,9 +1116,9 @@ class TwoYearLayout {
 
 
 //Admission::AttendanceSheet(2011); exit();
-Evaluation::ProcessAllFiles(); exit();
+//Evaluation::ProcessAllFiles(); exit();
 //Admission::RosterFromFile("/tmp/aa"); exit();
-//Admission::Roster(2011); exit();
+Admission::Roster(2011); exit();
 //Admission::itemDelivery(); exit();
 //Admission::classParentsEmail(67); Admission::classParentsEmail(65); exit();
 //TwoYearLayout::checkFeePaid(); exit();
