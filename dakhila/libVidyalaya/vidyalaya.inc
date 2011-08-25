@@ -656,7 +656,7 @@ class Enrollment{
 			$enrollmentArray[] = new self($row);
 		}
 		
-	        usort ($enrollmentArray, "self::CompareStudentName");
+	        usort ($enrollmentArray, "Enrollment::CompareStudentName");
 		return $enrollmentArray;
 	}
 	
