@@ -31,7 +31,7 @@ class VidSession {
 	// The request does not identify a session
       $_SESSION["message"] = "You are not authorized to access the URL {" . $_SERVER["REQUEST_URI"] ."}" ;
 	header("Location: /dakhila/php/dataViewer2.php?command=login");
-	exit;
+	exit();
       }
 
     // 2. Check if the request is from a different IP address to previously
@@ -43,7 +43,7 @@ class VidSession {
 
       	$_SESSION["message"] = "You are not authorized to access the URL {" . $_SERVER["REQUEST_URI"] . "} from the address {" . $_SERVER["REMOTE_ADDR"] . "}";
 	header("Location: /dakhila/php/dataViewer2.php?command=login");
-	exit;
+	exit();
       }
 
   }

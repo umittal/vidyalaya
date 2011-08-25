@@ -1,16 +1,16 @@
-<html>
-  <head>
 
 
-    <link type="text/css" href="/dakhila/css/ui-lightness/jquery-ui-1.8.16.custom.css" rel="Stylesheet" />	
+        <style type="text/css">
+            .dijitButtonNode { width:150px; }
+        </style>
 
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
 
-  </head>
-  <body>
+
+
     <script>
       $(function() {	$( "#tabs" ).tabs();});
+      document.title = "Vidyalaya - Dakhila Portal";
+       dojo.require("dijit.form.Button"); 
     </script>
 
 
@@ -25,18 +25,44 @@
       <div id="tabs-1">
 	<table>
 
-	  <tr>
-	    <td><a href="/dakhila/php/dataViewer2.php?command=AvailableCourse&facility=2&year=2011">Available Courses</td>
-	    <td>Classes (Department, course, room, count) setup for any year/facility </td>
+	  <tr><td>
+	      <button dojoType="dijit.form.Button" type="button" >
+		Available Courses
+		<script type="dojo/method" event="onClick" args="evt">
+		  window.open('/dakhila/php/dataViewer2.php?command=AvailableCourse&facility=2&year=2011', '_self', 'location=no' );
+		</script>
+	      </button>
+
+	    </td><td>		Classes (Department, course, room, count) setup for any year/facility </td>
 	  </tr>
 
-	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=ClassRoster&classId=75">Class Roster</td>
-	    <td>Roster for any class </td>
+
+	  <tr><td>
+	      <button dojoType="dijit.form.Button" type="button" >
+		Class Roster
+		<script type="dojo/method" event="onClick" args="evt">
+		  window.open('/dakhila/php/dataViewer2.php?command=ClassRoster&classId=75', '_self', 'location=no' );
+		</script>
+	      </button>
+
+	    </td><td>List of Students in any class</td>
 	  </tr>
 
-	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=CourseCatalog">Course Catalog</td>
-	    <td>Vidyalaya Course Catalog - All courses may not be offered every year</td>
+	  
+	  <tr><td colspan=2>&nbsp;</td></tr>
+	  <tr><td colspan=2>Database Lookup</td></tr>
+
+	  <tr><td>
+	      <button dojoType="dijit.form.Button" type="button" >
+		Course Catalog
+		<script type="dojo/method" event="onClick" args="evt">
+		  window.open('/dakhila/html/grid.php', '_self', 'location=no' );
+		</script>
+	      </button>
+	    </td><td>Vidyalaya Course Catalog - All courses may not be offered every year</td>
 	  </tr>
+
+
 
 	</table>
       </div>
@@ -66,5 +92,3 @@
       </div>
 
     </div>
-  </body>
-</html>

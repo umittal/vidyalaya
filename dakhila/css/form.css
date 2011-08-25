@@ -1,0 +1,35 @@
+/* - - - - - - - - - - - - - - - - - - - - -
+ File         : form.css
+ Description  : Dojo Tutorial 
+ Last Updated : March 1, 2008
+ - - - - - - - - - - - - - - - - - - - - - 
+*/
+	
+.formContainer {
+	margin: 10px;
+    background: #DBE4FF;  
+    width: 500px;
+    border-width: 1px;
+	border-style: solid;
+	border-color: purple;
+	padding: 10px;	
+}
+
+.formTitle {
+	font-size:24px; font-weight:bold;
+	padding: 10px; 
+}
+
+form {
+	margin-top: 5px;
+	width: 480px;
+}
+.formRow {
+	position:relative;
+	padding: 4px 0.75em 2px 2em;
+}
+
+.formRow label {
+	display: block;
+}
+
