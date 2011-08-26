@@ -13,7 +13,7 @@ require_once "$rootDir/libVidyalaya/vidyalaya.inc";
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Umesh: is best</title>
+    <title>Umesh: is the best</title>
     <!-- load Dojo -->
 <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dijit/themes/claro/claro.css"
         />
@@ -25,14 +25,14 @@ require_once "$rootDir/libVidyalaya/vidyalaya.inc";
 </head>
     
 <body class=" claro ">
-<div id="grid1" dojoType="dojox.grid.EnhancedGrid" query="{ short: '*' }" 
+<div id="grid1" dojoType="dojox.grid.EnhancedGrid" 
     plugins='{
      nestedSorting: true, 
      dnd: true, 
      "filter": {closeFilterbarButton: true,ruleCount: 0}, 
      }' 
-    store="csvStore1" structure="layout" 
-     style="height:800px"
+    store="jsonStore" structure="layout" 
+     style="height:730px; width:600px;"
 >
 
 </div>
@@ -54,17 +54,15 @@ dojo.require("dojox.grid.enhanced.plugins.Filter");
             defaultCell: { width: 8, editable: false, type: dojox.grid.cells._Widget },
             rows:
             [
-                { field: 'department', name:'Department', width: '12' },
-                { field: 'level', name:'Level', width: '6' },
-                { field: 'short', name:'Short', width: '6' },
-                { field: 'full', name:'Description', width: '25' },
-                { field: 'id', name:'ID',  width: '3', datatype: "number" },
+                { field: 'department', name:'Department', width: '6' },
+                { field: 'level', name:'Level', width: '2' },
+                { field: 'short', name:'Short', width: '2' },
+                { field: 'full', name:'Description', width: '24' },
+                { field: 'id', name:'ID',  width: '2', datatype: "number" },
             ]}
         ];
         //get data store
-//        csvStore1 = new dojox.data.CsvStore({ id:'csvStore1', url:'foo.csv' });
-//        csvStore1 = new dojox.data.CsvStore({ id:'csvStore1', url:'test.php' });
-        csvStore1 = new dojo.data.ItemFileReadStore({ id:'csvStore1', 
+        jsonStore = new dojo.data.ItemFileReadStore({ id:'jsonStore', 
 
 <?php
 	      echo "url:'/dakhila/php/dataserver.php?command=CourseCatalog'";

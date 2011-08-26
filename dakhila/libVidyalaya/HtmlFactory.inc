@@ -197,10 +197,63 @@ function DisplayFamilyV2(&$template, $family, $students) {
 	DisplayFamilyTemplate($template, $family, $students);
 }
 
+// ******** Family - use this
 function DisplayFamilyV3(&$template, $family) {
 	$template->addBlockFile('RESULT', 'F_RESULT', 'FamilyDetail.tpl');
 	$template->touchBlock('F_RESULT');
 	DisplayFamilyTemplateV3($template, $family);
+}
+
+function DisplayStudentTemplate (&$template, $student) {
+  $family = $student->family;
+	$templateName="FATHER";
+	$template->setCurrentBlock($templateName);
+
+
+	$template->setVariable("NAME", $family->father->fullName());
+	$template->setVariable("EMAIL", $family->father->email);
+	$template->setVariable("WORK", $family->father->workPhone);
+	$template->setVariable("CELL", $family->father->cellPhone);
+	$template->setVariable("ISCONTACTABLE", YesNoMap($family->father->IsContactable));
+	$template->parseCurrentBlock();
+
+
+	$templateName="MOTHER";
+	$template->setCurrentBlock($templateName);
+	$template->setVariable("EMAIL", $family->mother->email);
+	$template->setVariable("FAMILYID", $family->id);
+	$template->setVariable("WORK", $family->mother->workPhone);
+	$template->setVariable("CELL", $family->mother->cellPhone);
+	$template->setVariable("NAME", $family->mother->fullName());
+	$template->setVariable("ISCONTACTABLE", YesNoMap($family->mother->IsContactable));
+	$template->parseCurrentBlock();
+
+	$templateName="STUDENT";
+	$template->setCurrentBlock($templateName);
+	$line2 = $family->address->addr2;
+	if (! empty($line2)) {
+		$template->setVariable("LINE2", ", ". $line2);
+	}
+	$template->setVariable("ID", $student->id);
+	$template->setVariable("NAME", $student->fullName());
+	$dob = empty($student->dateOfBirth) ? "Unknown" : date("Y-m-d", strtotime($student->dateOfBirth));
+	$template->setVariable("DOB", $dob);
+	$template->setVariable("CELL", $student->cellPhone);
+	$template->setVariable("EMAIL", $student->email);
+	$template->setVariable("LINE1", $family->address->addr1);
+	$template->setVariable("CITY", $family->address->city);
+	$template->setVariable("STATE", $family->address->state);
+	$template->setVariable("ZIP", $family->address->zipcode);
+	$template->setVariable("HOMEPHONE", $family->phone);
+	$template->parseCurrentBlock();
+}
+
+// ******** Student
+function DisplayStudent(&$template, $student) {
+  if ($student == null) return;
+	$template->addBlockFile('RESULT', 'F_RESULT', 'StudentDetail.tpl');
+	$template->touchBlock('F_RESULT');
+	DisplayStudentTemplate($template, $student);
 }
 
 
@@ -356,7 +409,7 @@ function DisplayAvailableClass($template, $year, $facility) {
 }
 
 // ****************************
-// Available Class
+// Class Roster
 
 function DisplayClassRoster($template, $classId) {
   $template->addBlockFile('RESULT', 'F_RESULT', 'ClassRoster.tpl');
@@ -376,6 +429,8 @@ function DisplayClassRoster($template, $classId) {
     $student = $item->student;
     $template->setCurrentBlock("MOTHERROW");
 
+    $template->setVariable("ID", $student->id);
+    $template->setVariable("FAMILYID", $student->family->id);
     $template->setVariable("SFIRST", $student->firstName);
     $template->setVariable("SLAST", $student->lastName);
     $template->setVariable("SEMAIL", $student->email);

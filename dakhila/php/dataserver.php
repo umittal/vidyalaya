@@ -17,8 +17,7 @@
       break;
     }
 
-
-$command=$_GET["command"];
+$command=isset($_GET["command"]) ? $_GET["command"]: null ;
 switch ($command) {
 case "CourseCatalog":
   Dataserver::CourseCatlog();

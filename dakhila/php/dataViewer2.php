@@ -56,10 +56,7 @@ class DataViewer {
 
   }
 
-  public function verifyPassword() {
-  }
-
-
+  // ************************************************************
   public function login() {
     $html = <<<LOGIN
       <style type="text/css">
@@ -118,11 +115,13 @@ LOGIN;
   }
 
 
-  public function DoIt($command) {
 
+  // ************************************************************
+  public function DoIt($command) {
     VidSession::sessionAuthenticate();
     switch ($command) {
 
+    // ************************************************************
     case "home":
       $html = file_get_contents("../html/dakhila.inc");
       $this->template->setCurrentBlock('RESULT');
@@ -131,6 +130,7 @@ LOGIN;
       print $this->template->get();
       break;
 
+    // ************************************************************
     case "logout":
       $message = "<p>";
 
@@ -154,6 +154,7 @@ LOGIN;
 
       break;
 
+    // ************************************************************
     case "FamilyOld":
       $familyId=$_GET["familyId"];
       if ($familyId =="") $familyId="47";
@@ -162,6 +163,7 @@ LOGIN;
       print $this->template->get();
       break;
 
+    // ************************************************************
     case "Family":
       $url = htmlentities($_SERVER['PHP_SELF']) . "?command=Family";
       $familyId = isset($_POST['ID']) ?  $_POST['ID'] : null;
@@ -187,7 +189,33 @@ EOT;
       print $this->template->get();
       break;
 
+    // ************************************************************
+    case "Student":
+      $url = htmlentities($_SERVER['PHP_SELF']) . "?command=Student";
+      $studentId = isset($_POST['ID']) ?  $_POST['ID'] : null;
+
+      $form = <<<EOT
+	<form method="post" action="$url">
+	Student ID: <input type="text" name="ID" value="$studentId"> 
+	<input type="submit" name="submit" value="GO"><br>
+</form>
+
+EOT;
+      $this->template->setCurrentBlock('QUERY');
+      $this->template->setVariable('QUERY', $form);
+      $this->template->parseCurrentBlock();
+
+
+	if (isset($studentId)) {
+	    $student = Student::GetItemById($studentId);
+	    DisplayStudent($this->template, $student);
+	  }
+
+      print $this->template->get();
+      break;
+
 		
+    // ************************************************************
     case "Registration":
       $familyId=$_GET["familyId"];
       if ($familyId =="") $familyId="47";
@@ -197,6 +225,7 @@ EOT;
       break;
 		
 		
+    // ************************************************************
     case "MedicalForm":
       $studentId=$_GET["studentId"];
       if ($studentId =="") $studentId="1446";
@@ -248,11 +277,13 @@ SQLREGISTRATIONSUMMAY;
     print $this->template->get();
 		break;
 
+    // ************************************************************
     case "CourseCatalog":
       DisplayCourseCatalog($this->template);
       print $this->template->get();
       break;		
 
+    // ************************************************************
     case "AvailableCourse":
       $year=$_GET["year"];
       if ($year =="") $year=Calendar::CurrentYear();
@@ -265,11 +296,24 @@ SQLREGISTRATIONSUMMAY;
       $form = <<<EOT
     <script>
       dojo.require("dijit.form.ComboBox");    
+      dojo.require("dijit.form.Form");    
+      dojo.require("dijit.form.ValidationTextBox");    
     </script>
 
-	<form method="post" action="$url">
-	Year: <input type="text" name="ID" value="$year"> 
+<div class="formContainer">
+	<form method="post" action="$url"
+	dojoType = "dijit.form.Form">
+
 	<div class="formRow"> 
+	Year: <input type="text" name="year" id="year" value="$year" size=6
+           dojoType="dijit.form.ValidationTextBox" 
+           required="true"  
+	regExp="\b201\d\b"
+           promptMessage="Enter School Start Year."
+           invalidMessage="Invalid School Start Year." 
+           trim="true"
+
+	> 
       <label for="facility">Facility:</label> 
 	  <select id="facility" title="facility" name="facility" 
 	    dojoType="dijit.form.ComboBox"
@@ -277,13 +321,14 @@ SQLREGISTRATIONSUMMAY;
         forceValidOption="true"
 			      >
 		<option value="1">Eastlake Elementary School</option>
-		<option value="2">Parsippany Hills High School</option>
+		<option selected value="2">Parsippany Hills High School</option>
       </select>
+   <input type="submit" name="submit" value="GO"><br>
     </div>
 
 
-   <input type="submit" name="submit" value="GO"><br>
 </form>
+</div>
 
 EOT;
       $this->template->setCurrentBlock('QUERY');
@@ -294,6 +339,7 @@ EOT;
       print $this->template->get();
       break;		
       
+    // ************************************************************
       case "ClassRoster":
 		$classId=$_GET["classId"];
 		if ($classId =="") $classId=75;
@@ -301,6 +347,7 @@ EOT;
 		print $this->template->get();
 		break;	
 
+    // ************************************************************
     default:
       $html = "<p>Please specify a valid command for the data you want to see";
       print $html;

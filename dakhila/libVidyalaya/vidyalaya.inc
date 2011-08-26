@@ -338,6 +338,11 @@ class CourseCatalog {
 	public $short=null;
 	public $full = null;
 	
+	public static function CompareShort($a, $b) {
+	  if ($a->short == $b->short) return 0;
+	  return ($a->short < $b->short) ? -1 : 1;
+	}
+
 	public static function GetCourseCatalogFromCourse($course) {
 		print "Debug: Going to look for $course->department, $course->level\n";
 	 	self::firstTimeCall();
@@ -355,6 +360,7 @@ class CourseCatalog {
 		while ($row = mysql_fetch_alias_array($result)) {
 			self::ReadRow($row);
 		}
+	        usort (self::$objArray, "CourseCatalog::CompareShort");
 	}
 		
 	public static function GetItemById($key) {
@@ -577,6 +583,11 @@ class Rooms{
 	public $roomNumber = null;
 	public $capacity =null;
 		
+	public static function CompareRoomnumber($a, $b) {
+	  if ($a->roomNumber == $b->roomNumber) return 0;
+	  return ($a->roomNumber < $b->roomNumber) ? -1 : 1;
+	}
+
 	private static function firstTimeCall() {
 		if (!empty(self::$objArray)) return;
 		$query = "select * from Rooms";
@@ -584,6 +595,7 @@ class Rooms{
 		while ($row = mysql_fetch_alias_array($result)) {
 			self::ReadRow($row);
 		}
+	        usort (self::$objArray, "Rooms::CompareRoomnumber");
 	}
 	
 	public static function GetItemById($key) {

@@ -1,3 +1,37 @@
+        <style type="text/css">
+            td { padding-left:10px; }
+            th { padding-left:10px; }
+            .ou { font-style:oblique;text-decoration:underline; }
+        </style>
+    <script>
+         dojo.require("dijit.form.TextBox");    
+dojo.require("dijit.form.Form");
+dojo.require("dijit.Tooltip");
+			// When the DOM and reources are ready....
+			dojo.ready(function(){
+				// Add tooltip of his picture
+				new dijit.Tooltip({
+					connectId: ["tooltipField"],
+					label: "Click here to see details of Family"
+				});
+			});
+
+	function showStudentDetails(studentId) {
+	var form=dijit.byId("studentForm");
+	var idfield=dijit.byId("studentId");
+	idfield.attr("value", studentId);
+	if (form) {form.submit();} else {alert ("form not found");}
+      }
+    </script>
+
+	<form method="post" action="/dakhila/php/dataViewer2.php?command=Student" style="display:none" id="studentForm"
+	dojoType="dijit.form.Form"
+	>
+	Student ID: <input type="text" dojoType="dijit.form.TextBox" name="ID" id="studentId"> 
+	<input type="submit" name="go" value="GO"><br>
+	</form>
+
+
 <h3>Family Details</h3>
 <!-- 
 <p><a href="/dakhila/php/studentListByLanguage.php">Language</a>, <a href="/htdocs/php/studentListByCulture.php">Culture</a></p>
@@ -33,9 +67,9 @@
 
 <li class="section">Children</li>
 <table>
-<thead><tr><th scope="col">ID<th>Gender<th>NAME<th>DOB<th>EMAIL<th>CELL<th>2010-11</tr></thead>
+<thead><tr><th scope="col">ID<th>Gender<th>NAME<th>DOB<th>EMAIL<th width=30px>CELL<th>2010-11</tr></thead>
 <!-- BEGIN CHILDREN -->
-<tr><td>{ID}</td><td>{GENDER}</td><td>{NAME}</td><td nowrap="nowrap">{DOB}</td><td>{EMAIL}</td><td>{CELL}</td><td>{ENROLLED}</td></tr>
+<tr><td class="ou" onclick="showStudentDetails({ID})" onmouseover="this.style.cursor='pointer'">{ID}</td><td>{GENDER}</td><td>{NAME}</td><td nowrap="nowrap">{DOB}</td><td>{EMAIL}</td><td>{CELL}</td><td>{ENROLLED}</td></tr>
 
 <!-- END CHILDREN -->
 </table>
