@@ -236,7 +236,9 @@ function DisplayStudentTemplate (&$template, $student) {
 	}
 	$template->setVariable("ID", $student->id);
 	$template->setVariable("NAME", $student->fullName());
-	$dob = empty($student->dateOfBirth) ? "Unknown" : date("Y-m-d", strtotime($student->dateOfBirth));
+	$dob = empty($student->dateOfBirth) ? 
+	  "Unknown" : 
+	  date("Y-m-d", strtotime($student->dateOfBirth));
 	$template->setVariable("DOB", $dob);
 	$template->setVariable("CELL", $student->cellPhone);
 	$template->setVariable("EMAIL", $student->email);
@@ -246,6 +248,42 @@ function DisplayStudentTemplate (&$template, $student) {
 	$template->setVariable("ZIP", $family->address->zipcode);
 	$template->setVariable("HOMEPHONE", $family->phone);
 	$template->parseCurrentBlock();
+
+	$sessionRows = array(); 
+	foreach (Enrollment::GetEnrollmentHistory($student->id) as $item) {
+	  $session=$item->class->session;
+	  if (!isset($sessionRows[$session])  )
+	    $sessionRows[$session]= array();
+	  $sessionRows[$session][] = $item;
+	}
+
+	foreach ($sessionRows as $item1) {
+	  $tata = $item1[0];
+	  if ($tata->class->course->department == Department::Kindergarten) {
+	    $templateName="KINDERGARTEN";
+	    $template->setCurrentBlock($templateName);
+	    $template->setVariable("KG", $tata->class->url());
+	    $template->setVariable("SESSION", $tata->class->session);
+	    if (count($tata) != 1) {
+	      print "Error, student detail, KG should have only KG, nothing else\n";
+	    }
+	  } else {
+	    $templateName="ENROLLMENT";
+	    $template->setCurrentBlock($templateName);
+	    foreach ($item1 as $e) {
+	      $template->setVariable("SESSION", $e->class->session);
+	      if (Department::IsLanguage($e->class->course->department)) {
+		$template->setVariable("LANGUAGE", $e->class->url());
+	      } elseif ($e->class->course->department == Department::Culture) {
+		$template->setVariable("CULTURE", $e->class->url());
+	      } else {
+		print "Error, student detail, expect language, culture only\n";
+	      }
+	    }
+
+	  }
+	  $template->parseCurrentBlock();
+	}
 }
 
 // ******** Student

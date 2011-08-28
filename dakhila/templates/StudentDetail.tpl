@@ -65,16 +65,18 @@ dojo.require("dijit.Tooltip");
 <p>
 
 
-<li class="section">Class Assignment</li> to be developed
+<li class="section">Class Assignment</li>
 <table>
 <thead>
-<tr><th scope="col">Name<th>Class<th>Room<th>Teachers</tr>
+<tr><th>Session</th><th>Language</th><th>Culture</th></tr>
 </thead>
 <tbody>
-<!-- BEGIN REGISTRATION -->
-<tr><td rowspan=2>{FIRSTNAME}</td><td>{LANGUAGE}</td><td>{LROOM}</td><td>{LTEACHER}</td></tr>
-<tr><td>{CULTURE}</td><td>{CROOM}</td><td>{CTEACHER}</td></tr>
-<!-- END REGISTRATION -->
+<!-- BEGIN ENROLLMENT -->
+<tr><td>{SESSION}</td><td>{LANGUAGE}</td><td>{CULTURE}</td></tr>
+<!-- END ENROLLMENT -->
+<!-- BEGIN KINDERGARTEN -->
+<tr><td>{SESSION}</td><td colspan=2>{KG}</td></tr>
+<!-- END KINDERGARTEN -->
 </tbody>
 </table>
 

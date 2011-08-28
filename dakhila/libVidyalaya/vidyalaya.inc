@@ -31,6 +31,13 @@ class Department {
 		return Department::NameFromId($this->id);
 	}
 
+	public static function IsLanguage($id) {
+	  switch ($id) {
+	  case 1: case 2: case 3: return true;
+	  default: return false;
+	  }
+	}
+
 	public static function NameFromId($number) {
 		switch ($number) {
 			case 1: return "Hindi";
@@ -347,26 +354,45 @@ class CourseCatalog {
 		print "Debug: Going to look for $course->department, $course->level\n";
 	 	self::firstTimeCall();
 		foreach (self::$objArray as $coursecatalog ) {
-			if (($coursecatalog->department == $course->department) && ($coursecatalog->level == $course->level))
+			if (($coursecatalog->department == $course->department) && 
+			    ($coursecatalog->level == $course->level))
 			return $coursecatalog;
 		}
 		return null;
+	}
+
+	private static function ReadRow($row) {
+		$key = $row["CourseCatalog.id"];
+		if (!array_key_exists($key, self::$objArray)) 
+			return  new self($row);
 	}
 
 	private static function firstTimeCall() {
 		if (!empty(self::$objArray)) return;
 		$query = "select * from CourseCatalog";
 		$result = VidDb::query($query);
+		$temp = array();
 		while ($row = mysql_fetch_alias_array($result)) {
-			self::ReadRow($row);
+			$temp[] = new self($row);
 		}
-	        usort (self::$objArray, "CourseCatalog::CompareShort");
+	        usort ($temp, "CourseCatalog::CompareShort");
+		foreach ($temp as $value) {
+		  if (array_key_exists($value->id, self::$objArray)) print "duplicate key found coursecatalog\n";
+		  self::$objArray[$value->id] = $value;
+		}
+		
 	}
 		
 	public static function GetItemById($key) {
 	 	self::firstTimeCall();
-//		print "debug: trying to find $key in coursecatalog\n";
-	 	return self::$objArray[$key];
+		//		print "<p>debug: trying to find $key in coursecatalog\n";
+		
+		if (isset(self::$objArray[$key])) {
+		  $item= self::$objArray[$key];
+		return $item;
+		}
+		print "<p>debug: course catalog for key $key not found\n";
+		return null;
 	 }	
 
 	 public static function GetAll() {
@@ -376,12 +402,6 @@ class CourseCatalog {
 	 
 	private static $objArray = Array ();
 
-	private static function ReadRow($row) {
-		$key = $row["CourseCatalog.id"];
-		if (!array_key_exists($key, self::$objArray)) 
-			self::$objArray[$key] = new self($row);
-		return self::$objArray[$key];
-	}
 	
 	public function __construct($row) {
 		$this->id = $row["CourseCatalog.id"];
@@ -419,6 +439,21 @@ class AvailableClass {
 		while ($row = mysql_fetch_alias_array($result)) {
 			self::ReadRow($row);
 		}
+	}
+
+	public function url() {
+	  $roster =  "<a href=\"/dakhila/php/dataViewer2.php?command=ClassRoster&classId=$this->id\">" . 
+	    $this->short() . "</a>";
+
+	  $room =  " (Room: " . $this->room->roomNumber . ")";
+
+	  $change = $this->IsChangeAllowed() ? " <a href=\"\">Change</a>" : "";
+	  return $roster . $room . $change;
+	}
+
+	public function IsChangeAllowed() {
+	  if ($this->session == "2011-12") return true;
+	  return false;
 	}
 
 	public function short() {
@@ -592,6 +627,20 @@ class Rooms{
 		if (!empty(self::$objArray)) return;
 		$query = "select * from Rooms";
 		$result = VidDb::query($query);
+
+
+		$temp = array();
+		while ($row = mysql_fetch_alias_array($result)) {
+			$temp[] = new self($row);
+		}
+	        usort ($temp, "Rooms::CompareRoomnumber");
+		foreach ($temp as $value) {
+		  if (array_key_exists($value->id, self::$objArray)) print "duplicate key found room\n";
+		  self::$objArray[$value->id] = $value;
+		}
+
+		return;
+
 		while ($row = mysql_fetch_alias_array($result)) {
 			self::ReadRow($row);
 		}
@@ -600,7 +649,9 @@ class Rooms{
 	
 	public static function GetItemById($key) {
 	 	self::firstTimeCall();
-	 	return self::$objArray[$key];
+		if (isset(self::$objArray[$key])) return self::$objArray[$key];
+		print "debug: Room with id $key not found\n";
+	 	return null;
 	 }	
 	
 	public static function findEastlakeRoomFromCourse($course) {
@@ -680,7 +731,25 @@ class Enrollment{
 		return self::ArrayFromQuery($query);
 	}
 	
+	public static function GetEnrollmentHistory($studentId) {
+		$query = "
+		select * from Enrollment
+		left join AvailableClass on Enrollment.availableClass = AvailableClass.id
+		left join CourseCatalog on AvailableClass.course = CourseCatalog.id
+		where Enrollment.student = $studentId
+		order by AvailableClass.year, CourseCatalog.department
+		";
+		return self::ArrayFromQuery($query);
+	}
+
 	public static function GetLanguageHistory($studentId) {
+	  $enrollmentArray = Array();
+	  foreach (self::GetEnrollmentHistory($studentId) as $item) {
+	    if (Department::IsLanguage($item->class->course->department)) $enrollmentArray[] = $item;
+	  }
+	  return $enrollmentArray;
+
+	  // this is the old code, we need to remove it after testing above in asmita evaluation report
 		$query = "
 		select * from Enrollment
 		left join AvailableClass on Enrollment.availableClass = AvailableClass.id
@@ -706,8 +775,7 @@ class Enrollment{
 	
 	public function __construct($row) {
 		$this->student = Student::GetItemById($row["Enrollment.student"]);
-    	$this->class= AvailableClass::GetItemById($row["Enrollment.availableClass"]);
-    	
+		$this->class= AvailableClass::GetItemById($row["Enrollment.availableClass"]);
 		$this->academicGrade = $row["Enrollment.gradeAcademic"];
 		$this->disciplineGrade = $row["Enrollment.gradeDiscipline"];
 	}

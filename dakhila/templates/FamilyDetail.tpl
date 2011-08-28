@@ -76,7 +76,7 @@ dojo.require("dijit.Tooltip");
 
 
 
-<li class="section">Class Assignment</li>
+<li class="section">Class Assignment</li> the links below do not work, bug fix pending
 <table>
 <thead>
 <tr><th scope="col">Name<th>Class<th>Room<th>Teachers</tr>
