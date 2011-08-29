@@ -467,6 +467,14 @@ class AvailableClass {
 	 	self::firstTimeCall();
 	 	return self::$objArray[$key];
 	 }	
+
+	public static function GetItemByShort($short, $session) {
+	 	self::firstTimeCall();
+		foreach (self::$objArray as $item) {
+		  if ($short == $item->short() && $session == $item->session) return $item;
+		}
+	 }	
+
 	 
 	public static function GetAll() {
 		self::firstTimeCall();

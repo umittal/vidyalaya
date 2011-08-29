@@ -22,6 +22,8 @@ dojo.require("dijit.Tooltip");
 	a.set("value", classId);
 	a = dijit.byId("chgStudent");
 	a.set("value", studentId);
+	r = dijit.byId("response");
+	r.set("value","");		    
 	formDlg.show();
     }
 
@@ -51,7 +53,7 @@ dojo.require("dijit.Tooltip");
 
 
 <div dojoType="dijit.Dialog" id="formDialog2" title="Change Enrollment of a Student" style="display: none">
-    <form dojoType="dijit.form.Form">
+    <form dojoType="dijit.form.Form" id="ChgForm" name="doineedit">
         <script type="dojo/event" event="onSubmit" args="e">
             dojo.stopEvent(e); // prevent the default submit
             if (!this.isValid()) {
@@ -63,17 +65,36 @@ dojo.require("dijit.Tooltip");
 	classId=a.value;
 	a = dijit.byId("chgStudent");
 	studentId=a.value;
+	a = dijit.byId("newClass");
+	newClass=a.value;
 
 
-            window.alert("Would submit here via xhr " + classId + " " + studentId);
-            // dojo.xhrPost( {
-            //      url: 'foo.com/handler',
-            //      content: { field: 'go here' },
-            //      handleAs: 'json'
-            //      load: function(data) { .. },
-            //      error: function(data) { .. }
-            //  });
-            
+	r = dijit.byId("response");
+	r.set("value"," Form being sent...");
+	    
+	    qObject = new Object();
+	    qObject.studentId = studentId;
+	    qObject.currentClass = classId;
+	    qObject.newClass = newClass;
+	    qObject.owner = qObject;
+	    var queryString = dojo.objectToQuery(qObject);
+	    
+             var xhrArgs ={
+                  url: '/dakhila/php/dataserver.php?command=ChangeClass',
+//                form: dojo.byId("ChgForm"),
+		  postData:queryString,
+                load: function(data, ioArgs) {
+		    r.set("value","Success ..." + data);		    
+                },
+                error: function(error, ioArgs) {
+                    //We'll 404 in the demo, but that's okay.  We don't have a 'postIt' service on the
+                    //docs server.
+		    r.set("value","Failed... " + error);		    
+                }
+            };
+
+            var deferred = dojo.xhrPost(xhrArgs);
+
         </script>
         <div class="dijitDialogPaneContentArea">
 	<label>Session:</label> <div dojoType="dijit.form.ValidationTextBox" id="chgSession" disabled="disabled" style="width:50px" >nothing</div>
@@ -92,7 +113,7 @@ dojo.require("dijit.Tooltip");
             <label for='newClass'>
                 New Class:
             </label>
-            <div dojoType="dijit.form.ValidationTextBox" required="true">
+            <div dojoType="dijit.form.ValidationTextBox" id="newClass" required="true">
             </div>
         </div>
 
@@ -101,8 +122,11 @@ dojo.require("dijit.Tooltip");
                 Change
             </button>
             <button dojoType="dijit.form.Button" type="button" onClick="dijit.byId('formDialog2').hide();">
-                Cancel
+                GO Back
             </button>
+        <div class="dijitDialogPaneContentArea">
+	<div dojoType="dijit.form.ValidationTextBox" id="response" disabled="disabled">nothing</div>
+	</div>
         </div>
     </form>
 </div>

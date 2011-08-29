@@ -285,9 +285,9 @@ SQLREGISTRATIONSUMMAY;
 
     // ************************************************************
     case "AvailableCourse":
-      $year=$_GET["year"];
-      if ($year =="") $year=Calendar::CurrentYear();
-      $facility=$_GET["facility"];
+      $year = isset($_GET['year']) ?  $_GET['year'] : null;
+      if ($year == null) $year=Calendar::CurrentYear();
+      $facility = isset($_GET['facility']) ?  $_GET['facility'] : null;
       if ($facility =="") $facility=Facility::PHHS;
 
       $url = htmlentities($_SERVER['PHP_SELF']) . "?command=AvailableCourse";
