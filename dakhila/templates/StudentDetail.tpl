@@ -6,6 +6,25 @@
          dojo.require("dijit.form.TextBox");    
 dojo.require("dijit.form.Form");
 dojo.require("dijit.Tooltip");
+    dojo.require("dijit.form.Button");
+    dojo.require("dijit.Dialog");
+    dojo.require("dijit.form.ValidationTextBox");
+
+    function changeClass(name, classId, session, short, studentId) {
+        var formDlg = dijit.byId("formDialog2");
+	a = dijit.byId("chgSession");
+	a.set("value", session);
+	a = dijit.byId("chgName");
+	a.set("value", name);
+	a = dijit.byId("chgCurrent");
+	a.set("value", short);
+	a = dijit.byId("chgClass");
+	a.set("value", classId);
+	a = dijit.byId("chgStudent");
+	a.set("value", studentId);
+	formDlg.show();
+    }
+
 			// When the DOM and reources are ready....
 			dojo.ready(function(){
 				// Add tooltip of his picture
@@ -29,6 +48,65 @@ dojo.require("dijit.Tooltip");
 	Family ID: <input type="text" dojoType="dijit.form.TextBox" name="ID" id="familyId"> 
 	<input type="submit" name="go" value="GO"><br>
 	</form>
+
+
+<div dojoType="dijit.Dialog" id="formDialog2" title="Change Enrollment of a Student" style="display: none">
+    <form dojoType="dijit.form.Form">
+        <script type="dojo/event" event="onSubmit" args="e">
+            dojo.stopEvent(e); // prevent the default submit
+            if (!this.isValid()) {
+                window.alert('Please fix fields');
+                return;
+            }
+
+	a = dijit.byId("chgClass");
+	classId=a.value;
+	a = dijit.byId("chgStudent");
+	studentId=a.value;
+
+
+            window.alert("Would submit here via xhr " + classId + " " + studentId);
+            // dojo.xhrPost( {
+            //      url: 'foo.com/handler',
+            //      content: { field: 'go here' },
+            //      handleAs: 'json'
+            //      load: function(data) { .. },
+            //      error: function(data) { .. }
+            //  });
+            
+        </script>
+        <div class="dijitDialogPaneContentArea">
+	<label>Session:</label> <div dojoType="dijit.form.ValidationTextBox" id="chgSession" disabled="disabled" style="width:50px" >nothing</div>
+	<label>Current:</label>    <div dojoType="dijit.form.ValidationTextBox" id="chgCurrent" disabled="disabled" style="width:50px">nothing</div>
+	</div>
+        <div class="dijitDialogPaneContentArea">
+        <label>Name:</label>   <div dojoType="dijit.form.ValidationTextBox" id="chgName" disabled="disabled">nothing</div>
+	</div>
+        <div class="dijitDialogPaneContentArea" style="display:none">
+	<div dojoType="dijit.form.ValidationTextBox" id="chgClass" disabled="disabled">nothing</div>
+	<div dojoType="dijit.form.ValidationTextBox" id="chgStudent" disabled="disabled">nothing</div>
+        </div>
+
+
+        <div class="dijitDialogPaneContentArea">
+            <label for='newClass'>
+                New Class:
+            </label>
+            <div dojoType="dijit.form.ValidationTextBox" required="true">
+            </div>
+        </div>
+
+        <div class="dijitDialogPaneActionBar">
+            <button dojoType="dijit.form.Button" type="submit">
+                Change
+            </button>
+            <button dojoType="dijit.form.Button" type="button" onClick="dijit.byId('formDialog2').hide();">
+                Cancel
+            </button>
+        </div>
+    </form>
+</div>
+
 
 <h3>Student Details</h3>
 <ol>
@@ -81,3 +159,4 @@ dojo.require("dijit.Tooltip");
 </table>
 
 </ol>
+

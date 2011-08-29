@@ -446,9 +446,8 @@ class AvailableClass {
 	    $this->short() . "</a>";
 
 	  $room =  " (Room: " . $this->room->roomNumber . ")";
+	  return $roster . $room;
 
-	  $change = $this->IsChangeAllowed() ? " <a href=\"\">Change</a>" : "";
-	  return $roster . $room . $change;
 	}
 
 	public function IsChangeAllowed() {

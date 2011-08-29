@@ -204,6 +204,25 @@ function DisplayFamilyV3(&$template, $family) {
 	DisplayFamilyTemplateV3($template, $family);
 }
 
+function GetChangeUrl($class, $student) {
+	 $url = $class->url();
+	  if (!$class->IsChangeAllowed()) return $url;
+	  $name = $student->fullName();
+	  $short = $class->short();
+	  $change =  <<< BUTTONHERE
+	  <button data-dojo-type="dijit.form.Button" type="button">
+    <script type="dojo/method" event="onClick" args="evt">
+        // Do something:
+        changeClass("$name", $class->id, "$class->session", "$short", $student->id);
+    </script>
+    Change
+</button>
+
+BUTTONHERE;
+	  return $url . $change;
+
+}
+
 function DisplayStudentTemplate (&$template, $student) {
   $family = $student->family;
 	$templateName="FATHER";
@@ -262,7 +281,7 @@ function DisplayStudentTemplate (&$template, $student) {
 	  if ($tata->class->course->department == Department::Kindergarten) {
 	    $templateName="KINDERGARTEN";
 	    $template->setCurrentBlock($templateName);
-	    $template->setVariable("KG", $tata->class->url());
+	    $template->setVariable("KG", GetChangeUrl($tata->class, $student));
 	    $template->setVariable("SESSION", $tata->class->session);
 	    if (count($tata) != 1) {
 	      print "Error, student detail, KG should have only KG, nothing else\n";
@@ -273,9 +292,9 @@ function DisplayStudentTemplate (&$template, $student) {
 	    foreach ($item1 as $e) {
 	      $template->setVariable("SESSION", $e->class->session);
 	      if (Department::IsLanguage($e->class->course->department)) {
-		$template->setVariable("LANGUAGE", $e->class->url());
+		$template->setVariable("LANGUAGE", GetChangeUrl($e->class, $student));
 	      } elseif ($e->class->course->department == Department::Culture) {
-		$template->setVariable("CULTURE", $e->class->url());
+		$template->setVariable("CULTURE", GetChangeUrl($e->class, $student));
 	      } else {
 		print "Error, student detail, expect language, culture only\n";
 	      }
