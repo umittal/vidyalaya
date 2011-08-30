@@ -41,7 +41,9 @@ class DataViewer {
 
     $this->template->setCurrentBlock('MENU');
     $table = "<table width='100%'><tr>";
-    $table .= "<td><a href=\"$this->thispage?command=home\">Home</a></td><td align='right'><a href=\"$this->thispage?command=logout\">Logout</a></td>";
+    $table .= "<td><a href=\"$this->thispage?command=home\">Home</a></td>";
+    $table .= "<td><a href=\"$this->thispage?command=AvailableCourse&facility=1&year=2011\">Classes</a></td>";
+    $table .= "<td align='right'><a href=\"$this->thispage?command=logout\">Logout</a></td>";
     $table .= "</tr></table>\n";
     $this->template->setVariable('MENU', $table);
     $this->template->parseCurrentBlock();

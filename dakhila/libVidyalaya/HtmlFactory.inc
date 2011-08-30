@@ -446,11 +446,16 @@ function DisplayAvailableClass($template, $year, $facility) {
 		$template->setCurrentBlock($templateName);
 
 		$classLink=sprintf("<a href=\"/dakhila/php/dataViewer2.php?command=ClassRoster&classId=%s\">%s</a>", $item->id, $item->id);
-     		$template->setVariable("ID", $classLink);
 		$template->setVariable("DEPARTMENT", Department::NameFromId( $item->course->department));
-		$template->setVariable("SHORT", $item->short());
 		$template->setVariable("ROOM", $item->room->roomNumber);
+		$template->setVariable("ROOMID", $item->room->id);
+		$template->setVariable("SHORT", $item->short());
 		$template->setVariable("COUNT", $count);
+
+     		$template->setVariable("ID", $classLink);
+
+		$template->setVariable("CAPACITY", $item->room->capacity);
+		$template->setVariable("FREE", $item->room->capacity - $count);
 		 
 		$template->parseCurrentBlock();
 
