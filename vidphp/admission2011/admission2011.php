@@ -848,8 +848,8 @@ class TwoYearLayout {
 	const Continuing = "Continuing";
 	const Change = "Change";
 	
-	const LeavingStudentsFile = "/tmp/leaving.csv";
-	const EnrolledStudentsFile = "/tmp/enrolled.csv";
+	const LeavingStudentsFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/leaving.csv";
+	const EnrolledStudentsFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/enrolled.csv";
 	
 	private static $objArray = Array ();
 	private static $orientation = Array();
@@ -1122,7 +1122,7 @@ class TwoYearLayout {
 //Admission::classParentsEmail(67); Admission::classParentsEmail(65); exit();
 //TwoYearLayout::checkFeePaid(); exit();
 //TwoYearLayout::assignClass(); exit();
-//TwoYearLayout::twoYearCsv(); exit();
+TwoYearLayout::twoYearCsv(); exit();
 
 
 //OrientationCheck(); exit();

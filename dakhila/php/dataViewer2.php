@@ -283,6 +283,7 @@ SQLREGISTRATIONSUMMAY;
       print $this->template->get();
       break;		
 
+
     // ************************************************************
     case "AvailableCourse":
       $year = isset($_GET['year']) ?  $_GET['year'] : null;
@@ -346,6 +347,21 @@ EOT;
 		DisplayClassRoster($this->template, $classId);
 		print $this->template->get();
 		break;	
+
+
+    // ************************************************************
+    case "Rooms":
+      $year = isset($_GET['year']) ?  $_GET['year'] : null;
+      if ($year == null) $year=Calendar::CurrentYear();
+      $facility = isset($_GET['facility']) ?  $_GET['facility'] : null;
+      if ($facility =="") $facility=Facility::Eastlake;
+
+      $url = htmlentities($_SERVER['PHP_SELF']) . "?command=$command";
+
+      DisplayRooms($this->template, $year, $facility);
+      print $this->template->get();
+      break;		
+
 
     // ************************************************************
     default:

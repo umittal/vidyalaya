@@ -659,7 +659,15 @@ class Rooms{
 		if (isset(self::$objArray[$key])) return self::$objArray[$key];
 		print "debug: Room with id $key not found\n";
 	 	return null;
-	 }	
+	 }
+
+	public static function GetRoomsFacility($facilityId) {
+	  $list = array();
+	  foreach (self::GetAll() as $item) {
+	    if ($item->facility->id == $facilityId) $list[] = $item;
+	  }
+	  return $list;
+	}
 	
 	public static function findEastlakeRoomFromCourse($course) {
 		self::firstTimeCall();
@@ -671,6 +679,11 @@ class Rooms{
 	}
 
 	public static $objArray = Array ();
+
+	public static function GetAll() {
+		self::firstTimeCall();
+		return self::$objArray;
+	}
 
 	private static function ReadRow($row) {
 		$key = $row["Rooms.id"];

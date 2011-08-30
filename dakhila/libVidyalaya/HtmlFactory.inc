@@ -515,4 +515,22 @@ function DisplayClassRoster($template, $classId) {
   }
 }
 
+// ****************************
+// Rooms
+function DisplayRooms($template, $year, $facilityId) {
+  $template->addBlockFile('RESULT', 'F_RESULT', 'Rooms.tpl');
+  $template->touchBlock('F_RESULT');
+  foreach (Rooms::GetRoomsFacility($facilityId) as $item) {
+    $templateName="ROOM";
+    $template->setCurrentBlock($templateName);
+
+    $template->setVariable("ID", $item->id);
+    $template->setVariable("FACILITY", $item->facility->name);
+    $template->setVariable("ROOMNUMNBER", $item->roomNumber);
+    $template->setVariable("CAPACITY", $item->capacity);
+    $template->parseCurrentBlock();
+  }
+}
+
+
 ?>

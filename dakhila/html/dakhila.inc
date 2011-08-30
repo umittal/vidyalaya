@@ -62,6 +62,16 @@
 	    </td><td>Vidyalaya Course Catalog - All courses may not be offered every year</td>
 	  </tr>
 
+	  <tr><td>
+	      <button dojoType="dijit.form.Button" type="button" >
+		Rooms
+		<script type="dojo/method" event="onClick" args="evt">
+		  window.open('/dakhila/php/dataViewer2.php?command=Rooms&facility=1', '_self', 'location=no' );
+		</script>
+	      </button>
+	    </td><td>Rooms available to hold classes</td>
+	  </tr>
+
 
 
 	</table>
