@@ -195,7 +195,7 @@ function printRosterClass($class) {
 
 function printRosterYear () {
 	$classCount = array();
-	foreach (Enrollment::GetAllEnrollmentForFacilitySession(2, 2011) as $item) {
+	foreach (Enrollment::GetAllEnrollmentForFacilitySession(1, 2011) as $item) {
 		if (empty($classCount[$item->class->id])) $classCount[$item->class->id]=0;
 		$classCount[$item->class->id]++;
 	}

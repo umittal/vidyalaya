@@ -721,7 +721,7 @@ ITEMEMAIL;
 	}
 	
 	private static function AttendanceSheetFill($class) {
-		$inputFileName = "/tmp/attendance2011.xlsx";
+		$inputFileName = "/home/umesh/Dropbox/Vidyalaya-Management/Admission/attendance2011.xlsx";
 		$activeSheetIndex=0;
 		$row =4;
 
@@ -912,7 +912,7 @@ class TwoYearLayout {
 	}
 	
 	private static function currentYearFromDatabase () {
-		foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS,2011) as $enrollment) {
+		foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake,2011) as $enrollment) {
 			if (empty(self::$objArray[$enrollment->student->id])) self::$objArray[$enrollment->student->id] = new TwoYearLayout();
 			$twoyear = self::GetItemById($enrollment->student->id);
 			//print "setting this year value for $enrollment->student->id\n";
@@ -1122,7 +1122,7 @@ class TwoYearLayout {
 //Admission::classParentsEmail(67); Admission::classParentsEmail(65); exit();
 //TwoYearLayout::checkFeePaid(); exit();
 //TwoYearLayout::assignClass(); exit();
-TwoYearLayout::twoYearCsv(); exit();
+//TwoYearLayout::twoYearCsv(); exit();
 
 
 //OrientationCheck(); exit();
