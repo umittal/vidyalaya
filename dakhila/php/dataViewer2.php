@@ -289,7 +289,7 @@ SQLREGISTRATIONSUMMAY;
       $year = isset($_GET['year']) ?  $_GET['year'] : null;
       if ($year == null) $year=Calendar::CurrentYear();
       $facility = isset($_GET['facility']) ?  $_GET['facility'] : null;
-      if ($facility =="") $facility=Facility::PHHS;
+      if ($facility =="") $facility=Facility::Eastlake;
 
       $url = htmlentities($_SERVER['PHP_SELF']) . "?command=AvailableCourse";
 
@@ -321,10 +321,10 @@ SQLREGISTRATIONSUMMAY;
         autoComplete="false"
         forceValidOption="true"
 			      >
-		<option value="1">Eastlake Elementary School</option>
-		<option selected value="2">Parsippany Hills High School</option>
+		<option selected value="1">Eastlake Elementary School</option>
+		<option  value="2">Parsippany Hills High School</option>
       </select>
-   <input type="submit" name="submit" value="GO"><br>
+   <input type="submit" name="submit" value="Under Construction"><br>
     </div>
 
 
@@ -363,6 +363,32 @@ EOT;
       break;		
 
 
+    // ************************************************************
+    case "Room":
+      $url = htmlentities($_SERVER['PHP_SELF']) . "?command=$command";
+      $roomId = isset($_POST['ID']) ?  $_POST['ID'] : null;
+
+      $form = <<<EOT
+	<form method="post" action="$url">
+	Room ID: <input type="text" name="ID" value="$roomId"> 
+	<input type="submit" name="submit" value="GO"><br>
+</form>
+
+EOT;
+      $this->template->setCurrentBlock('QUERY');
+      $this->template->setVariable('QUERY', $form);
+      $this->template->parseCurrentBlock();
+
+
+	if (isset($roomId)) {
+	    $room = Rooms::GetItemById($roomId);
+	    DisplayRoom($this->template, $room);
+	  }
+
+      print $this->template->get();
+      break;
+
+		
     // ************************************************************
     default:
       $html = "<p>Please specify a valid command for the data you want to see";

@@ -523,14 +523,55 @@ function DisplayRooms($template, $year, $facilityId) {
   foreach (Rooms::GetRoomsFacility($facilityId) as $item) {
     $templateName="ROOM";
     $template->setCurrentBlock($templateName);
-
+    
+    $template->setVariable("ROOMID", $item->id);
     $template->setVariable("ID", $item->id);
-    $template->setVariable("FACILITY", $item->facility->name);
+    $template->setVariable("FACILITY", $item->facility->name );
     $template->setVariable("ROOMNUMNBER", $item->roomNumber);
     $template->setVariable("CAPACITY", $item->capacity);
     $template->parseCurrentBlock();
   }
 }
+
+// ******** Room Detail
+function DisplayRoom(&$template, $room) {
+  $template->addBlockFile('RESULT', 'F_RESULT', 'RoomDetail.tpl');
+  $template->touchBlock('F_RESULT');
+
+
+  $templateName="ROOMHEAD";
+  $template->setCurrentBlock($templateName);
+
+  $template->setVariable("ID", $room->id);
+  $template->setVariable("FACILITY", $room->facility->name  . "<br />" . $room->facility->address);
+  $template->setVariable("ROOMNUMBER", $room->roomNumber);
+  $template->setVariable("CAPACITY", $room->capacity);
+  $template->parseCurrentBlock();
+
+  $classCount = array();
+  foreach (Enrollment::GetAllEnrollmentForRoom($room->id) as $item) {
+    if (empty($classCount[$item->class->id])) $classCount[$item->class->id]=0;
+    $classCount[$item->class->id]++;
+  }
+  
+
+  foreach (AvailableClass::GetClassesForRoom($room->id) as $item) {
+    $templateName="USAGE";
+    $template->setCurrentBlock($templateName);
+
+    $roster =  "<a href=\"/dakhila/php/dataViewer2.php?command=ClassRoster&classId=$item->id\">" . 
+      $item->short() . "</a>";
+
+
+    $template->setVariable("SESSION", $item->session);
+    $template->setVariable("TIME", "$item->startTime - $item->endTime" );
+    $template->setVariable("CLASS", $roster);
+    $template->setVariable("COUNT", $classCount[$item->id]);
+    $template->parseCurrentBlock();
+  }
+
+}
+
 
 
 ?>

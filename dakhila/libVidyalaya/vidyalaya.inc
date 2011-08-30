@@ -432,23 +432,20 @@ class AvailableClass {
 	public $startTime = null;
 	public $endTime = null;
 	
-	private static function firstTimeCall() {
-		if (!empty(self::$objArray)) return;
-		$query = "select * from AvailableClass";
-		$result = VidDb::query($query);
-		while ($row = mysql_fetch_alias_array($result)) {
-			self::ReadRow($row);
-		}
-	}
-
 	public function url() {
-	  $roster =  "<a href=\"/dakhila/php/dataViewer2.php?command=ClassRoster&classId=$this->id\">" . 
-	    $this->short() . "</a>";
-
-	  $room =  " (Room: " . $this->room->roomNumber . ")";
-	  return $roster . $room;
+	  return $this->urlRoster() . $this->urlRoom();
 
 	}
+
+	public function urlRoster() {
+	  return "<a href=\"/dakhila/php/dataViewer2.php?command=ClassRoster&classId=$this->id\">" . 
+	    $this->short() . "</a>";
+	}
+
+	public function urlRoom() {
+	  return " (Room: " . $this->room->roomNumber . ")";
+	}
+
 
 	public function IsChangeAllowed() {
 	  if ($this->session == "2011-12") return true;
@@ -476,6 +473,23 @@ class AvailableClass {
 	 }	
 
 	 
+	public static function GetClassesForRoom($roomId) {
+	  $list=array();
+	  foreach (self::GetAll() as $item) {
+	    if ($item->room->id === $roomId) $list[]= $item;
+	  }
+	  return $list;
+	}
+
+	private static function firstTimeCall() {
+		if (!empty(self::$objArray)) return;
+		$query = "select * from AvailableClass";
+		$result = VidDb::query($query);
+		while ($row = mysql_fetch_alias_array($result)) {
+			self::ReadRow($row);
+		}
+	}
+
 	public static function GetAll() {
 		self::firstTimeCall();
 		return self::$objArray;
@@ -792,6 +806,17 @@ class Enrollment{
 		";
 		return self::ArrayFromQuery($query);	
 	}
+
+	public static function GetAllEnrollmentForRoom($roomId) {
+		$query = "select * 
+		from Enrollment
+			inner join AvailableClass on Enrollment.availableClass = AvailableClass.id
+			inner join Rooms on AvailableClass.room = Rooms.id
+		where Rooms.id = $roomId
+		";
+		return self::ArrayFromQuery($query);	
+	}
+
 	
 	public function __construct($row) {
 		$this->student = Student::GetItemById($row["Enrollment.student"]);
