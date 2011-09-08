@@ -494,17 +494,16 @@ class AvailableClass {
 		self::firstTimeCall();
 		return self::$objArray;
 	}
-	
+
 	public static function GetAllYear($year) {
-		if ($year >= 2010) $year -= 2010;
-		self::firstTimeCall();
-		$availableYear = array();
-		foreach (self::GetAll() as $item) {
-			if($item->year == $year) $availableYear[$item->id] = $item;
-		}
-		return $availableYear;
+	  $list= array();
+	  if ($year >= 2010) $year -= 2010;
+	  foreach (self::GetAll() as $item) {
+	    if ($item->year == $year) $list[$item->id]=$item;
+	  }
+	  
+	  return $list;
 	}
-	
 	 
 	private static $objArray = Array ();
 
@@ -731,6 +730,17 @@ class Enrollment{
 	  return 0;
 	}
 
+	public static function CompareSessionDepartment($a, $b) {
+	  if (( $a->class->session == $b->class->session )
+
+	      && ($a->class->course->department == $b->class->course->department) )return 0;
+	  if ($a->class->session < $b->class->session) return -1;
+	  if ($a->class->session > $b->class->session) return 1;
+	  if ($a->class->course->department < $b->class->course->department) return -1;
+	  if ($a->class->course->department > $b->class->course->department) return 1;
+	  return 0;
+	}
+
 	// return all families in an availableclass
 	public static function GetFamilies($class) {
 	  $families = array();
@@ -827,6 +837,57 @@ class Enrollment{
 }
 
 // ************** 
+class Volunteers {
+  public $year=null;
+  public $session = null;
+  public $MFS= null; // Mother, Father or Student
+  public $mfsId=null;
+  public $role = null; // volunteer, wellwisher
+
+  const Mother = 1
+    , Father = 2
+    , Student = 4
+    , Volunteer = 8
+    , WellWisher = 16
+    ;
+
+  public static $objArray = Array ();
+
+  private static function firstTimeCall() {
+    if (!empty(self::$objArray)) return;
+    $query = "select * from Volunteers";
+    $result = VidDb::query($query);
+    while ($row = mysql_fetch_alias_array($result)) {
+      self::$objArray[] = new self($row);
+    }
+  }
+
+  public static function GetAll() {
+    self::firstTimeCall();
+    return self::$objArray;
+  }
+
+  public static function GetAllYear($year) {
+    if ($year >= 2010) $year -= 2010;
+    $list = array();
+    foreach (self::GetAll() as $item) {
+      if ($item->year == $year) $list[]=$item;
+    }
+    return $list;
+  }
+
+  public function __construct($row) {
+    $this->year= $row["Volunteers.year"];
+    $this->session = sprintf("%s-%s",  $this->year+2010 , $this->year+11);
+    $this->MFS = $row["Volunteers.MFS"];
+    $this->mfsId = $row["Volunteers.mfsId"];
+    $this->role = $row["Volunteers.role"];
+  }
+}
+
+
+
+// ************** 
 class StudentStatus {
   public $id=null;
   public $name = null;
@@ -904,6 +965,15 @@ class Family {
 	public $phone=null;
 	public $category = null;
 	public $priority_date = null;
+
+	public static function CompareFatherLast($a, $b) {
+	  if ($a->father->lastName == $b->father->lastName) return 0;
+	  if ($a->father->lastName < $b->father->lastName) return -1;
+	  if ($a->father->lastName > $b->father->lastName) return 1;
+	  if ($a->father->firstName < $b->father->firstName) return -1;
+	  if ($a->father->firstName > $b->father->firstName) return 1;
+	  return 0;
+	}
 
 	public static $objArray = Array ();
 
@@ -1117,6 +1187,14 @@ class FamilyTracker {
 		return self::$objArray;
 	}
 	
+	public static function RegisteredFamilies() {
+	  $list = array();
+	  foreach (self::GetAll() as $item) {
+	    if ($item->currentYear == EnumFamilyTracker::registered) $list[] = $item;
+	  }
+	  return $list;
+	}
+
 	public static function CurrentYearStatus ($family){
 		self::firstTimeCall();
 		return self::$objArray[$family]->currentYear;

@@ -12,15 +12,6 @@ $(document).ready(function() {
 	headers : { 1:{sorter: false}}
 	});
 
-    FilterText = "";
-//    ColumnArray = ["ID", "Room Number"];
-    for (i=0;i<ColumnArray.length;i++) {
-        $("#maintable tbody tr").find("td:eq(" + i + ")").click( function() {
-            clickedText = $(this).text();
-            FilterText = ((FilterText == clickedText) ? "" : clickedText );
-            $.uiTableFilter( $table, FilterText, ColumnArray[i]);
-        });
-    }
 });
 </script>
 

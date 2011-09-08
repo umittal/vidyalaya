@@ -368,7 +368,7 @@ class Mail {
 	}
 
 	public static function  mailFamilyFromAdmission($family, $subject, $body, $production) {
-		$footer = "<p>Umesh Mittal<br>Admissions</p>";
+		$footer = "<p>Admissions<br>Umesh Mittal</p>";
 		self::mailFamily($family, $subject, $body, $production, $footer);
 	}
 
@@ -413,7 +413,7 @@ class Mail {
 		We also want to take this opportunity to thank the teachers for their voluntary contribution.
 
 		<p>Should you have any questions or concerns, please respond to this email at the 
-		earliest. All placement issues will be addressed before the school opens in September. 
+		earliest. 
 		Please forward any questions or comments to spa@vidyalaya.us.  The SPA team will 
 		coordinate with the Language Curriculum Team to address your concerns.
 
@@ -516,6 +516,8 @@ EOT;
 		self::$html .= "<tr><td>Teachers</td><td></td><td>" . $student->registration->language->teachers . "</td></tr>\n";
 		// Get Enrollemnet details
 		$history = Enrollment::GetLanguageHistory($studentId);
+		usort ($history, "Enrollment::CompareSessionDepartment");
+
 		$year = null;
 		foreach ($history as $item) {
 			$year = $item->class->year + 2010;
@@ -556,8 +558,8 @@ EOT;
 		
 		
 		self::PrintThreeFiles($studentId);
-		if ($studentId != 1452) return;
-		Mail::mailEvaluation($studentId, self::$html, 0);
+		//		if ($studentId != 1452) return;
+		Mail::mailEvaluation($studentId, self::$html, 1);
 
 	}
 
@@ -660,6 +662,70 @@ ITEMEMAIL;
 		}
 		print "Grand Total = $grandTotal\n";
 	}
+
+	// ***********************
+
+	private static function admissionConfirmationEmailFamily($familyId, $tuition, $enrollment) {
+		
+	  $family = Family::GetItemById($familyId);
+
+		$body = <<<ADMISSIONEMAIL
+		  <p>
+		  Hope you had a great summer and have recovered from the after effects of the big hurricane. It gives
+		  us a great pleasure to confirm  your participation in Vidyalaya 2011-12. The first day of the school is on
+
+		  September 11, 2011 at Eastlake Elementary School. Please expect to see further
+		  communication regarding placement and first day from Vidyalaya in coming
+		  days. This closes the admission process for 2011-12 and no further emails will
+		  be accepted at admission2011@vidyalaya.us email address.
+
+		  <p>
+		   We received an amount of \$ $tuition from you as tuition. Following students are 
+		   registered from your family
+<ol>
+
+ADMISSIONEMAIL;
+		$list = null; $done=array();
+		foreach($enrollment as $item) {
+		  if (array_key_exists($item->student->id, $done)) continue;
+		  if ($item->student->family->id == $familyId) {
+		    $list .= "<li> " . $item->student->fullName() . "</li>\n";
+		    $done[$item->student->id] = 1;
+		  }
+		} 
+		if (is_null($list)) die ("Houston, we have a problem, $familyId\n");
+
+		$closing = <<<CLOSING
+		  </ol>
+
+		  <p>
+		  See you on September 11, 2011 at Eastlake.
+
+CLOSING;
+		$subject = "Participation Confirmation 2011-12, Family- $family->id";
+
+		return;
+		if ($familyId > 469)
+		  Mail::mailFamilyFromAdmission($family, $subject, $body . $list . $closing, 0);
+	}
+
+	public static function admissionConfirmationEmail($year) {
+	  $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake, $year);
+	  $i=1;
+	  $fp = fopen("/tmp/familylist.csv", "w");
+	  foreach (FamilyTracker::RegisteredFamilies() as $item) {
+	    $family = Family::GetItemById($item->family);
+	    $csv = array();
+	    $csv[]=$i++;
+	    $csv[]=$family->id;
+	    $csv[]=$item->tuition;
+	    $csv[]=$family->mother->fullName();
+	    $csv[]=$family->father->fullName();
+	    $csv[]=$family->address->OneLineAddress();
+	    fputcsv($fp, $csv);
+	    	    self::admissionConfirmationEmailFamily($item->family, $item->tuition, $enrollment);
+	  }
+	}
 	
 	public static function classParentsEmail($class) {
 	  foreach (Enrollment::GetFamilies($class) as $family) {
@@ -667,6 +733,21 @@ ITEMEMAIL;
 #	    print "$family->id, ". "$family->mother->email," . " $family->father->email" . " \n";
 	  }
 
+	}
+
+	public static function CreateMailingLists($year) {
+	  $directory="/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/mailinglist";
+	  foreach (AvailableClass::GetAllYear($year) as $item) {
+	    $filename = $item->short() . ".txt";
+	    
+	    $fp=popen("sort -u --output=$directory/$filename", "w");
+	    foreach (Enrollment::GetFamilies($item->id) as $family) {
+	      fwrite($fp, str_replace(";", "\n", $family->mother->email) . "\n");
+	      fwrite($fp, str_replace(";", "\n", $family->father->email) . "\n");
+	    }
+	    pclose($fp);
+	    
+	  }
 	}
 	
 	private static $rosterid = null;
@@ -701,6 +782,33 @@ ITEMEMAIL;
 			self::$rosterfh = null;
 			self::RosterClass($class);
 		}
+	}
+
+	public static function BadgeFile($year) {
+	  $list = array(); $language= array(); $culture= array();
+	  foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake, $year) as $item) {
+ 	    $list[$item->student->id] = $item->student;
+	    if ($item->class->course->department == Department::Culture ) {
+	      $culture[$item->student->id] = $item->class;
+	    } else {
+	      $language[$item->student->id] = $item->class;
+	    }
+	  }
+
+	  $fh = fopen("/tmp/studentbadge.csv", "w");
+	  foreach ($list as $item) {
+	    $csv = array();
+	    $csv[] = $item->id;
+	    $csv[] = $item->firstName;
+	    $csv[] = $item->lastName;
+	    $csv[] = $language[$item->id]->short();
+	    $csv[] = $language[$item->id]->room->roomNumber;
+	    if (array_key_exists($item->id, $culture)) {
+	      $csv[] = $culture[$item->id]->short();
+	      $csv[] = $culture[$item->id]->room->roomNumber;
+	    }
+	    fputcsv($fh, $csv);
+	  }
 	}
 	
 	public static function RosterFromFile ($filename) {
@@ -791,6 +899,27 @@ ITEMEMAIL;
 			$objWriter->save($excelFile);
 			echo date('H:i:s') . " Peak memory usage: " . (memory_get_peak_usage(true) / 1024 / 1024) . " MBrn\no";
 		}
+	}
+
+	public static function PrintVolunteers($year) {
+	  foreach(Volunteers::GetAllYear($year) as $item) {
+	    switch ($item->MFS) {
+	    case Volunteers::Mother:
+	      $family = Family::GetItemById($item->mfsId);
+	      print $family->mother->fullName() . "\n";
+	      break;
+	    case Volunteers::Father:
+	      $family = Family::GetItemById($item->mfsId);
+	      print $family->father->fullName(). "\n";
+	      break;
+	    case Volunteers::Student:
+	      $student = Student::GetItemById($item->mfsId);
+	      print $student->fullName(). "\n";
+	      break;
+	    default: 
+	      die ("unexpected type of item found in volunteers\n");
+	    }
+	  }
 	}
 }
 
@@ -1114,12 +1243,17 @@ class TwoYearLayout {
 	}
 }
 
+Admission::PrintVolunteers(2011); exit();
 //Admission::AttendanceSheet(2011); exit();
 //Evaluation::ProcessAllFiles(); exit();
 //Admission::RosterFromFile("/tmp/aa"); exit();
 //Admission::Roster(2011); exit();
+//Admission::CreateMailingLists(2011);exit();
+//Admission::admissionConfirmationEmail(2011);exit();
+//Admission::BadgeFile(2011); exit();
 //Admission::itemDelivery(); exit();
-//Admission::classParentsEmail(67); Admission::classParentsEmail(65); exit();
+//Admission::classParentsEmail(69); exit();
+//Admission::classParentsEmail(35); exit();
 //TwoYearLayout::checkFeePaid(); exit();
 //TwoYearLayout::assignClass(); exit();
 //TwoYearLayout::twoYearCsv(); exit();
