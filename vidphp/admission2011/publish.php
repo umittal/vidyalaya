@@ -69,13 +69,13 @@ class Publications {
     }      
     foreach(Volunteers::GetAllYear(2011) as $item) {
       switch ($item->MFS) {
-      case Volunteers::Mother:
+      case MFS::Mother:
 	$families[$item->mfsId] =  Family::GetItemById($item->mfsId);
 	break;
-      case Volunteers::Father:
+      case MFS::Father:
 	$families[$item->mfsId] =  Family::GetItemById($item->mfsId);
 	break;
-      case Volunteers::Student:
+      case MFS::Student:
 	$student = Student::GetItemById($item->mfsId);
 	$families[$student->family->id] = $student->family;
 	break;
@@ -182,7 +182,7 @@ class Publications {
   }
 }	
 
-Publications::SchoolDirectory(); exit();
+//Publications::SchoolDirectory(); exit();
 Publications::ClassDirectory(2011); exit (); // Directory of all classes, with and without email
 
 ?>

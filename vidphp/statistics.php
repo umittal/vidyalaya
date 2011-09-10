@@ -484,7 +484,7 @@ function ConvertTeacherToObject() {
 }
 
 
-FamilyTracker::UpdateFamilyTracker(); exit();
+//FamilyTracker::UpdateFamilyTracker(); exit();
 //FamilyTracker::loadPayments();exit();
 //FamilyTracker::ReportPending();exit();
 //FamilyTracker::TrackerSummary();exit(); This has probably been removed
@@ -492,7 +492,7 @@ FamilyTracker::UpdateFamilyTracker(); exit();
 //emailListForVasudhaRegdParents();
 //ConvertTeacherToObject();
 //testExcelThing();
-classUtilizationReport();
+//classUtilizationReport();
 //
 
 //	GetAllData();

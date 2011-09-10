@@ -131,8 +131,12 @@ class Student {
   	self::firstTimeCall();
   	return self::$objArray;
   }
-  
 
+  public static function GetAll() {
+  	self::firstTimeCall();
+  	return self::$objArray;
+  }
+  
   public static function RegisteredStudents() {
   	self::firstTimeCall();
   	$students = Array();
@@ -844,13 +848,6 @@ class Volunteers {
   public $mfsId=null;
   public $role = null; // volunteer, wellwisher
 
-  const Mother = 1
-    , Father = 2
-    , Student = 4
-    , Volunteer = 8
-    , WellWisher = 16
-    ;
-
   public static $objArray = Array ();
 
   private static function firstTimeCall() {
@@ -885,6 +882,114 @@ class Volunteers {
   }
 }
 
+// ************** 
+class MFS {
+  const Mother = 1
+    , Father = 2
+    , Student = 4
+    , Volunteer = 8
+    , WellWisher = 16
+    ;
+}
+
+Class Emails {
+  public $email=null;
+  public $MFS= null; 
+  public $mfsId=null;
+
+  public static $objArray = Array ();
+
+  private static function AddEmailToArray($emailPraveen, $mfs, $mfsid) {
+    foreach (explode(";", $emailPraveen) as $email) {
+      if (array_key_exists($email, self::$objArray)) {
+	print "$email is a duplicate in the database\n";
+	continue;
+      }
+      if (empty($email)) continue;
+      self::$objArray[strtolower($email)] = new self($email, $mfs, $mfsid);
+    }
+  }
+
+  private static function firstTimeCall() {
+    if (!empty(self::$objArray)) return;
+    foreach (Family::GetAll() as $family) {
+      self::AddEmailToArray($family->mother->email, MFS::Mother, $family->id);
+      self::AddEmailToArray($family->father->email, MFS::Father, $family->id);
+
+    }
+    foreach (Student::GetAll() as $student) {
+      self::AddEmailToArray($student->email, MFS::Student, $student->id);
+    }
+  }
+
+  public static function GetMFS($email) {
+    self::firstTimeCall();
+    if (!array_key_exists($email, self::$objArray)) return 0;
+    return self::$objArray[$email]->MFS;
+  }
+
+  public static function Getmfsid($email) {
+    self::firstTimeCall();
+    if (!array_key_exists($email, self::$objArray)) return 0;
+    return self::$objArray[$email]->mfsId;
+  }
+
+  public static function GetAll() {
+    self::firstTimeCall();
+    return self::$objArray;
+  }
+
+  public function __construct($email, $mfs, $mfsid) {
+    $this->email = $email;
+    $this->MFS = $mfs;
+    $this->mfsId = $mfsid;
+  }
+}
+
+
+// ************** 
+class Teachers {
+  public $classId = null;
+  public $MFS= null; // Mother, Father or Student
+  public $mfsId=null;
+  public $IsLead = null; // volunteer, wellwisher
+
+  public static $objArray = Array ();
+
+  private static function firstTimeCall() {
+    if (!empty(self::$objArray)) return;
+    $query = "select * from teachers";
+    $result = VidDb::query($query);
+    while ($row = mysql_fetch_alias_array($result)) {
+      self::$objArray[] = new self($row);
+    }
+  }
+
+  public static function GetAll() {
+    self::firstTimeCall();
+    return self::$objArray;
+  }
+
+  public static function AddTeacher($classId, $email, $IsLead) {
+    $email = strtolower($email);
+    $mfs = Emails::GetMFS($email);
+    $mfsid = Emails::Getmfsid($email);
+
+    if ($mfs == 0 || $mfsid ==0) die ("cannot find $email in the database correctly\n");
+
+    $sql = "insert into teachers values ($classId, $mfs, $mfsid, $IsLead)";
+    
+    $result = VidDb::query($sql);
+  }
+
+  public function __construct($row) {
+    $this->classId = $row["teachers.classId"];
+    $this->MFS = $row["teachers.MFS"];
+    $this->mfsId = $row["teachers.mfsId"];
+    $this->IsLead = $row["teachers.IsLead"];
+  }
+
+}
 
 
 // ************** 
@@ -1002,6 +1107,12 @@ class Family {
 		self::firstTimeCall();
 		return self::$objArray;
 	}
+
+	public static function GetAll() {
+	  self::firstTimeCall();
+	  return self::$objArray;
+	}
+
 
 	public function parentsName() {
 		if ($this->mother->lastName == $this->father->lastName) {

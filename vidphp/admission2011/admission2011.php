@@ -307,7 +307,8 @@ class Mail {
 		$mail->Password = $password; // SMTP password
 		$mail->From = $email;
 		$mail->FromName = $name;
-		$mail->AddReplyTo($email,$name);
+		//		$mail->AddReplyTo($email,$name);
+		$mail->AddReplyTo("umesh@vidyalaya.us", "Umesh Mittal");
 		$mail->IsHTML(true); // send as HTML
 		$mail->WordWrap = 50; // set word wrap
 
@@ -368,14 +369,15 @@ class Mail {
 	}
 
 	public static function  mailFamilyFromAdmission($family, $subject, $body, $production) {
-		$footer = "<p>Admissions<br>Umesh Mittal</p>";
+		$footer = "<p>Vidyalaya Management Team<br>Umesh Mittal</p>";
 		self::mailFamily($family, $subject, $body, $production, $footer);
 	}
+
 
 	public static function  mailFamily($family, $subject, $body, $production, $footer) {
 		if ($production == 0) $subject = "[Test] $subject";
 
-		$mail = self::SetupMail();
+		$mail = self::SetupMailSPA();
 		self::SetFamilyAddress($mail, $family, $production);
 
 		$mail->Subject = $subject;
@@ -549,7 +551,7 @@ EOT;
 				print "$studentId, $row[$i]\n"; // Dispaly it once, to move to file
 			} else {
 				self::$txt .= "\n" . $header[$i] . "," . $evaluation  . "\n";
-				self::$html .= "<tr><td class=left> $header[$i] </td><td> <i>$evaluation</i>   </td></tr>\n";
+				Self::$html .= "<tr><td class=left> $header[$i] </td><td> <i>$evaluation</i>   </td></tr>\n";
 			}
 		}
 		
@@ -670,18 +672,18 @@ ITEMEMAIL;
 	  $family = Family::GetItemById($familyId);
 
 		$body = <<<ADMISSIONEMAIL
-		  <p>
-		  Hope you had a great summer and have recovered from the after effects of the big hurricane. It gives
-		  us a great pleasure to confirm  your participation in Vidyalaya 2011-12. The first day of the school is on
+<p>
 
-		  September 11, 2011 at Eastlake Elementary School. Please expect to see further
-		  communication regarding placement and first day from Vidyalaya in coming
-		  days. This closes the admission process for 2011-12 and no further emails will
-		  be accepted at admission2011@vidyalaya.us email address.
+We are writing this email to let you know that the start of Vidyalaya 2011-12 session has been delayed by one week. Our first day now will be September 18, 2011.
 
-		  <p>
-		   We received an amount of \$ $tuition from you as tuition. Following students are 
-		   registered from your family
+<p>
+We were planning to start the school at Eastlake Elementary School.  However, earlier this week, concerned authorities advised us that because of the size of our enrollment, we were at serious risk of violations not only for parking but also for crowding in the hallways and gym.  In order to not jeopardize the safety of our families and to minimize the disruption that a potential fire code violation would have on Vidyalaya, we decided to find an alternate venue for the school. 
+
+<p>
+We are pleased to inform you that pending some contractual paperwork, we will be moving to Parsippany Hills High School for the current session.
+<p>
+We apologize for the late notice due to events out of our control and look forward to seeing you all on Sunday September 18, 2011. More emails will be coming with further details. For the record, following students are enrolled from your family
+
 <ol>
 
 ADMISSIONEMAIL;
@@ -698,15 +700,13 @@ ADMISSIONEMAIL;
 		$closing = <<<CLOSING
 		  </ol>
 
-		  <p>
-		  See you on September 11, 2011 at Eastlake.
+		  <p>Regards,<p>
 
 CLOSING;
-		$subject = "Participation Confirmation 2011-12, Family- $family->id";
+		$subject = "Opening Day 2011-12 notification, Family- $family->id";
 
-		return;
-		if ($familyId > 469)
-		  Mail::mailFamilyFromAdmission($family, $subject, $body . $list . $closing, 0);
+		if ($familyId > 472)
+		  Mail::mailFamilyFromAdmission($family, $subject, $body . $list . $closing, 1);
 	}
 
 	public static function admissionConfirmationEmail($year) {
@@ -748,6 +748,53 @@ CLOSING;
 	    pclose($fp);
 	    
 	  }
+
+	  $filename="volunteers.txt";
+
+	  $fp=popen("sort -u --output=$directory/$filename", "w");
+	  foreach(Volunteers::GetAllYear(2011) as $item) {
+	    switch ($item->MFS) {
+	    case MFS::Mother:
+	      $family =  Family::GetItemById($item->mfsId);
+	      fwrite($fp, str_replace(";", "\n", $family->mother->email) . "\n");
+	      break;
+	    case MFS::Father:
+	      $family =  Family::GetItemById($item->mfsId);
+	      fwrite($fp, str_replace(";", "\n", $family->father->email) . "\n");
+	      break;
+	    case MFS::Student:
+	      $student = Student::GetItemById($item->mfsId);
+	      fwrite($fp, str_replace(";", "\n", $student->email) . "\n");
+	      break;
+	    default: 
+	      die ("unexpected type of item found in volunteers\n");
+	    }
+	  }
+
+	  $filename="allEmails.csv";
+	  $fp=fopen("$directory/$filename", "w");
+	  foreach(Emails::GetAll() as $item) {
+	    $csv = array();
+	    $csv[] = $item->email;
+	    switch ($item->MFS) {
+	    case MFS::Mother:
+	      $family =  Family::GetItemById($item->mfsId);
+	      $csv[] = $family->mother->fullName();
+	      break;
+	    case MFS::Father:
+	      $family =  Family::GetItemById($item->mfsId);
+	      $csv[] = $family->father->fullName();
+	      break;
+	    case MFS::Student:
+	      $student = Student::GetItemById($item->mfsId);
+	      $csv[] = $student->fullName();
+	      break;
+	    default: 
+	      die ("unexpected type of item found in volunteers\n");
+	    }
+	    fputcsv($fp, $csv);
+	  }
+
 	}
 	
 	private static $rosterid = null;
@@ -855,6 +902,7 @@ CLOSING;
 
 		$objPHPExcel->getActiveSheet()->setTitle($class->short());
 		$objPHPExcel->getActiveSheet()->getCell("B2")->setValue($class->short());
+		$objPHPExcel->getActiveSheet()->getCell("B3")->setValue("Room: " . $class->room->roomNumber);
 			
 		$objPHPExcel->getActiveSheet()->getRowDimension("1")->setVisible(TRUE);
 		$objPHPExcel->getActiveSheet()->getRowDimension("2")->setVisible(TRUE);
@@ -863,7 +911,11 @@ CLOSING;
 			$cellValue=sprintf("B%d", $row);
 			$objPHPExcel->getActiveSheet()->getCell($cellValue)->setValue($item->student->id);
 			$cellValue=sprintf("C%d", $row);
-			$objPHPExcel->getActiveSheet()->getCell($cellValue)->setValue($item->student->fullName());
+			$fullName=$item->student->fullName();
+			if ($class->course->department == Department::Kindergarten) {
+			  $fullName = substr(Department::NameFromId($item->student->languagePreference), 0, 1) . " " . $fullName;
+			}
+			$objPHPExcel->getActiveSheet()->getCell($cellValue)->setValue($fullName);
 			$objPHPExcel->getActiveSheet()->getRowDimension($row)->setVisible(TRUE);
 			$row++;
 		}
@@ -921,6 +973,7 @@ CLOSING;
 	    }
 	  }
 	}
+
 }
 
 
@@ -1243,12 +1296,44 @@ class TwoYearLayout {
 	}
 }
 
-Admission::PrintVolunteers(2011); exit();
+
+Teachers::AddTeacher(44, "Mmistry1@gmail.com", 1); 
+Teachers::AddTeacher(44, "sipu@optonline.net", 0); 
+Teachers::AddTeacher(44, "jagrutigoswami@yahoo.com", 0); 
+Teachers::AddTeacher(44, "patelr5@yahoo.com", 0); 
+
+//Teachers::AddTeacher(41, "", 1); 
+Teachers::AddTeacher(41, "nirajhetal@yahoo.com", 0); 
+Teachers::AddTeacher(41, "vparmar@hotmail.com", 0); 
+
+Teachers::AddTeacher(45, "hemalsheth@hotmail.com", 1); 
+//Teachers::AddTeacher(45, "", 0); 
+Teachers::AddTeacher(45, "aruna67_bm@yahoo.com", 0); 
+
+//Teachers::AddTeacher(79, "", 1); 
+Teachers::AddTeacher(79, "deveshshah@hotmail.com", 0); 
+Teachers::AddTeacher(79, "Nila_Parmar@bd.com", 0); 
+
+Teachers::AddTeacher(46, "dinesh.patel@ms.com", 1); 
+Teachers::AddTeacher(46, "bhavinsheth2000@yahoo.com", 0); 
+//Teachers::AddTeacher(46, "", 0); 
+
+Teachers::AddTeacher(49, "tbhavsar@yahoo.com", 1); 
+Teachers::AddTeacher(49, "malinijoshi@hotmail.com", 0); 
+Teachers::AddTeacher(49, "sejalmehta@yahoo.com", 0); 
+
+
+
+exit();
+
+Teachers::AddTeacher(34, "", 0); 
+
+//Admission::PrintVolunteers(2011); exit();
 //Admission::AttendanceSheet(2011); exit();
 //Evaluation::ProcessAllFiles(); exit();
 //Admission::RosterFromFile("/tmp/aa"); exit();
 //Admission::Roster(2011); exit();
-//Admission::CreateMailingLists(2011);exit();
+Admission::CreateMailingLists(2011);exit();
 //Admission::admissionConfirmationEmail(2011);exit();
 //Admission::BadgeFile(2011); exit();
 //Admission::itemDelivery(); exit();
@@ -1262,7 +1347,16 @@ Admission::PrintVolunteers(2011); exit();
 //OrientationCheck(); exit();
 
 //sendReminders();
-//exit;
+
+if (php_sapi_name() != "cli") die ("only cli allowed here\n");
+if( $_SERVER["argc"] < 2) die ("no arguments specified\n");
+$out=parseArgs($_SERVER["argv"]);
+if (array_key_exists('f', $out)) 
+   die("you want me to execute " . $out['f'] . "\n");
+if (array_key_exists("function", $out)) 
+  die("you want me to execute " . $out['function'] . "\n");
+die("I have nothing to do\n");
+
 
 $students = GetAllData();
 
