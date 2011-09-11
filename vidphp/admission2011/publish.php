@@ -10,6 +10,21 @@ class WordTable {
   public $table = null;
   public $filename = null;
   private $PHPWord=null;
+  private $sectionStyle=null;
+  private $footer=null;
+  private $header=null;
+
+  public function SetLandscape() {
+    $this->sectionStyle->setLandscape();
+  }
+
+  public function SetFooter($text) {
+    $this->footer->addText($text);
+  }
+
+  public function SetHeader($text) {
+    $this->header->addText($text);
+  }
 
   public function __construct() {
 
@@ -18,7 +33,10 @@ class WordTable {
 
     // New portrait section
     $section = $this->PHPWord->createSection();
-
+    $this->sectionStyle = $section->getSettings();
+    $this->footer = $section->createFooter();
+    $this->header = $section->createHeader();
+     
     // Define table style arrays
     $styleTable = array('borderBottomSize'=>6, 'borderBottomColor'=>'006699', 'cellMargin'=>20);
     $styleFirstRow = array('borderBottomSize'=>18, 'borderBottomColor'=>'0000FF', 'bgColor'=>'66BBFF');
@@ -167,12 +185,18 @@ class Publications {
       $short= $class->short();
 
       $document = new WordTable();
+      $document->SetLandscape();
+      $text = $class->short() . "- " . Teachers::TeacherList($class->id);
+      $document->SetFooter($text);
+      $text = "Vidyalaya Inc. 2011-12 Roster";
+      $document->SetHeader($text);
+
       $table = $document->table;
       self::ClassDirectoryTable($table, $class, true);
       $document->filename = "$directory/ClassWide/$short.docx";
       $document->SaveDocument();
 
-      $document = new WordTable();
+      $document = new WordTable(false);
       $table = $document->table;
       self::ClassDirectoryTable($table, $class, false);
       $document->filename = "$directory/ClassShort/$short.docx";
@@ -270,10 +294,53 @@ class Publications {
     self::MailingListsAll($year);
   }
 
+  public static function TeacherListForHandbook($year) {
+    
+    $teachercount=0; $done = array();
+    foreach (Teachers::TeacherListYear($year) as $teacher) {
+      $key = "$teacher->MFS:$teacher->mfsId"; echo $key;
+      if (!array_key_exists($key, $done)) {
+	$done[$key]=1;
+	$teachercount++;
+      }
+    }
+    
+    print "<p>The classes at Vidyalaya are made possible by the volunteerism of following $teachercount teachers.\n";
+    print "<div id='teacherlist'>\n"; 
+      print "<table>\n";
+    foreach (Department::GetAll() as $dept) {
+      print "<tr><th colspan=3 class='rowhead'>" . Department::NameFromId($dept) . "</th></tr>\n";
+      foreach (AvailableClass::GetAllYearDepartment($dept, $year) as $class) {
+	print "<tr><td>" .  $class->short() . "</td><td nowrap='true'>" . $class->course->full . "</td><td>" . Teachers::TeacherList($class->id) . "</td></tr>\n";
+      }
+    }
+    print "</table>\n";
+    print "</div>\n";
+  }
+
+
+  private static function printParentContact($parent, $family) {
+    print $parent->firstName . ", " . $parent->lastName . ", " . $parent->email .
+      ", \"" . $family->address->OneLineAddress() . "\", " . $parent->cellPhone . "\n";
+  }
+  public static function FullDumpFamilies() {
+    print "ID, MF, First Name, Last Name, E-mail Address, Home Address, Mobile Phone\n";
+    foreach (Family::GetAll() as $family) {
+      print "$family->id, m, ";
+      self::printParentContact($family->mother, $family);
+      print "$family->id, f, ";
+      self::printParentContact($family->father, $family);
+    }
+  }
+
+
 
 }	
 
-Publications::CreateMailingLists(2011);exit();
+
+//Publications::TeacherListForHandbook(2011);exit();
+Publications::FullDumpFamilies();
+//Publications::CreateMailingLists(2011);exit();
 //Publications::TeacherList(2011);  exit();
 //Publications::SchoolDirectory(); exit();
 //Publications::ClassDirectory(2011); exit (); // Directory of all classes, with and without email

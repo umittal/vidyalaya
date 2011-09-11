@@ -38,6 +38,10 @@ class Department {
 	  }
 	}
 
+	public static function GetAll() {
+	  return  array(self::Kindergarten, self::Hindi, self::Gujarati, self::Telugu, self::Culture);
+	}
+
 	public static function NameFromId($number) {
 		switch ($number) {
 			case 1: return "Hindi";
@@ -436,6 +440,14 @@ class AvailableClass {
 	public $startTime = null;
 	public $endTime = null;
 	
+	public static function CompareShort($a, $b) {
+	  $ashort = $a->short();
+	  $bshort = $b->short();
+
+	  if ($ashort == $bshort) return 0;
+	  return ($ashort < $bshort) ? -1 : 1;
+	}
+
 	public function url() {
 	  return $this->urlRoster() . $this->urlRoom();
 
@@ -506,6 +518,17 @@ class AvailableClass {
 	    if ($item->year == $year) $list[$item->id]=$item;
 	  }
 	  
+	  return $list;
+	}
+	 
+	public static function GetAllYearDepartment($dept, $year) {
+	  $list= array();
+	  if ($year >= 2010) $year -= 2010;
+	  foreach (self::GetAllYear($year) as $item) {
+	    if ($item->course->department == $dept) $list[$item->id]=$item;
+	  }
+	  
+	  usort ($list, "AvailableClass::CompareShort");
 	  return $list;
 	}
 	 

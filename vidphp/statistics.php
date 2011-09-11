@@ -41,21 +41,6 @@ function cultureAge($students) {
 	}
 }
 
-function printParentContact($parent, $family) {
-
-	if (!empty($parent->email)) {
-		print $parent->firstName . ", " . $parent->lastName . ", " . $parent->email .
-			", \"" . $family->address->OneLineAddress() . "\", " . $parent->cellPhone . "\n";
-	}
-}
-
-function printMemberList() {
-	print "First Name, Last Name, E-mail Address, Home Address, Mobile Phone\n";
-	foreach (Family::$objArray as $family) {
-		printParentContact($family->mother, $family);
-		printParentContact($family->father, $family);
-	}
-}
 
 function checkWaitingList() {
 	$fh = fopen("/tmp/a.csv", "r"); // address book
@@ -314,6 +299,7 @@ function GetChildrenCountForFamily($id, $students) {
 }
 
 
+// not sure if i still need it.
 function listAllFamilies() {
 	$students = GetAllData();
 	
