@@ -735,67 +735,6 @@ CLOSING;
 
 	}
 
-	public static function CreateMailingLists($year) {
-	  $directory="/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/mailinglist";
-	  foreach (AvailableClass::GetAllYear($year) as $item) {
-	    $filename = $item->short() . ".txt";
-	    
-	    $fp=popen("sort -u --output=$directory/$filename", "w");
-	    foreach (Enrollment::GetFamilies($item->id) as $family) {
-	      fwrite($fp, str_replace(";", "\n", $family->mother->email) . "\n");
-	      fwrite($fp, str_replace(";", "\n", $family->father->email) . "\n");
-	    }
-	    pclose($fp);
-	    
-	  }
-
-	  $filename="volunteers.txt";
-
-	  $fp=popen("sort -u --output=$directory/$filename", "w");
-	  foreach(Volunteers::GetAllYear(2011) as $item) {
-	    switch ($item->MFS) {
-	    case MFS::Mother:
-	      $family =  Family::GetItemById($item->mfsId);
-	      fwrite($fp, str_replace(";", "\n", $family->mother->email) . "\n");
-	      break;
-	    case MFS::Father:
-	      $family =  Family::GetItemById($item->mfsId);
-	      fwrite($fp, str_replace(";", "\n", $family->father->email) . "\n");
-	      break;
-	    case MFS::Student:
-	      $student = Student::GetItemById($item->mfsId);
-	      fwrite($fp, str_replace(";", "\n", $student->email) . "\n");
-	      break;
-	    default: 
-	      die ("unexpected type of item found in volunteers\n");
-	    }
-	  }
-
-	  $filename="allEmails.csv";
-	  $fp=fopen("$directory/$filename", "w");
-	  foreach(Emails::GetAll() as $item) {
-	    $csv = array();
-	    $csv[] = $item->email;
-	    switch ($item->MFS) {
-	    case MFS::Mother:
-	      $family =  Family::GetItemById($item->mfsId);
-	      $csv[] = $family->mother->fullName();
-	      break;
-	    case MFS::Father:
-	      $family =  Family::GetItemById($item->mfsId);
-	      $csv[] = $family->father->fullName();
-	      break;
-	    case MFS::Student:
-	      $student = Student::GetItemById($item->mfsId);
-	      $csv[] = $student->fullName();
-	      break;
-	    default: 
-	      die ("unexpected type of item found in volunteers\n");
-	    }
-	    fputcsv($fp, $csv);
-	  }
-
-	}
 	
 	private static $rosterid = null;
 	private static $rosterfh = null;
@@ -956,15 +895,15 @@ CLOSING;
 	public static function PrintVolunteers($year) {
 	  foreach(Volunteers::GetAllYear($year) as $item) {
 	    switch ($item->MFS) {
-	    case Volunteers::Mother:
+	    case MFS::Mother:
 	      $family = Family::GetItemById($item->mfsId);
 	      print $family->mother->fullName() . "\n";
 	      break;
-	    case Volunteers::Father:
+	    case MFS::Father:
 	      $family = Family::GetItemById($item->mfsId);
 	      print $family->father->fullName(). "\n";
 	      break;
-	    case Volunteers::Student:
+	    case MFS::Student:
 	      $student = Student::GetItemById($item->mfsId);
 	      print $student->fullName(). "\n";
 	      break;
@@ -1297,30 +1236,7 @@ class TwoYearLayout {
 }
 
 
-Teachers::AddTeacher(44, "Mmistry1@gmail.com", 1); 
-Teachers::AddTeacher(44, "sipu@optonline.net", 0); 
-Teachers::AddTeacher(44, "jagrutigoswami@yahoo.com", 0); 
-Teachers::AddTeacher(44, "patelr5@yahoo.com", 0); 
-
-//Teachers::AddTeacher(41, "", 1); 
-Teachers::AddTeacher(41, "nirajhetal@yahoo.com", 0); 
-Teachers::AddTeacher(41, "vparmar@hotmail.com", 0); 
-
-Teachers::AddTeacher(45, "hemalsheth@hotmail.com", 1); 
-//Teachers::AddTeacher(45, "", 0); 
-Teachers::AddTeacher(45, "aruna67_bm@yahoo.com", 0); 
-
-//Teachers::AddTeacher(79, "", 1); 
-Teachers::AddTeacher(79, "deveshshah@hotmail.com", 0); 
-Teachers::AddTeacher(79, "Nila_Parmar@bd.com", 0); 
-
-Teachers::AddTeacher(46, "dinesh.patel@ms.com", 1); 
-Teachers::AddTeacher(46, "bhavinsheth2000@yahoo.com", 0); 
-//Teachers::AddTeacher(46, "", 0); 
-
-Teachers::AddTeacher(49, "tbhavsar@yahoo.com", 1); 
-Teachers::AddTeacher(49, "malinijoshi@hotmail.com", 0); 
-Teachers::AddTeacher(49, "sejalmehta@yahoo.com", 0); 
+Teachers::AddTeacher(76, "usarabu@gmail.com", 0); 
 
 
 
@@ -1333,7 +1249,6 @@ Teachers::AddTeacher(34, "", 0);
 //Evaluation::ProcessAllFiles(); exit();
 //Admission::RosterFromFile("/tmp/aa"); exit();
 //Admission::Roster(2011); exit();
-Admission::CreateMailingLists(2011);exit();
 //Admission::admissionConfirmationEmail(2011);exit();
 //Admission::BadgeFile(2011); exit();
 //Admission::itemDelivery(); exit();

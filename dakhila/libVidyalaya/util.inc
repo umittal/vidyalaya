@@ -88,6 +88,19 @@ function HtmlToPdf($html) {
 	return $dompdf->output();
 }
 
+function formatPhone($num) 
+{ 
+    $num = ereg_replace('[^0-9]', '', $num); 
+
+    $len = strlen($num); 
+    if($len == 7) 
+        $num = preg_replace('/([0-9]{3})([0-9]{4})/', '$1-$2', $num); 
+    elseif($len == 10) 
+        $num = preg_replace('/([0-9]{3})([0-9]{3})([0-9]{4})/', '$1-$2-$3', $num); 
+
+    return $num; 
+}
+
 
 Class Calendar {
 	const BaseYear = 2010

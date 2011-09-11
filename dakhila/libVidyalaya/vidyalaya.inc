@@ -771,10 +771,10 @@ class Enrollment{
 		return $enrollmentArray;
 	}
 	
-	public static function GetEnrollmentForClass ($class) {
+	public static function GetEnrollmentForClass ($classId) {
 		$query = "select * 
 		from Enrollment
-		where availableClass = $class
+		where availableClass = $classId
 		";
 		return self::ArrayFromQuery($query);
 	}
@@ -841,6 +841,77 @@ class Enrollment{
 }
 
 // ************** 
+class Person { // a new concept to break away from praveen's students2003 and parents2003
+
+  public $firstName=null;
+  public $lastName=null;
+  public $cellPhone = null;
+  public $email=null; // this needs to be turned unique somehow so it can be used as a reference
+  public $MFS=null; // reference to praveen's mother, father, student
+  public $mfsId =null; //reference to id in parents2003 or students2003
+  public $hideData=false;
+  public $home=false;
+
+  public static function CompareLastName($a, $b) {
+    if ($a->lastName == $b->lastName) return 0;
+    return ($a->lastName < $b->lastName) ? -1 : 1;
+  }
+
+  public function fullName() {
+  	return $this->firstName . " " . $this->lastName;
+  }
+
+
+  public static function PersonFromStudent($student) {
+    $person = new Person();
+    $person->firstName = $student->firstName;
+    $person->lastName = $student->lastName;
+    $person->cellPhone = $student->cellPhone;
+    $person->email = $student->email;
+    $person->MFS = MFS::Student;
+    $person->mfsId = $student->id;
+    $person->hideData = false;
+    $person->home=$student->family;
+    return $person;
+  }
+
+  public static function PersonFromParent($parent, $mfs, $id) {
+    $person = new Person();
+    $person->firstName = $parent->firstName;
+    $person->lastName = $parent->lastName;
+    $person->cellPhone = $parent->cellPhone;
+    $person->email = $parent->email;
+    $person->MFS = $mfs;
+    $person->mfsId = $id;
+    $person->hideData = $parent->IsContactable;
+    $person->home=Family::GetItemById($id);
+    return $person;
+  }
+
+  public static function PersonFromTeacher($teacher) {
+      switch ($teacher->MFS) {
+      case MFS::Mother:
+	$family = Family::GetItemById($teacher->mfsId);
+	return self::PersonFromParent($family->mother, $teacher->MFS, $teacher->mfsId);
+      case MFS::Father:
+	$family = Family::GetItemById($teacher->mfsId);
+	return self::PersonFromParent($family->father, $teacher->MFS, $teacher->mfsId);
+      case MFS::Student:
+	$student = Student::GetItemById($teacher->mfsId);
+	return self::PersonFromStudent($student);
+      default: 
+	die ("unexpected type of item found in volunteers\n");
+      }
+    
+  }
+
+
+  function __construct() {
+  }
+
+}
+
+// ************** 
 class Volunteers {
   public $year=null;
   public $session = null;
@@ -890,6 +961,23 @@ class MFS {
     , Volunteer = 8
     , WellWisher = 16
     ;
+
+  public static function FullName($mfs, $mfsId) {
+    switch ($mfs) {
+    case MFS::Mother:
+      $family = Family::GetItemById($mfsId);
+      return $family->mother->fullName();
+    case MFS::Father:
+      $family = Family::GetItemById($mfsId);
+      return $family->father->fullName();
+    case MFS::Student:
+      $student = Student::GetItemById($mfsId);
+      return $student->fullName();
+    default: 
+      die ("unexpected type of item found in volunteers\n");
+    }
+
+  }
 }
 
 Class Emails {
@@ -953,6 +1041,17 @@ class Teachers {
   public $MFS= null; // Mother, Father or Student
   public $mfsId=null;
   public $IsLead = null; // volunteer, wellwisher
+  public $person=null;
+  public $class=null;
+
+  public static function CompareLastName($a, $b) {
+    $alast = $a->person->lastName;
+    $blast = $b->person->lastName;
+    
+    if ($alast == $blast) return 0;
+    return ($alast < $blast) ? -1 : 1;
+  }
+
 
   public static $objArray = Array ();
 
@@ -982,11 +1081,64 @@ class Teachers {
     $result = VidDb::query($sql);
   }
 
+  public static function TeacherList($classId) {
+    $csv = array();
+    foreach (self::GetAll() as $item) {
+      if ($item->classId == $classId) $csv[] = MFS::FullName($item->MFS, $item->mfsId);
+    }
+    return implode(", ", $csv);
+  }
+
+  private static function ArrayFromQuery($query) {
+    $localarray = Array();
+		
+    $result = VidDb::query($query);
+    while ($row = mysql_fetch_alias_array($result)) {
+      $localarray[] = new self($row);
+    }
+    usort ($localarray, "self::CompareLastName");
+    return $localarray;
+  }
+
+  public static function TeacherListDepartment($department, $year) {
+    if ($year >= 2010) $year -= 2010;
+    $query = "select *
+              from teachers
+              inner join AvailableClass on teachers.classId = AvailableClass.id
+              inner join CourseCatalog on AvailableClass.course = CourseCatalog.id
+              where AvailableClass.year = $year and CourseCatalog.department = $department
+             ";
+    return self::ArrayFromQuery($query);
+  }
+
+  public static function TeacherListClass($classId) {
+    $query = "select *
+              from teachers
+              inner join AvailableClass on teachers.classId = AvailableClass.id
+              where AvailableClass.id = $classId
+             ";
+    return self::ArrayFromQuery($query);
+  }
+
+
+  public static function TeacherListYear($year) {
+    if ($year >= 2010) $year -= 2010;
+    $query = "select *
+              from teachers
+              inner join AvailableClass on teachers.classId = AvailableClass.id
+              where AvailableClass.year = $year
+             ";
+    return self::ArrayFromQuery($query);
+  }
+
+
   public function __construct($row) {
     $this->classId = $row["teachers.classId"];
     $this->MFS = $row["teachers.MFS"];
     $this->mfsId = $row["teachers.mfsId"];
     $this->IsLead = $row["teachers.IsLead"];
+    $this->person = Person::PersonFromTeacher($this);
+    $this->class = AvailableClass::GetItemById($this->classId);
   }
 
 }
@@ -1161,7 +1313,7 @@ class Family {
 //    print "*** I was here for $this->id\n";
     $this->mother = Parents::GetParent($row, "m");
     $this->father = Parents::GetParent($row, "f");
-    $this->phone = $row["Parents2003.MH_PHONE"];
+    $this->phone = formatPhone($row["Parents2003.MH_PHONE"]);
     $this->priority_date = $row["Parents2003.priority_date"];
 
     $this->address = new Address();

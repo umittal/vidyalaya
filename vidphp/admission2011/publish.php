@@ -180,9 +180,102 @@ class Publications {
 
     }
   }
+
+  public static function TeacherList($year) {
+    $directory = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/roster/word/";
+    //    foreach (Teachers::TeacherListDepartment(Department::Hindi, $year) as $teacher) {
+    foreach (Teachers::TeacherListYear($year) as $teacher) {
+      //      print $teacher->class->short() . ", " . $teacher->person->fullName() . ", " . $teacher->person->email .  "\n";
+      print $teacher->class->short() . ", " . $teacher->person->fullName() . ", " . $teacher->person->home->phone .  "\n";
+    }
+
+  }
+
+  const MAILINGLISTDIR="/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/mailinglist/";
+
+  private static function  MailingListsClass($year) {
+    foreach (AvailableClass::GetAllYear($year) as $item) {
+      $filename = self::MAILINGLISTDIR . $item->short() . ".txt";
+	    
+      $fp=popen("sort -u --output=$filename", "w");
+      foreach (Enrollment::GetFamilies($item->id) as $family) {
+	fwrite($fp, str_replace(";", "\n", $family->mother->email) . "\n");
+	fwrite($fp, str_replace(";", "\n", $family->father->email) . "\n");
+      }
+
+      foreach (Teachers::TeacherListClass($item->id) as $teacher) {
+	fwrite($fp, str_replace(";", "\n", $teacher->person->email) . "\n");
+      }
+
+      pclose($fp);
+    }
+  }
+
+  private static function MailingListsVolunteers($year) {
+    $filename="volunteers.txt";
+
+    $fp=popen("sort -u --output=self::MAILINGLISTDIR/$filename", "w");
+    foreach(Volunteers::GetAllYear(2011) as $item) {
+      switch ($item->MFS) {
+      case MFS::Mother:
+	$family =  Family::GetItemById($item->mfsId);
+	fwrite($fp, str_replace(";", "\n", $family->mother->email) . "\n");
+	break;
+      case MFS::Father:
+	$family =  Family::GetItemById($item->mfsId);
+	fwrite($fp, str_replace(";", "\n", $family->father->email) . "\n");
+	break;
+      case MFS::Student:
+	$student = Student::GetItemById($item->mfsId);
+
+	fwrite($fp, str_replace(";", "\n", $student->email) . "\n");
+	break;
+      default: 
+	die ("unexpected type of item found in volunteers\n");
+      }
+    }
+  }
+
+  private static function MailingListsAll($year) {
+    $filename="allEmails.csv";
+    $fp=fopen("self::MAILINGLISTDIR/$filename", "w");
+    foreach(Emails::GetAll() as $item) {
+      $csv = array();
+      $csv[] = $item->email;
+      switch ($item->MFS) {
+      case MFS::Mother:
+	$family =  Family::GetItemById($item->mfsId);
+	$csv[] = $family->mother->fullName();
+	break;
+      case MFS::Father:
+	$family =  Family::GetItemById($item->mfsId);
+	$csv[] = $family->father->fullName();
+	break;
+      case MFS::Student:
+	$student = Student::GetItemById($item->mfsId);
+	$csv[] = $student->fullName();
+	break;
+      default: 
+	die ("unexpected type of item found in volunteers\n");
+      }
+      fputcsv($fp, $csv);
+    }
+
+  }
+
+  public static function CreateMailingLists($year) {
+    self::MailingListsClass($year);
+    return;
+    self::MailingListsVolunteers($year);
+    self::MailingListsAll($year);
+  }
+
+
 }	
 
+Publications::CreateMailingLists(2011);exit();
+//Publications::TeacherList(2011);  exit();
 //Publications::SchoolDirectory(); exit();
-Publications::ClassDirectory(2011); exit (); // Directory of all classes, with and without email
+//Publications::ClassDirectory(2011); exit (); // Directory of all classes, with and without email
 
 ?>
