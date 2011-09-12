@@ -44,12 +44,9 @@ dojo.require("dijit.Tooltip");
 <table>
 <!-- BEGIN HOME -->
 
-<tr><td>ID</td><td>{ID}</td></tr>
+<tr><td>ID</td><td>{ID} (Home: {HOMEPHONE})</td></tr>
 <tr><td rowspan=2>Address</td><td>{LINE1} {LINE2}</td></tr>
 <tr><td>{CITY}, {STATE} {ZIP}</td></tr>
-<tr><td>Phone</td><td>{HOMEPHONE}</td></tr>
-<tr><td>Category</td><td width="200px">{CATEGORY}</td></tr>
-<tr><td>Session</td><td>2010-11</td></tr>
 <!-- END HOME -->
 </table>
 
@@ -67,19 +64,19 @@ dojo.require("dijit.Tooltip");
 
 <li class="section">Children</li>
 <table>
-<thead><tr><th scope="col">ID<th>Gender<th>NAME<th>DOB<th>EMAIL<th width=30px>CELL<th>2010-11</tr></thead>
+<thead><tr><th scope="col">ID<th>Gender<th>NAME<th>DOB<th>EMAIL<th width=30px>CELL</th></tr></thead>
 <!-- BEGIN CHILDREN -->
-<tr><td class="ou" onclick="showStudentDetails({ID})" onmouseover="this.style.cursor='pointer'">{ID}</td><td>{GENDER}</td><td>{NAME}</td><td nowrap="nowrap">{DOB}</td><td>{EMAIL}</td><td>{CELL}</td><td>{ENROLLED}</td></tr>
+<tr><td class="ou" onclick="showStudentDetails({ID})" onmouseover="this.style.cursor='pointer'">{ID}</td><td>{GENDER}</td><td>{NAME}</td><td nowrap="nowrap">{DOB}</td><td>{EMAIL}</td><td>{CELL}</td></tr>
 
 <!-- END CHILDREN -->
 </table>
 
 
 
-<li class="section">Class Assignment</li> the links below do not work, bug fix pending
+<li class="section">Class Assignment (2011-12)</li>
 <table>
 <thead>
-<tr><th scope="col">Name<th>Class<th>Room<th>Teachers</tr>
+<tr><th scope="col">Name<th>Class<th>Room<th width='400px'>Teachers</tr>
 </thead>
 <tbody>
 <!-- BEGIN REGISTRATION -->

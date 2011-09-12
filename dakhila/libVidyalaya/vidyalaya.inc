@@ -548,8 +548,8 @@ class AvailableClass {
 		$this->course = CourseCatalog::GetItemById($row["AvailableClass.course"]);
 		$this->section = $row["AvailableClass.section"];
 		$this->room = Rooms::GetItemById($row["AvailableClass.room"]);
-		$this->startTime = $row["AvailableClass.startTime"];
-		$this->endTime = $row["AvailableClass.endTime"];
+		$this->startTime = strftime("%H:%M", strtotime($row["AvailableClass.startTime"]));
+		$this->endTime = strftime("%H:%M", strtotime($row["AvailableClass.endTime"]));
 
 	}
 
@@ -805,6 +805,19 @@ class Enrollment{
 		";
 		return self::ArrayFromQuery($query);
 	}
+
+	public static function GetEnrollmentStudent($studentId, $year) {
+		if ($year >= 2010) $year -= 2010;
+		$query = "
+		select * from Enrollment
+		left join AvailableClass on Enrollment.availableClass = AvailableClass.id
+		left join CourseCatalog on AvailableClass.course = CourseCatalog.id
+		where AvailableClass.year = $year and Enrollment.student = $studentId
+		order by AvailableClass.year, CourseCatalog.department
+		";
+		return self::ArrayFromQuery($query);
+	}
+
 	
 	public static function GetEnrollmentHistory($studentId) {
 		$query = "

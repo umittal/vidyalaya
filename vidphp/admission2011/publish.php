@@ -61,6 +61,7 @@ class WordTable {
 class Publications {
   const BaseDir = "/home/umesh/Dropbox/Vidyalaya-Roster";
   const MAILINGLISTDIR="/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/mailinglist/";
+  const rosterDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/roster/";
 
   public static function SchoolDirectory() {
     $document = new WordTable();
@@ -426,6 +427,89 @@ class Publications {
     echo "Run the program to convert text file to pdf file from command line\n";
   }
 
+  private static function printOneStudent($student, $lc, $cc) {
+    $printDir = "/home/umesh/student2011";
+    $dompdf = new DOMPDF();
+    $html = "<html><head><style type='text/css'>td {padding-left:10px;}</style></head><body><img src='/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/PHHS2.png' width='700' height='680' alt='layout'>\n";
+    //    $html .= "<h3>Student</h3>";
+    $html .=  "<table>\n";
+    $html .= "<tr><td>ID</td><td>$student->id (Family: ". $student->family->id . ", Home Phone: " . $student->family->phone .  ")</td>\n";
+    $html .= "<tr><td>Name</td><td>" . $student->fullName() . " (Parents: " . $student->parentsName() .  ")</td>\n";
+    $html .=  "</table>\n";
+
+
+    //    $html .= "<h3>Enrollment</h3>";
+    $html .= "<p>&nbsp;</p>";
+    $html .=  "<table>\n";
+    $html .= "<tr><th>Time</th><th>Class</th><th>Location</th><th>Teachers</th></tr>\n";
+    $html .= "<tr><td>09:30 - 10:00</td><td>Prayers</td><td>Gym</td><td>Mukesh Dave et. al.</td>\n";
+    if (!is_null($lc)) {
+      $html .= "<tr><td>$lc->startTime - $lc->endTime</td><td>". $lc->short() . "</td><td>" . $lc->room->roomNumber . "</td>";
+      $html .= "<td>" . Teachers::TeacherListClassHtml($lc->id) .  "\n";
+    }
+    if (!is_null($cc)) {
+      $html .= "<tr><td>$cc->startTime - $cc->endTime</td><td>". $cc->short() . "</td><td>" . $cc->room->roomNumber . "</td>";
+      $html .= "<td>" . Teachers::TeacherListClassHtml($cc->id) .  "\n";
+    }
+
+    $html .= "</table></body></html>";
+    $pdf = HtmlToPdf($html);
+    $fileName = $printDir . "/" . $student->id . ".pdf";
+    file_put_contents("$fileName", $pdf);
+    echo "printed $fileName\n";
+    die ();
+  }
+
+
+
+  public static function RosterSpa($year) {
+    $filename = self::rosterDir . "StudentsSpa.csv";
+    $fh = fopen("$filename", "w");
+    fwrite ($fh, "ID, First, Last, Language, , Culture, ,\n");
+    $language = array(); $culture=array();
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake, $year) as $item) {
+      $done[$item->student->id] = $item->student;
+      if ($item->class->course->department != Department::Culture) {
+	if (array_key_exists($item->student->id, $language) )
+	  print "oh oh , i am going to overwrite language for $item->student->id\n";
+	$language[$item->student->id] = $item->class;
+      } else {
+	if (array_key_exists($item->student->id, $culture) )
+	  print "oh oh , i am going to overwrite culture for $item->student->id\n";
+	$culture[$item->student->id] = $item->class;
+      }
+    }
+
+    foreach ($done as $student) {
+      $csv = array();
+      $csv[] =  $student->id;
+      $csv[] =  $student->firstName;
+      $csv[] =  $student->lastName;
+      $lc = null; $cc = null; 
+      if (array_key_exists($student->id, $language)) {
+	$lc = $language[$student->id];
+	$csv[] = $language[$student->id]->short();
+	$csv[] = $language[$student->id]->room->roomNumber;
+      } else {
+	$csv[] = "";
+	$csv[] = "";
+      }
+      
+      if (array_key_exists($student->id, $culture)) {
+	$cc = $culture[$student->id];
+	$csv[] = $culture[$student->id]->short();
+	$csv[] = $culture[$student->id]->room->roomNumber;
+      } else {
+	$csv[] = "";
+	$csv[] = "";
+      }
+      
+      fputcsv($fh, $csv);
+      self::printOneStudent($student, $lc, $cc);
+    }
+  }
+
+
   public static function RosterFromFile ($filename) {
     self::$rosterid = 1;
     self::$rosterfh = fopen("$filename.out", "w");
@@ -616,9 +700,11 @@ class Publications {
 }	
 
 
-Publications::AttendanceSheet(2011); exit();
+//Publications::AttendanceSheet(2011); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
 //Publications::Roster(2011); exit();
+
+Publications::RosterSpa(2011); exit();
 
 //Publications::FullDumpFamilies();
 
@@ -631,7 +717,7 @@ Publications::AttendanceSheet(2011); exit();
 //Publications::SchoolDirectory(); exit();
 //Publications::TeacherDirectory(2011); exit (); // Directory of all Teachers
 //Publications::VolunteerDirectory(2011); exit (); // Directory of all Volunteers
-Publications::ClassDirectory(2011); exit (); // Directory of all classes, with and without email
+//Publications::ClassDirectory(2011); exit (); // Directory of all classes, with and without email
 
 
 

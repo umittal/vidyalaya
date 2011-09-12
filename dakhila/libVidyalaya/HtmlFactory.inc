@@ -66,8 +66,7 @@ function DisplayFamilyTemplate (&$template, $family, $students) {
 	$template->setVariable("ISCONTACTABLE", YesNoMap($family->mother->IsContactable));
 	$template->parseCurrentBlock();
 
-	foreach ($students as $id => $student) {
-
+	foreach (Student::GetAll() as $id => $student) {
 		if ($student->family->id == $family->id) {
 			DisplayChildren($template, $student);
 		}
@@ -85,9 +84,6 @@ function DisplayFamilyTemplate (&$template, $family, $students) {
 	$template->setVariable("STATE", $family->address->state);
 	$template->setVariable("ZIP", $family->address->zipcode);
 	$template->setVariable("HOMEPHONE", $family->phone);
-	$category = $family->category->name;
-	if ($family->category->id == 5) $category = $category . ", Date: " . $family->priority_date;
-	$template->setVariable("CATEGORY", $category );
 	$template->parseCurrentBlock();
 
 
@@ -146,48 +142,26 @@ function DisplayChildren(&$template, $student) {
 	$template->setVariable("GENDER", GenderMap($student->gender));
 	$dob = empty($student->dateOfBirth) ? "Unknown" : date("Y-m-d", strtotime($student->dateOfBirth));
 	$template->setVariable("DOB",$dob);
-	$template->setVariable("ENROLLED", YesNoMap($student->IsEnrolled));
+	//	$template->setVariable("ENROLLED", YesNoMap($student->IsEnrolled));
 	$template->parseCurrentBlock();
 
 
 	$templateName="REGISTRATION";
 	$template->setCurrentBlock($templateName);
-	$template->setVariable("FIRSTNAME", $student->firstName);
 
-	if ($student->studentStatus->id != StudentStatus::Inactive) {
-		$reg = $student->registration;
-		if (!empty($reg->language)) {
-			$class = $reg->language->symbol;
-			$classLink=sprintf("<a href=\"/dakhila/php/classDetails.php?className=%s\">%s</a>", $class, $class);
-			$template->setVariable("LANGUAGE", $classLink);
-			$template->setVariable("LROOM", $reg->language->room);
-		} else {
-			$template->setVariable("LANGUAGE", "Unknown");
-		}
-
-		if (!empty($reg->culture)) {
-			$class = $reg->culture->description;
-			$classLink=sprintf("<a href=\"/dakhila/php/classDetails.php?className=%s\">%s</a>", $class, $class);
-			$template->setVariable("CULTURE", $classLink);
-			$template->setVariable("CROOM", $reg->culture->room);
-		} else {
-			$template->setVariable("CULTURE", "Unknown");
-		}
-
-
-		if ($student->studentStatus->id == StudentStatus::Active) {
-			$template->setVariable("LTEACHER", $reg->language->teachers);
-			$template->setVariable("CTEACHER", $reg->culture->teachers);
-		} else {
-			$template->setVariable("LTEACHER", "Waiting List");
-			$template->setVariable("CTEACHER", "Waiting List");
-		}
-	} else {
-		$template->setVariable("LTEACHER", "Not Enrolled");
+	foreach(Enrollment::GetEnrollmentStudent($student->id, 2011) as $item) {
+	  if ($item->class->course->department == Department::Culture ) {
+	    $template->setVariable("CULTURE", $item->class->short());
+	    $template->setVariable("CROOM", $item->class->room->roomNumber);
+	    $template->setVariable("CTEACHER", Teachers::TeacherListClassHtml($item->class->id));
+	  } else {
+	    $template->setVariable("FIRSTNAME", $student->firstName);
+	    $template->setVariable("LANGUAGE", $item->class->short());
+	    $template->setVariable("LROOM", $item->class->room->roomNumber);
+	    $template->setVariable("LTEACHER", Teachers::TeacherListClassHtml($item->class->id));
+	  }
 	}
 	$template->parseCurrentBlock();
-
-
 }
 
 function DisplayFamilyV2(&$template, $family, $students) {
