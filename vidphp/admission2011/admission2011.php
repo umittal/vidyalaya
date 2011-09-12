@@ -590,92 +590,90 @@ EOT;
 }
 
 class Admission {
-	const DataFile = "/home/umesh/Dropbox/Vidyalaya-Management/Administration/2011.csv";
-	const OrientationFile = "/home/umesh/workspace/vidphp/admission2011/orientation1.txt";
-	const assesssmentFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/data/assessment.csv";
+  const DataFile = "/home/umesh/Dropbox/Vidyalaya-Management/Administration/2011.csv";
+  const OrientationFile = "/home/umesh/workspace/vidphp/admission2011/orientation1.txt";
+  const assesssmentFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/data/assessment.csv";
 
-	const BaseDir = "/home/umesh/Dropbox/Vidyalaya-Roster";
+  const BaseDir = "/home/umesh/Dropbox/Vidyalaya-Roster";
 
-	private static function sendItemEmail($familyId, $cd, $pb, $bag) {
+  private static function sendItemEmail($familyId, $cd, $pb, $bag) {
 		
-		$family = Family::GetItemById($familyId);
-		$body = <<<ITEMEMAIL
-		<p>As part of the registration process, you ordered the following items. 
-		Please collect it from us at Picnic tomorrow, Sunday June 19, 2011. Please also bring a printout of this email, 
-		if possible.
-		<p>
+    $family = Family::GetItemById($familyId);
+    $body = <<<ITEMEMAIL
+      <p>As part of the registration process, you ordered the following items. 
+      Please collect it from us at Picnic tomorrow, Sunday June 19, 2011. Please also bring a printout of this email, 
+      if possible.
+	<p>
 ITEMEMAIL;
 
-		$counter = 1;
-		$table = "<table>\n";
-		if ($cd!= 0) $table .= "<tr><td>". $counter++ . ". </td><td>Prayer CD</td><td>\$$cd</td></tr>\n";
-		if ($pb!= 0) $table .= "<tr><td>". $counter++ . ". </td><td>Prayer Book</td><td>\$$pb</td></tr>\n";
-		if ($bag!= 0) $table .= "<tr><td>". $counter++ . ". </td><td>Book Bag</td><td>\$$bag</td></tr>\n";
-		$total = $bag+$cd+$pb;
-		$table .= "<tr><td>&nbsp;</td><td>Total</td><td> \$$total</td></tr>\n";
-		$table .= "</table>\n";
-		$subject = "Additional Item Fulfillment, Family- $family->id";
+    $counter = 1;
+    $table = "<table>\n";
+    if ($cd!= 0) $table .= "<tr><td>". $counter++ . ". </td><td>Prayer CD</td><td>\$$cd</td></tr>\n";
+    if ($pb!= 0) $table .= "<tr><td>". $counter++ . ". </td><td>Prayer Book</td><td>\$$pb</td></tr>\n";
+    if ($bag!= 0) $table .= "<tr><td>". $counter++ . ". </td><td>Book Bag</td><td>\$$bag</td></tr>\n";
+    $total = $bag+$cd+$pb;
+    $table .= "<tr><td>&nbsp;</td><td>Total</td><td> \$$total</td></tr>\n";
+    $table .= "</table>\n";
+    $subject = "Additional Item Fulfillment, Family- $family->id";
 
-//		print $table;
-		Mail::mailFamilyFromAdmission($family, $subject, $body . $table, 1);
+    //		print $table;
+    Mail::mailFamilyFromAdmission($family, $subject, $body . $table, 1);
+  }
+
+  public static function itemDelivery() {
+    $totalCD = array();
+    $totalPB = array();
+    $totalBag = array();
+    $totalFamily = array();
+
+    if (($handle = fopen(self::DataFile, "r")) !== FALSE) {
+      $header = fgetcsv($handle, 0, ",");
+      $header = fgetcsv($handle, 0, ",");
+      $i=1;
+      $totalTuition=0;
+      $done=array();
+      $fileTuition = array();
+      while ((list($family,$Check , $base, $new , $DVD , $CD , $PB , $Bag , $Ann , $Total ,$foo, $ch1 , $ch2 , $ch3 )
+	      = fgetcsv($handle, 0, ",")) !== FALSE) {
+	if (!empty($family)) {
+	  $CD = str_replace('$', "",$CD);
+	  $PB = str_replace('$', "",$PB);
+	  $Bag = str_replace('$', "",$Bag);
+
+	  if (empty($totalFamily[$family])) {
+	    $totalFamily[$family] =0;
+	    $totalCD[$family] = 0;
+	    $totalPB[$family] = 0;
+	    $totalBag[$family] = 0;
+	  }
+	  $totalFamily[$family] +=$CD+$PB+$Bag;
+	  $totalCD[$family] += $CD;
+	  $totalPB[$family] += $PB;
+	  $totalBag[$family] += $Bag;
+
 	}
+      }
+    }
 
-	public static function itemDelivery() {
-		$totalCD = array();
-		$totalPB = array();
-		$totalBag = array();
-		$totalFamily = array();
+    $grandTotal = 0;
+    foreach ($totalFamily as $familyId => $total) {
+      if ($total == 0 ) continue;
+      print "$familyId, $totalCD[$familyId], $totalPB[$familyId], $totalBag[$familyId], $totalFamily[$familyId]\n";
+      //			self::sendItemEmail($familyId, $totalCD[$familyId], $totalPB[$familyId], $totalBag[$familyId]);
+      $grandTotal += $total;
+    }
+    print "Grand Total = $grandTotal\n";
+  }
 
-		if (($handle = fopen(self::DataFile, "r")) !== FALSE) {
-			$header = fgetcsv($handle, 0, ",");
-			$header = fgetcsv($handle, 0, ",");
-			$i=1;
-			$totalTuition=0;
-			$done=array();
-			$fileTuition = array();
-			while ((list($family,$Check , $base, $new , $DVD , $CD , $PB , $Bag , $Ann , $Total ,$foo, $ch1 , $ch2 , $ch3 )
-			= fgetcsv($handle, 0, ",")) !== FALSE) {
-				if (!empty($family)) {
-					$CD = str_replace('$', "",$CD);
-					$PB = str_replace('$', "",$PB);
-					$Bag = str_replace('$', "",$Bag);
+  // ***********************
 
-					if (empty($totalFamily[$family])) {
-						$totalFamily[$family] =0;
-						$totalCD[$family] = 0;
-						$totalPB[$family] = 0;
-						$totalBag[$family] = 0;
-					}
-					$totalFamily[$family] +=$CD+$PB+$Bag;
-					$totalCD[$family] += $CD;
-					$totalPB[$family] += $PB;
-					$totalBag[$family] += $Bag;
-
-				}
-			}
-		}
-
-		$grandTotal = 0;
-		foreach ($totalFamily as $familyId => $total) {
-			if ($total == 0 ) continue;
-			print "$familyId, $totalCD[$familyId], $totalPB[$familyId], $totalBag[$familyId], $totalFamily[$familyId]\n";
-//			self::sendItemEmail($familyId, $totalCD[$familyId], $totalPB[$familyId], $totalBag[$familyId]);
-			$grandTotal += $total;
-		}
-		print "Grand Total = $grandTotal\n";
-	}
-
-	// ***********************
-
-	private static function admissionConfirmationEmailFamily($familyId, $tuition, $enrollment) {
+  private static function admissionConfirmationEmailFamily($familyId, $tuition, $enrollment) {
 		
-	  $family = Family::GetItemById($familyId);
+    $family = Family::GetItemById($familyId);
 
-		$body = <<<ADMISSIONEMAIL
+    $body = <<<ADMISSIONEMAIL
 <p>
-
 We are writing this email to let you know that the start of Vidyalaya 2011-12 session has been delayed by one week. Our first day now will be September 18, 2011.
-
 <p>
 We were planning to start the school at Eastlake Elementary School.  However, earlier this week, concerned authorities advised us that because of the size of our enrollment, we were at serious risk of violations not only for parking but also for crowding in the hallways and gym.  In order to not jeopardize the safety of our families and to minimize the disruption that a potential fire code violation would have on Vidyalaya, we decided to find an alternate venue for the school. 
 
@@ -687,231 +685,217 @@ We apologize for the late notice due to events out of our control and look forwa
 <ol>
 
 ADMISSIONEMAIL;
-		$list = null; $done=array();
-		foreach($enrollment as $item) {
-		  if (array_key_exists($item->student->id, $done)) continue;
-		  if ($item->student->family->id == $familyId) {
-		    $list .= "<li> " . $item->student->fullName() . "</li>\n";
-		    $done[$item->student->id] = 1;
-		  }
-		} 
-		if (is_null($list)) die ("Houston, we have a problem, $familyId\n");
 
-		$closing = <<<CLOSING
-		  </ol>
+    $list = null; $done=array();
+    foreach($enrollment as $item) {
+      if (array_key_exists($item->student->id, $done)) continue;
+      if ($item->student->family->id == $familyId) {
+	$list .= "<li> " . $item->student->fullName() . "</li>\n";
+	$done[$item->student->id] = 1;
+      }
+    }
+    if (is_null($list)) die ("Houston, we have a problem, $familyId\n");
 
-		  <p>Regards,<p>
+    $closing = <<<CLOSING
+      </ol>
+
+      <p>Regards,<p>
 
 CLOSING;
-		$subject = "Opening Day 2011-12 notification, Family- $family->id";
+    $subject = "Opening Day 2011-12 notification, Family- $family->id";
 
-		if ($familyId > 472)
-		  Mail::mailFamilyFromAdmission($family, $subject, $body . $list . $closing, 1);
-	}
+    if ($familyId > 472)
+      Mail::mailFamilyFromAdmission($family, $subject, $body . $list . $closing, 1);
+  }
 
-	public static function admissionConfirmationEmail($year) {
-	  $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake, $year);
-	  $i=1;
-	  $fp = fopen("/tmp/familylist.csv", "w");
-	  foreach (FamilyTracker::RegisteredFamilies() as $item) {
-	    $family = Family::GetItemById($item->family);
-	    $csv = array();
-	    $csv[]=$i++;
-	    $csv[]=$family->id;
-	    $csv[]=$item->tuition;
-	    $csv[]=$family->mother->fullName();
-	    $csv[]=$family->father->fullName();
-	    $csv[]=$family->address->OneLineAddress();
-	    fputcsv($fp, $csv);
-	    	    self::admissionConfirmationEmailFamily($item->family, $item->tuition, $enrollment);
-	  }
-	}
+  public static function admissionConfirmationEmail($year) {
+    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake, $year);
+    $i=1;
+    $fp = fopen("/tmp/familylist.csv", "w");
+    foreach (FamilyTracker::RegisteredFamilies() as $item) {
+      $family = Family::GetItemById($item->family);
+      $csv = array();
+      $csv[]=$i++;
+      $csv[]=$family->id;
+      $csv[]=$item->tuition;
+      $csv[]=$family->mother->fullName();
+      $csv[]=$family->father->fullName();
+      $csv[]=$family->address->OneLineAddress();
+      fputcsv($fp, $csv);
+      self::admissionConfirmationEmailFamily($item->family, $item->tuition, $enrollment);
+    }
+  }
 	
-	public static function classParentsEmail($class) {
-	  foreach (Enrollment::GetFamilies($class) as $family) {
-	    print "$family->id, " . $family->mother->email. ", " . $family->father->email . "\n";
-#	    print "$family->id, ". "$family->mother->email," . " $family->father->email" . " \n";
-	  }
-
-	}
-
 	
-	private static $rosterid = null;
-	private static $rosterfh = null;
+  private static function AttendanceSheetFill($class) {
+    $inputFileName = "/home/umesh/Dropbox/Vidyalaya-Management/Admission/attendance2011.xlsx";
+    $activeSheetIndex=0;
+    $row =4;
 
-	private static function RosterStudent($student) {
-		fwrite(self::$rosterfh,  "\n" . self::$rosterid++ . ",  $student->id, " .  $student->fullName() . ", " . $student->GenderName() );
-		fwrite(self::$rosterfh, "(Age: " . (int)$student->AgeAt(Calendar::CurrentSession) . ", Grade: ". $student->Grade() . "), " . $student->CellEmail() . "\n");
-		fwrite(self::$rosterfh, "   Home, " . $student->family->phone . ", " .  $student->family->address->city . "\n");
+    /**  Identify the type of $inputFileName  **/
+    //		$inputFileType =PHPExcel_IOFactory::identify($inputFileName);
+    /**  Create a new Reader of the type that has been identified  **/
+    //		$objReader = PHPExcel_IOFactory::createReader($inputFileType);
+    /**  Load $inputFileName to a PHPExcel Object  **/
+    //		$objPHPExcel = $objReader->load($inputFileName);
+    $objPHPExcel = PHPExcel_IOFactory::load($inputFileName);
+    $objPHPExcel->setActiveSheetIndex($activeSheetIndex);
+    $objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
+    $objPHPExcel->getActiveSheet()->setShowGridlines(false);
+    $objPHPExcel->getActiveSheet()->setRightToLeft(FALSE);
 		
-		fwrite(self::$rosterfh, "   Mother, " . $student->family->mother->fullName() . ", " . $student->family->mother->WorkCellEmail() . "\n");
-		fwrite(self::$rosterfh, "   Father, " . $student->family->father->fullName() . ", " . $student->family->father->WorkCellEmail() . "\n");
-	}
-	
-	private static function RosterClass($class) {
-		$filename = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/roster/txt/" .  $class->short() . ".txt";
-		self::$rosterfh = fopen($filename, "w");
-		echo "$filename\n";
-		//fwrite(self::$rosterfh,  "\n**********************\n");
-		fwrite(self::$rosterfh, "Class: " . $class->short() . "\n");
-		fwrite(self::$rosterfh, "Room: " . "Facility: " . "\n");
-		fwrite(self::$rosterfh, "Teachers: " . "\n"); 
-		foreach (Enrollment::GetEnrollmentForClass($class->id)  as $item) {
-			self::RosterStudent ($item->student);
-		}
-		fclose(self::$rosterfh);
-	}
-	
-	public static function Roster($year) {
-		foreach (AvailableClass::GetAllYear($year) as $class) {
-			self::$rosterid = 1;
-			self::$rosterfh = null;
-			self::RosterClass($class);
-		}
-	}
-
-	public static function BadgeFile($year) {
-	  $list = array(); $language= array(); $culture= array();
-	  foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake, $year) as $item) {
- 	    $list[$item->student->id] = $item->student;
-	    if ($item->class->course->department == Department::Culture ) {
-	      $culture[$item->student->id] = $item->class;
-	    } else {
-	      $language[$item->student->id] = $item->class;
-	    }
-	  }
-
-	  $fh = fopen("/tmp/studentbadge.csv", "w");
-	  foreach ($list as $item) {
-	    $csv = array();
-	    $csv[] = $item->id;
-	    $csv[] = $item->firstName;
-	    $csv[] = $item->lastName;
-	    $csv[] = $language[$item->id]->short();
-	    $csv[] = $language[$item->id]->room->roomNumber;
-	    if (array_key_exists($item->id, $culture)) {
-	      $csv[] = $culture[$item->id]->short();
-	      $csv[] = $culture[$item->id]->room->roomNumber;
-	    }
-	    fputcsv($fh, $csv);
-	  }
-	}
-	
-	public static function RosterFromFile ($filename) {
-		self::$rosterid = 1;
-		self::$rosterfh = fopen("$filename.out", "w");
-		if (($handle = fopen($filename, "r")) !== FALSE) {
-			while ((list($studentid, $rest )= fgetcsv($handle, 0, "\t")) !== FALSE) {
-				if (empty($studentid)) continue;
-				$student = Student::GetItemById($studentid);
-				if (empty($student)) {
-					print "student not found for $studentid\n";
-				} else {
-					self::RosterStudent ($student);
-				}
-				
-			}
-		}
-	}
-	
-	private static function AttendanceSheetFill($class) {
-		$inputFileName = "/home/umesh/Dropbox/Vidyalaya-Management/Admission/attendance2011.xlsx";
-		$activeSheetIndex=0;
-		$row =4;
-
-		/**  Identify the type of $inputFileName  **/
-//		$inputFileType =PHPExcel_IOFactory::identify($inputFileName);
-		/**  Create a new Reader of the type that has been identified  **/
-//		$objReader = PHPExcel_IOFactory::createReader($inputFileType);
-		/**  Load $inputFileName to a PHPExcel Object  **/
-//		$objPHPExcel = $objReader->load($inputFileName);
-		$objPHPExcel = PHPExcel_IOFactory::load($inputFileName);
-		$objPHPExcel->setActiveSheetIndex($activeSheetIndex);
-		$objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
-		$objPHPExcel->getActiveSheet()->setShowGridlines(false);
-		$objPHPExcel->getActiveSheet()->setRightToLeft(FALSE);
-		
-//		$objPHPExcel->getProperties()->setCreator("Umesh Mittal");
-//		$objPHPExcel->getProperties()->setLastModifiedBy("Umesh Mittal");
-//		$objPHPExcel->getProperties()->setTitle("Students");
-//		$objPHPExcel->getProperties()->setSubject("Vidyalaya Students");
-//		$objPHPExcel->getProperties()->setDescription("List of Vidyalaya Students by Classes");
+    //		$objPHPExcel->getProperties()->setCreator("Umesh Mittal");
+    //		$objPHPExcel->getProperties()->setLastModifiedBy("Umesh Mittal");
+    //		$objPHPExcel->getProperties()->setTitle("Students");
+    //		$objPHPExcel->getProperties()->setSubject("Vidyalaya Students");
+    //		$objPHPExcel->getProperties()->setDescription("List of Vidyalaya Students by Classes");
 		
 		
 
-		$objPHPExcel->getActiveSheet()->setTitle($class->short());
-		$objPHPExcel->getActiveSheet()->getCell("B2")->setValue($class->short());
-		$objPHPExcel->getActiveSheet()->getCell("B3")->setValue("Room: " . $class->room->roomNumber);
+    $objPHPExcel->getActiveSheet()->setTitle($class->short());
+    $objPHPExcel->getActiveSheet()->getCell("B2")->setValue($class->short());
+    $objPHPExcel->getActiveSheet()->getCell("B3")->setValue("Room: " . $class->room->roomNumber);
 			
-		$objPHPExcel->getActiveSheet()->getRowDimension("1")->setVisible(TRUE);
-		$objPHPExcel->getActiveSheet()->getRowDimension("2")->setVisible(TRUE);
-		$objPHPExcel->getActiveSheet()->getRowDimension("3")->setVisible(TRUE);
-		foreach(Enrollment::GetEnrollmentForClass ($class->id) as $item) {
-			$cellValue=sprintf("B%d", $row);
-			$objPHPExcel->getActiveSheet()->getCell($cellValue)->setValue($item->student->id);
-			$cellValue=sprintf("C%d", $row);
-			$fullName=$item->student->fullName();
-			if ($class->course->department == Department::Kindergarten) {
-			  $fullName = substr(Department::NameFromId($item->student->languagePreference), 0, 1) . " " . $fullName;
-			}
-			$objPHPExcel->getActiveSheet()->getCell($cellValue)->setValue($fullName);
-			$objPHPExcel->getActiveSheet()->getRowDimension($row)->setVisible(TRUE);
-			$row++;
-		}
-		$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
-		$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setVisible(true);
-		$objPHPExcel->getActiveSheet()->getColumnDimension('B')->setVisible(TRUE);
-		$objPHPExcel->getActiveSheet()->getColumnDimension('B')->setVisible(TRUE);
-		$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setVisible(TRUE);
-		$objPHPExcel->getActiveSheet()->getColumnDimension('D')->setVisible(TRUE);
+    $objPHPExcel->getActiveSheet()->getRowDimension("1")->setVisible(TRUE);
+    $objPHPExcel->getActiveSheet()->getRowDimension("2")->setVisible(TRUE);
+    $objPHPExcel->getActiveSheet()->getRowDimension("3")->setVisible(TRUE);
+    foreach(Enrollment::GetEnrollmentForClass ($class->id) as $item) {
+      $cellValue=sprintf("B%d", $row);
+      $objPHPExcel->getActiveSheet()->getCell($cellValue)->setValue($item->student->id);
+      $cellValue=sprintf("C%d", $row);
+      $fullName=$item->student->fullName();
+      if ($class->course->department == Department::Kindergarten) {
+	$fullName = substr(Department::NameFromId($item->student->languagePreference), 0, 1) . " " . $fullName;
+      }
+      $objPHPExcel->getActiveSheet()->getCell($cellValue)->setValue($fullName);
+      $objPHPExcel->getActiveSheet()->getRowDimension($row)->setVisible(TRUE);
+      $row++;
+    }
+    $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
+    $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setVisible(true);
+    $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setVisible(TRUE);
+    $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setVisible(TRUE);
+    $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setVisible(TRUE);
+    $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setVisible(TRUE);
 
-		return $objPHPExcel;
-	}
+    return $objPHPExcel;
+  }
 	
-	public static function AttendanceSheet($year) {
-		foreach (AvailableClass::GetAllYear($year) as $class) {
-			$excelDir = self::BaseDir . "/" . $class->session . "/attendance/" . 
-			Department::NameFromId($class->course->department) . "/excel/";
-			$pdfDir=str_replace("excel", "pdf", $excelDir);
-			if (!file_exists($excelDir) && !mkdir($excelDir, 0777, true)) die ("error creating directory $excelDir");
-			if (!file_exists($pdfDir) && !mkdir($pdfDir, 0777, true)) die ("error creating directory $pdfDir");
+  public static function AttendanceSheet($year) {
+    foreach (AvailableClass::GetAllYear($year) as $class) {
+      $excelDir = self::BaseDir . "/" . $class->session . "/attendance/" . 
+	Department::NameFromId($class->course->department) . "/excel/";
+      $pdfDir=str_replace("excel", "pdf", $excelDir);
+      if (!file_exists($excelDir) && !mkdir($excelDir, 0777, true)) die ("error creating directory $excelDir");
+      if (!file_exists($pdfDir) && !mkdir($pdfDir, 0777, true)) die ("error creating directory $pdfDir");
 			
-			$excelFile=$excelDir . $class->short() . ".xlsx";
-			$pdfFile=$excelDir . $class->short() . ".pdf";
-			print "$excelFile, $pdfFile \n";
+      $excelFile=$excelDir . $class->short() . ".xlsx";
+      $pdfFile=$excelDir . $class->short() . ".pdf";
+      print "$excelFile, $pdfFile \n";
 			
-//			continue;
-			$objPHPExcel = self::AttendanceSheetFill($class);
+      //			continue;
+      $objPHPExcel = self::AttendanceSheetFill($class);
 
-			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'PDF');
-//			$objWriter->save($pdfFile);
+      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'PDF');
+      //			$objWriter->save($pdfFile);
 
-			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-			$objWriter->save($excelFile);
-			echo date('H:i:s') . " Peak memory usage: " . (memory_get_peak_usage(true) / 1024 / 1024) . " MBrn\no";
-		}
-	}
+      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+      $objWriter->save($excelFile);
+      echo date('H:i:s') . " Peak memory usage: " . (memory_get_peak_usage(true) / 1024 / 1024) . " MBrn\no";
+    }
+  }
 
-	public static function PrintVolunteers($year) {
-	  foreach(Volunteers::GetAllYear($year) as $item) {
-	    switch ($item->MFS) {
-	    case MFS::Mother:
-	      $family = Family::GetItemById($item->mfsId);
-	      print $family->mother->fullName() . "\n";
-	      break;
-	    case MFS::Father:
-	      $family = Family::GetItemById($item->mfsId);
-	      print $family->father->fullName(). "\n";
-	      break;
-	    case MFS::Student:
-	      $student = Student::GetItemById($item->mfsId);
-	      print $student->fullName(). "\n";
-	      break;
-	    default: 
-	      die ("unexpected type of item found in volunteers\n");
-	    }
+  public static function Validation($year) {
+    print "1. Validate Registered Parents between enrollment and familytracker\n";
+    // get list of families from enrollment
+    $enrolledFamily = array();
+    foreach(Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake, $year) as $item) {
+      $enrolledStudent[$item->student->id] = 1;
+      $enrolledFamily[$item->student->family->id] = 1;
+    }
+    $done = array();
+    // validate all registered familes from familytracker
+    foreach (FamilyTracker::RegisteredFamilies() as $item) {
+      if (array_key_exists($item->family, $enrolledFamily)) {
+	$done[$item->family] = 1;
+      } else {
+	print "Error: Family id $item->family is registered but has no enrolled students\n";
+      }
+    }
+
+    // make sure all enrolled families are acounted for in tracker
+    foreach ($enrolledFamily as $key => $item) {
+      if (!array_key_exists($key, $done))
+	print "Error: Family $key has kids but is not marked registered\n";
+    }
+    print "check #1 is complete\n\n";
+
+
+    print "2. Validate Volunteers are not registered\n";
+    foreach (Volunteers::GetAllYear($year) as $item) {
+      $key = "$item->MFS:$item->mfsId";
+      $volunteerRole[$key] = $item->role;
+      switch ($item->MFS) {
+      case MFS::Mother:
+      case MFS::Father:
+	if (array_key_exists($item->mfsId, $enrolledFamily))
+	  print "Error: Family $item->mfsId is enrolled, remove it from volunteer list\n";
+	break;
+      case MFS::Student:
+	if (array_key_exists($item->mfsId, $enrolledStudent))
+	  print "Error: Student $item->mfsId is enrolled, remove it from volunteer list\n";
+	break;
+      default:
+	print "Error: Found something other MFS in volunteer list. bad,very bad\n";
+      }
+    }
+
+
+    // get all teachers, either they should be parent or volunteer. if volunteer. should be marketd as teachers
+    print "3. Teachers: must be registered families or volunteers. If volunteer mark them teacher";
+    foreach (Teachers::TeacherListYear($year) as $item) {
+      $key = "$item->MFS:$item->mfsId";
+      $teacherList[$key]=1;
+      switch ($item->MFS) {
+      case MFS::Mother:
+      case MFS::Father:
+	if (!array_key_exists($item->mfsId, $enrolledFamily)) {
+	  // family is not enrolled, must be a volunteer
+	  if (!array_key_exists($key, $volunteerRole)) {
+	    print "Error: Key $key is teaching ". $item->class->short() .", not enrolled, should be added as a volunteer\n";
+	    break;
 	  }
+	  $role = $volunteerRole[$key];
+	  if (!($role & VolunteerRole::Teacher))
+	    print "Error: change role for volunteer key $key from $role to include teacher \n";
 	}
+	break;
+      case MFS::Student:
+	if (!array_key_exists($key, $volunteerRole)) {
+	  print "Error: Key $key is teaching ". $item->class->short() .", not enrolled, should be added as a volunteer\n";
+	  break;
+	}
+	$role = $volunteerRole[$key];
+	if (!($role & VolunteerRole::Teacher))
+	  print "Error: change role for volunteer key $key from $role to include teacher \n";
+	break;
+      default:
+	print "Error: Found something other MFS in teacher list. bad,very bad\n";
+      }
+      
+    }
+
+    print "4. validate all teacher volunteers are teaching\n";
+    foreach ($volunteerRole as $key=>$role) {
+      if (!($role & VolunteerRole::Teacher)) continue;
+      // so we have a volunteer who is a teacher
+      if(!array_key_exists($key, $teacherList))
+	print "Error: key $key is setup as teacher in volunteer but not found in teacher list\n";
+    }
+
+
+
+  }
 
 }
 
@@ -958,303 +942,292 @@ class TwoYearEnrollment {
 
 
 class TwoYearLayout {
-	public $previousYear = null;
-	public $thisYear = null;
-	public $status=null;
-	public $assessment=null;
+  public $previousYear = null;
+  public $thisYear = null;
+  public $status=null;
+  public $assessment=null;
 
-	const Leaving = "Leaving";
-	const NewStudent = "New";
-	const Orientation = "Orientation"; // Family attended Orientation
-	const Continuing = "Continuing";
-	const Change = "Change";
+  const Leaving = "Leaving";
+  const NewStudent = "New";
+  const Orientation = "Orientation"; // Family attended Orientation
+  const Continuing = "Continuing";
+  const Change = "Change";
 	
-	const LeavingStudentsFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/leaving.csv";
-	const EnrolledStudentsFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/enrolled.csv";
+  const LeavingStudentsFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/leaving.csv";
+  const EnrolledStudentsFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/enrolled.csv";
 	
-	private static $objArray = Array ();
-	private static $orientation = Array();
+  private static $objArray = Array ();
+  private static $orientation = Array();
 	
 
 
-	private static function firstTimeCall() {
-		if (!empty(self::$objArray)) return;
-		self::currentYearFromDatabase();
-		self::currentYearFromFile();
-		self::prevYearFromDatabase();
-		self::orientationList();
-		self::loadAssessment();
-		self::updateStatus();
-	}
+  private static function firstTimeCall() {
+    if (!empty(self::$objArray)) return;
+    self::currentYearFromDatabase();
+    self::currentYearFromFile();
+    self::prevYearFromDatabase();
+    self::orientationList();
+    self::loadAssessment();
+    self::updateStatus();
+  }
 
-	public static function GetItemById($key) {
-		self::firstTimeCall();
-		return self::$objArray[$key];
-	}
+  public static function GetItemById($key) {
+    self::firstTimeCall();
+    return self::$objArray[$key];
+  }
 	
-	public static function GetAll() {
-		self::firstTimeCall();
-		return self::$objArray;
-	}
+  public static function GetAll() {
+    self::firstTimeCall();
+    return self::$objArray;
+  }
 	
-	private static function updateStatus() {
-	  foreach (self::$objArray as $studentid => $twoyear) {
-	    if ($twoyear->previousYear->language == null) {
-	      if ($twoyear->thisYear->language != null) {
-		$twoyear->status = self::NewStudent;
-		$studnet = Student::GetItemById($studentid);
-		$familyId = $studnet->family->id;
-		if (!empty(self::$orientation[$familyId])) {
-		  $twoyear->status = self::Orientation;
-		}
-	      }
-	    } else {
-	      if ($twoyear->thisYear->language == null) {
-		$twoyear->status = self::Leaving;
-		continue;
-	      } 
-	      if ($twoyear->previousYear->language == Department::Kindergarten) {
-		$twoyear->status =self::Continuing;
-	      } else {
-		$twoyear->status = $twoyear->previousYear->language == $twoyear->thisYear->language ? 
-		  self::Continuing : self::Change;
-	      }
-	    }
+  private static function updateStatus() {
+    foreach (self::$objArray as $studentid => $twoyear) {
+      if ($twoyear->previousYear->language == null) {
+	if ($twoyear->thisYear->language != null) {
+	  $twoyear->status = self::NewStudent;
+	  $studnet = Student::GetItemById($studentid);
+	  $familyId = $studnet->family->id;
+	  if (!empty(self::$orientation[$familyId])) {
+	    $twoyear->status = self::Orientation;
 	  }
+	}
+      } else {
+	if ($twoyear->thisYear->language == null) {
+	  $twoyear->status = self::Leaving;
+	  continue;
+	} 
+	if ($twoyear->previousYear->language == Department::Kindergarten) {
+	  $twoyear->status =self::Continuing;
+	} else {
+	  $twoyear->status = $twoyear->previousYear->language == $twoyear->thisYear->language ? 
+	    self::Continuing : self::Change;
+	}
+      }
+    }
 		
-	}
+  }
 
-	private static function prevYearFromDatabase () {
-		foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake,2010) as $enrollment) {
-			if (empty(self::$objArray[$enrollment->student->id])) self::$objArray[$enrollment->student->id] = new TwoYearLayout();
-			$twoyear = self::GetItemById($enrollment->student->id);
-			$twoyear->previousYear->updateFromEnrollment($enrollment);
-		}
-	}
+  private static function prevYearFromDatabase () {
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake,2010) as $enrollment) {
+      if (empty(self::$objArray[$enrollment->student->id])) self::$objArray[$enrollment->student->id] = new TwoYearLayout();
+      $twoyear = self::GetItemById($enrollment->student->id);
+      $twoyear->previousYear->updateFromEnrollment($enrollment);
+    }
+  }
 	
-	private static function currentYearFromDatabase () {
-		foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake,2011) as $enrollment) {
-			if (empty(self::$objArray[$enrollment->student->id])) self::$objArray[$enrollment->student->id] = new TwoYearLayout();
-			$twoyear = self::GetItemById($enrollment->student->id);
-			//print "setting this year value for $enrollment->student->id\n";
-			$twoyear->thisYear->updateFromEnrollment($enrollment);
-		}
-	}
+  private static function currentYearFromDatabase () {
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake,2011) as $enrollment) {
+      if (empty(self::$objArray[$enrollment->student->id])) self::$objArray[$enrollment->student->id] = new TwoYearLayout();
+      $twoyear = self::GetItemById($enrollment->student->id);
+      //print "setting this year value for $enrollment->student->id\n";
+      $twoyear->thisYear->updateFromEnrollment($enrollment);
+    }
+  }
 	
 
-	private static function updateNewStudent($studentId) {
-		$student = Student::GetItemById($studentId);
-		if (empty($student)) print "student not found for id ==$studentId==";
-		if (empty(self::$objArray[$studentId])) {
-			print "I am here for student $studentId, found in current year from file\n";
-			self::$objArray[$studentId] = new TwoYearLayout();
-			$twoyear = self::GetItemById($studentId);
-			$twoyear->thisYear->updateFromStudent($student);
-		}
-	}
+  private static function updateNewStudent($studentId) {
+    $student = Student::GetItemById($studentId);
+    if (empty($student)) print "student not found for id ==$studentId==";
+    if (empty(self::$objArray[$studentId])) {
+      print "I am here for student $studentId, found in current year from file\n";
+      self::$objArray[$studentId] = new TwoYearLayout();
+      $twoyear = self::GetItemById($studentId);
+      $twoyear->thisYear->updateFromStudent($student);
+    }
+  }
 
-	private static function currentYearFromFile() {
-		$filename = "/home/umesh/Dropbox/Vidyalaya-Management/Administration/2011.csv";
-		if (($handle = fopen($filename, "r")) !== FALSE) {
-			$header = fgetcsv($handle, 0, ",");
-			$header = fgetcsv($handle, 0, ",");
-			$i=1;
-			$totalTuition=0;
-			$done=array();
-			$fileTuition = array();
-			while ((list($family,$Check , $base, $new , $DVD , $CD , $PB , $Bag , $Ann , $Total ,$foo, $ch1 , $ch2 , $ch3 )
-			= fgetcsv($handle, 0, ",")) !== FALSE) {
-				if (!empty($family)) {
-					if (!empty($ch1)) self::updateNewStudent($ch1);
-					if (!empty($ch2)) self::updateNewStudent($ch2);
-					if (!empty($ch3)) self::updateNewStudent($ch3);
-				}
-			}
-		}
+  private static function currentYearFromFile() {
+    $filename = "/home/umesh/Dropbox/Vidyalaya-Management/Administration/2011.csv";
+    if (($handle = fopen($filename, "r")) !== FALSE) {
+      $header = fgetcsv($handle, 0, ",");
+      $header = fgetcsv($handle, 0, ",");
+      $i=1;
+      $totalTuition=0;
+      $done=array();
+      $fileTuition = array();
+      while ((list($family,$Check , $base, $new , $DVD , $CD , $PB , $Bag , $Ann , $Total ,$foo, $ch1 , $ch2 , $ch3 )
+	      = fgetcsv($handle, 0, ",")) !== FALSE) {
+	if (!empty($family)) {
+	  if (!empty($ch1)) self::updateNewStudent($ch1);
+	  if (!empty($ch2)) self::updateNewStudent($ch2);
+	  if (!empty($ch3)) self::updateNewStudent($ch3);
 	}
+      }
+    }
+  }
 	
-	private static function loadAssessment() {
-		$filename = Admission::assesssmentFile;
-		$count = array();
-		if (($handle = fopen($filename, "r")) !== FALSE) {
-			while ((list($studentId,$recommendation)=
-			fgetcsv($handle, 0, ",")) !== FALSE) {
-				if (empty(self::$objArray[$studentId])) {
-					print "Studnet $studentId not found in twoyear array, look into it\n";
-				}
-				$twoyear = self::GetItemById($studentId);
-				$twoyear->assessment = $recommendation;
-			}
-		}
+  private static function loadAssessment() {
+    $filename = Admission::assesssmentFile;
+    $count = array();
+    if (($handle = fopen($filename, "r")) !== FALSE) {
+      while ((list($studentId,$recommendation)=
+	      fgetcsv($handle, 0, ",")) !== FALSE) {
+	if (empty(self::$objArray[$studentId])) {
+	  print "Studnet $studentId not found in twoyear array, look into it\n";
 	}
+	$twoyear = self::GetItemById($studentId);
+	$twoyear->assessment = $recommendation;
+      }
+    }
+  }
 
-	private static function orientationList() {
-	  $filename = Admission::OrientationFile;
-	  $count = array();
-	  if (($handle = fopen($filename, "r")) !== FALSE) {
-	    while ((list($familyid,$Check)=
-		    fgetcsv($handle, 0, ",")) !== FALSE) {
-	      self::$orientation[$familyid] = 1;
-	    }
-	  }
+  private static function orientationList() {
+    $filename = Admission::OrientationFile;
+    $count = array();
+    if (($handle = fopen($filename, "r")) !== FALSE) {
+      while ((list($familyid,$Check)=
+	      fgetcsv($handle, 0, ",")) !== FALSE) {
+	self::$orientation[$familyid] = 1;
+      }
+    }
 
-	  // update the static array
-	}
+    // update the static array
+  }
 	
-	public static function twoYearCsv () {
-		$enrolledHandle = fopen(self::EnrolledStudentsFile, "w") or die ("cannot open file " . self::EnrolledStudentsFile);
-		$leavingHandle = fopen(self::LeavingStudentsFile, "w") or die ("cannot open file " . self::LeavingStudentsFile);
-		self::firstTimeCall();
-		foreach (self::$objArray as $studentid => $twoYear) {
-			$student = Student::GetItemById($studentid);
-			$familyid = $student->family->id;
-			$currFamilyStatus = EnumFamilyTracker::NameFromId(FamilyTracker::CurrentYearStatus($familyid));
-			$fileHandle = null;
+  public static function twoYearCsv () {
+    $enrolledHandle = fopen(self::EnrolledStudentsFile, "w") or die ("cannot open file " . self::EnrolledStudentsFile);
+    $leavingHandle = fopen(self::LeavingStudentsFile, "w") or die ("cannot open file " . self::LeavingStudentsFile);
+    self::firstTimeCall();
+    foreach (self::$objArray as $studentid => $twoYear) {
+      $student = Student::GetItemById($studentid);
+      $familyid = $student->family->id;
+      $currFamilyStatus = EnumFamilyTracker::NameFromId(FamilyTracker::CurrentYearStatus($familyid));
+      $fileHandle = null;
 				
-			$fields = Array();
-			$fields[] = $studentid;
-			$fields[] = $familyid;
-			//			$fields[] = $twoYear->previousYear->csv();
+      $fields = Array();
+      $fields[] = $studentid;
+      $fields[] = $familyid;
+      //			$fields[] = $twoYear->previousYear->csv();
 				
-			if ($twoYear->status != self::Leaving) {
-				$fileHandle = $enrolledHandle;
+      if ($twoYear->status != self::Leaving) {
+	$fileHandle = $enrolledHandle;
 
-				//				$fields[] = $twoYear->thisYear->csv();
-				$twoYear->thisYear->csv(&$fields);
-				$fields[] = $twoYear->status;
-				$fields[] = $twoYear->assessment;
-			} else {
+	//				$fields[] = $twoYear->thisYear->csv();
+	$twoYear->thisYear->csv(&$fields);
+	$fields[] = $twoYear->status;
+	$fields[] = $twoYear->assessment;
+      } else {
 
-				$fileHandle = $leavingHandle;
-				$twoYear->previousYear->csv(&$fields);
-				$fields[] = $currFamilyStatus;
-			}
-			$fields[] = $student->fullName();
+	$fileHandle = $leavingHandle;
+	$twoYear->previousYear->csv(&$fields);
+	$fields[] = $currFamilyStatus;
+      }
+      $fields[] = $student->fullName();
 				
-			if ($twoYear->status == self::Continuing) $twoYear->previousYear->csv(&$fields);
+      if ($twoYear->status == self::Continuing) $twoYear->previousYear->csv(&$fields);
 				
-			fputcsv($fileHandle, $fields);
-		}
+      fputcsv($fileHandle, $fields);
+    }
 
-		fclose($enrolledHandle); fclose($leavingHandle);
+    fclose($enrolledHandle); fclose($leavingHandle);
+  }
+
+  public static function assignClass() {
+    self::firstTimeCall();
+    $count = 0;
+    foreach (self::$objArray as $studentid => $twoYear) {
+      $student = Student::GetItemById($studentid);
+				
+      if ($twoYear->thisYear->languageLevel != null) continue;
+      if ($twoYear->status == self::Leaving) continue;
+				
+      $count++;
+				
+      if($student->GradeAt(Calendar::RegistrationSession) == "KG") {
+	$class = AvailableClass::findAvailableClass(2011, Department::Kindergarten, 0, null);
+	if ($class ==null) {
+	  print "Error:KG not found for year 2011\n";
+	} else {
+	  print "insert into Enrollment set student = $student->id, availableClass = $class->id;\n";
 	}
-
-	public static function assignClass() {
-		self::firstTimeCall();
-		$count = 0;
-		foreach (self::$objArray as $studentid => $twoYear) {
-			$student = Student::GetItemById($studentid);
+	continue;
+      }
 				
-			if ($twoYear->thisYear->languageLevel != null) continue;
-			if ($twoYear->status == self::Leaving) continue;
-				
-			$count++;
-				
-			if($student->GradeAt(Calendar::RegistrationSession) == "KG") {
-				$class = AvailableClass::findAvailableClass(2011, Department::Kindergarten, 0, null);
-				if ($class ==null) {
-					print "Error:KG not found for year 2011\n";
-				} else {
-					print "insert into Enrollment set student = $student->id, availableClass = $class->id;\n";
-				}
-				continue;
-			}
-				
-			// all others require culture and language. Let us do culture first
-			$level = $twoYear->thisYear->cultureLevel;
-			$class = AvailableClass::findAvailableClass(2011, Department::Culture, $level, null);
-			if ($class ==null) {
-				print "Error:Culture level $level not found for year 2011\n";
-			} else {
-				print "insert into Enrollment set student = $student->id, availableClass = $class->id;\n";
-			}
+      // all others require culture and language. Let us do culture first
+      $level = $twoYear->thisYear->cultureLevel;
+      $class = AvailableClass::findAvailableClass(2011, Department::Culture, $level, null);
+      if ($class ==null) {
+	print "Error:Culture level $level not found for year 2011\n";
+      } else {
+	print "insert into Enrollment set student = $student->id, availableClass = $class->id;\n";
+      }
 			
-			// for language, we have new, change and continuing
+      // for language, we have new, change and continuing
 			
-			$department = $twoYear->thisYear->language;
-			if ($twoYear->status == self::Continuing) {
-				//assign same level as last year
-				$level = $twoYear->previousYear->languageLevel;;
-				if ($level == 0) $level=1;
-			} else {
-				$level = 1; 
-			}
-			$class = AvailableClass::findAvailableClass(2011, $department, $level, null);
-			if ($class ==null) {
-				print "Error:Department $department,  level $level not found for year 2011\n";
-			} else {
-				print "insert into Enrollment set student = $student->id, availableClass = $class->id;\n";
-			}
+      $department = $twoYear->thisYear->language;
+      if ($twoYear->status == self::Continuing) {
+	//assign same level as last year
+	$level = $twoYear->previousYear->languageLevel;;
+	if ($level == 0) $level=1;
+      } else {
+	$level = 1; 
+      }
+      $class = AvailableClass::findAvailableClass(2011, $department, $level, null);
+      if ($class ==null) {
+	print "Error:Department $department,  level $level not found for year 2011\n";
+      } else {
+	print "insert into Enrollment set student = $student->id, availableClass = $class->id;\n";
+      }
 			
 				
 				
-			print "$count: $studentid needs to be enrolled";
-			print "\n";
-		}
-	}
+      print "$count: $studentid needs to be enrolled";
+      print "\n";
+    }
+  }
 
-	public static  function checkFeePaid() {
-		self::firstTimeCall();
+  public static  function checkFeePaid() {
+    self::firstTimeCall();
 		
-		$feeRequired = Array();
-		$newRegFee = Array();
+    $feeRequired = Array();
+    $newRegFee = Array();
 		
-		foreach (self::$objArray as $studentid => $twoYear) {
-			$student = Student::GetItemById($studentid);
-			$familyid = $student->family->id;
+    foreach (self::$objArray as $studentid => $twoYear) {
+      $student = Student::GetItemById($studentid);
+      $familyid = $student->family->id;
 			
-			if ($twoYear->status != self::Leaving) {
-				if(empty($feeRequired[$familyid])) {
-					$feeRequired[$familyid] = 450;
-					$newRegFee[$familyid] = 0;
-				} else {
-					$feeRequired[$familyid] = 550;
-				}
+      if ($twoYear->status != self::Leaving) {
+	if(empty($feeRequired[$familyid])) {
+	  $feeRequired[$familyid] = 450;
+	  $newRegFee[$familyid] = 0;
+	} else {
+	  $feeRequired[$familyid] = 550;
+	}
 				
-				if ($twoYear->status == self::NewStudent || $twoYear->status == self::Orientation ) $newRegFee[$familyid] += 50; 
-			}
-		}
+	if ($twoYear->status == self::NewStudent || $twoYear->status == self::Orientation ) $newRegFee[$familyid] += 50; 
+      }
+    }
 		
 		
-		// check if fee is paid fully
-		foreach ($feeRequired as $familyid=>$require) {
-			$require += $newRegFee[$familyid];
-			$tracker = FamilyTracker::GetItemById($familyid);
-			$family = Family::GetItemById($familyid);
-			if ($require != $tracker->tuition) {
-				print "Family: $familyid, Require: $require, Paid: $tracker->tuition, " . $family->parentsName() . "\n";
-			}
-		}
+    // check if fee is paid fully
+    foreach ($feeRequired as $familyid=>$require) {
+      $require += $newRegFee[$familyid];
+      $tracker = FamilyTracker::GetItemById($familyid);
+      $family = Family::GetItemById($familyid);
+      if ($require != $tracker->tuition) {
+	print "Family: $familyid, Require: $require, Paid: $tracker->tuition, " . $family->parentsName() . "\n";
+      }
+    }
 		
-	}
+  }
 	
-	private function __construct() { 
-		$this->previousYear = new TwoYearEnrollment();
-		$this->thisYear = new TwoYearEnrollment();
-		$this->status = "unknown";
-	}
+  private function __construct() { 
+    $this->previousYear = new TwoYearEnrollment();
+    $this->thisYear = new TwoYearEnrollment();
+    $this->status = "unknown";
+  }
 }
 
-
-Teachers::AddTeacher(65, "Crfty_hlpr@yahoo.com", 0);
-
-
-
-
-exit();
-
-Teachers::AddTeacher(34, "", 0); 
-
-//Admission::PrintVolunteers(2011); exit();
 //Admission::AttendanceSheet(2011); exit();
-//Evaluation::ProcessAllFiles(); exit();
-//Admission::RosterFromFile("/tmp/aa"); exit();
-//Admission::Roster(2011); exit();
 //Admission::admissionConfirmationEmail(2011);exit();
-//Admission::BadgeFile(2011); exit();
 //Admission::itemDelivery(); exit();
-//Admission::classParentsEmail(69); exit();
-//Admission::classParentsEmail(35); exit();
+Admission::Validation(2011); exit();
+
+
+//Evaluation::ProcessAllFiles(); exit();
+
+
 //TwoYearLayout::checkFeePaid(); exit();
 //TwoYearLayout::assignClass(); exit();
 //TwoYearLayout::twoYearCsv(); exit();

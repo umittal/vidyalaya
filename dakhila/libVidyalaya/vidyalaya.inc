@@ -664,6 +664,8 @@ class Rooms{
 	public $facility = null;
 	public $roomNumber = null;
 	public $capacity =null;
+	public $hint =null;
+	public $notes =null;
 		
 	public static function CompareRoomnumber($a, $b) {
 	  if ($a->roomNumber == $b->roomNumber) return 0;
@@ -737,6 +739,8 @@ class Rooms{
 		$this->facility= Facility::GetItemById($row["Rooms.facility"]);
 		$this->roomNumber = $row["Rooms.room"];
 		$this->capacity = $row["Rooms.capacity"];
+		$this->hint = $row["Rooms.hint"];
+		$this->notes = $row["Rooms.notes"];
 	}
 }
 
@@ -876,7 +880,10 @@ class Person { // a new concept to break away from praveen's students2003 and pa
   public $home=false;
 
   public static function CompareLastName($a, $b) {
-    if ($a->lastName == $b->lastName) return 0;
+    if ($a->lastName == $b->lastName) {
+      if ($a->firstName == $b->firstName) return 0;
+      return ($a->firstName < $b->firstName) ? -1 : 1;
+    }
     return ($a->lastName < $b->lastName) ? -1 : 1;
   }
 
@@ -911,6 +918,7 @@ class Person { // a new concept to break away from praveen's students2003 and pa
     return $person;
   }
 
+  // actually this works for any object that has mfs and mfsid. This is an unfortunate benefit of lack of type checking
   public static function PersonFromTeacher($teacher) {
       switch ($teacher->MFS) {
       case MFS::Mother:
@@ -923,7 +931,7 @@ class Person { // a new concept to break away from praveen's students2003 and pa
 	$student = Student::GetItemById($teacher->mfsId);
 	return self::PersonFromStudent($student);
       default: 
-	die ("unexpected type of item found in volunteers\n");
+	die ("unexpected type of item found in volunteers, id $teacher->mfsId, type = $teacher->MFS \n");
       }
     
   }
@@ -941,6 +949,11 @@ class Volunteers {
   public $MFS= null; // Mother, Father or Student
   public $mfsId=null;
   public $role = null; // volunteer, wellwisher
+  public $person=null;
+
+  public static function CompareLastName($a, $b) {
+    return Person::CompareLastName($a->person, $b->person);
+  }
 
   public static $objArray = Array ();
 
@@ -951,6 +964,7 @@ class Volunteers {
     while ($row = mysql_fetch_alias_array($result)) {
       self::$objArray[] = new self($row);
     }
+    usort (self::$objArray, "self::CompareLastName");
   }
 
   public static function GetAll() {
@@ -973,6 +987,31 @@ class Volunteers {
     $this->MFS = $row["Volunteers.MFS"];
     $this->mfsId = $row["Volunteers.mfsId"];
     $this->role = $row["Volunteers.role"];
+    $this->person = Person::PersonFromTeacher($this);
+  }
+}
+
+
+// ************** 
+class VolunteerRole {
+  const ExtraCurricular = 1
+    , Trustee = 2
+    , Substitute = 4
+    , Fundraising = 8
+    , Teacher = 16
+    , Publication = 32
+    , MAXID = 32
+    ;
+  public static function IdToString($id) {
+    if ($id > self::MAXID) return "Error: too big";
+    $csv = array();
+    if ($id & self::ExtraCurricular) $csv[] = "Extra Curricular Activities";
+    if ($id & self::Trustee) $csv[] = "Board of Trustee";
+    if ($id & self::Substitute) $csv[] = "Substitute Teacher";
+    if ($id & self::Fundraising) $csv[] = "Fundraising";
+    if ($id & self::Teacher) $csv[] = "Teacher";
+    if ($id & self::Publication) $csv[] = "Publication";
+    return implode(", ", $csv);
   }
 }
 
@@ -980,26 +1019,20 @@ class Volunteers {
 class MFS {
   const Mother = 1
     , Father = 2
-    , Student = 4
-    , Volunteer = 8
-    , WellWisher = 16
+    , Student = 3
     ;
 
-  public static function FullName($mfs, $mfsId) {
-    switch ($mfs) {
+  public static function CodeFromId($id) {
+    switch ($id) {
     case MFS::Mother:
-      $family = Family::GetItemById($mfsId);
-      return $family->mother->fullName();
+      return "M";
     case MFS::Father:
-      $family = Family::GetItemById($mfsId);
-      return $family->father->fullName();
+      return "F";
     case MFS::Student:
-      $student = Student::GetItemById($mfsId);
-      return $student->fullName();
+      return "S";
     default: 
-      die ("unexpected type of item found in volunteers\n");
+      return "?";
     }
-
   }
 }
 
@@ -1068,11 +1101,7 @@ class Teachers {
   public $class=null;
 
   public static function CompareLastName($a, $b) {
-    $alast = $a->person->lastName;
-    $blast = $b->person->lastName;
-    
-    if ($alast == $blast) return 0;
-    return ($alast < $blast) ? -1 : 1;
+    return Person::CompareLastName($a->person, $b->person);
   }
 
 
@@ -1085,6 +1114,7 @@ class Teachers {
     while ($row = mysql_fetch_alias_array($result)) {
       self::$objArray[] = new self($row);
     }
+    usort ($objArray, "self::CompareLastName");
   }
 
   public static function GetAll() {
@@ -1102,14 +1132,6 @@ class Teachers {
     $sql = "insert into teachers values ($classId, $mfs, $mfsid, $IsLead)";
     
     $result = VidDb::query($sql);
-  }
-
-  public static function TeacherList($classId) {
-    $csv = array();
-    foreach (self::GetAll() as $item) {
-      if ($item->classId == $classId) $csv[] = MFS::FullName($item->MFS, $item->mfsId);
-    }
-    return implode(", ", $csv);
   }
 
   private static function ArrayFromQuery($query) {
@@ -1133,6 +1155,23 @@ class Teachers {
              ";
     return self::ArrayFromQuery($query);
   }
+
+  public static function TeacherListClassCsv($classId) {
+    $csv = array();
+    foreach (self::TeacherListClass($classId) as $teacher) {
+      $csv[] = $teacher->person->fullName();
+    }
+    return implode(", ", $csv);
+  }
+
+  public static function TeacherListClassHtml($classId) {
+    $csv = array();
+    foreach (self::TeacherListClass($classId) as $teacher) {
+      $csv[] = $teacher->IsLead ? "<b>" . $teacher->person->fullName() ."</b>"  :  $teacher->person->fullName();
+    }
+    return implode(", ", $csv);
+  }
+
 
   public static function TeacherListClass($classId) {
     $query = "select *
