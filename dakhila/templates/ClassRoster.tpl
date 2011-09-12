@@ -56,6 +56,7 @@ dojo.require("dijit.Tooltip");
 <tr><td>Class</td><td>{SESSION} - {SHORT} - {LONG}</td></tr>
 <tr><td>Location</td><td>Room {ROOM} - {FACILITY}</td></tr>
 <tr><td width=100px>Teachers</td><td>{TEACHERS}</td></tr>
+<tr><td width=100px>Enrollment</td><td>{COUNT}</td></tr>
 </table>
 <!-- END ROSTERHEAD -->
 
