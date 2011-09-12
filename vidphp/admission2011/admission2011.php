@@ -589,8 +589,6 @@ class Admission {
   const OrientationFile = "/home/umesh/workspace/vidphp/admission2011/orientation1.txt";
   const assesssmentFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/data/assessment.csv";
 
-  const BaseDir = "/home/umesh/Dropbox/Vidyalaya-Roster";
-
   private static function sendItemEmail($familyId, $cd, $pb, $bag) {
 		
     $family = Family::GetItemById($familyId);
