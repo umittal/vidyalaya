@@ -964,7 +964,7 @@ class Volunteers {
     while ($row = mysql_fetch_alias_array($result)) {
       self::$objArray[] = new self($row);
     }
-    usort (self::$objArray, "self::CompareLastName");
+    usort (self::$objArray, "Volunteers::CompareLastName");
   }
 
   public static function GetAll() {
@@ -1114,7 +1114,7 @@ class Teachers {
     while ($row = mysql_fetch_alias_array($result)) {
       self::$objArray[] = new self($row);
     }
-    usort ($objArray, "self::CompareLastName");
+    usort ($objArray, "Teachers::CompareLastName");
   }
 
   public static function GetAll() {
@@ -1141,7 +1141,7 @@ class Teachers {
     while ($row = mysql_fetch_alias_array($result)) {
       $localarray[] = new self($row);
     }
-    usort ($localarray, "self::CompareLastName");
+    usort ($localarray, "Teachers::CompareLastName");
     return $localarray;
   }
 
