@@ -6,11 +6,6 @@ require_once "$libDir/vidyalaya.inc";
 
 require("../../Classes/PHPMailer_v5.1/class.phpmailer.php");
 
-/** PHPExcel */
-//require_once  "PHPExcel/PHPExcel.php";
-require_once  "PHPExcel/PHPExcel/IOFactory.php";
-//require_once  'PHPExcel/PHPExcel/Writer/Excel2007.php';
-
 
 function SetupMail() {
 
@@ -727,84 +722,6 @@ CLOSING;
   }
 	
 	
-  private static function AttendanceSheetFill($class) {
-    $inputFileName = "/home/umesh/Dropbox/Vidyalaya-Management/Admission/attendance2011.xlsx";
-    $activeSheetIndex=0;
-    $row =4;
-
-    /**  Identify the type of $inputFileName  **/
-    //		$inputFileType =PHPExcel_IOFactory::identify($inputFileName);
-    /**  Create a new Reader of the type that has been identified  **/
-    //		$objReader = PHPExcel_IOFactory::createReader($inputFileType);
-    /**  Load $inputFileName to a PHPExcel Object  **/
-    //		$objPHPExcel = $objReader->load($inputFileName);
-    $objPHPExcel = PHPExcel_IOFactory::load($inputFileName);
-    $objPHPExcel->setActiveSheetIndex($activeSheetIndex);
-    $objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
-    $objPHPExcel->getActiveSheet()->setShowGridlines(false);
-    $objPHPExcel->getActiveSheet()->setRightToLeft(FALSE);
-		
-    //		$objPHPExcel->getProperties()->setCreator("Umesh Mittal");
-    //		$objPHPExcel->getProperties()->setLastModifiedBy("Umesh Mittal");
-    //		$objPHPExcel->getProperties()->setTitle("Students");
-    //		$objPHPExcel->getProperties()->setSubject("Vidyalaya Students");
-    //		$objPHPExcel->getProperties()->setDescription("List of Vidyalaya Students by Classes");
-		
-		
-
-    $objPHPExcel->getActiveSheet()->setTitle($class->short());
-    $objPHPExcel->getActiveSheet()->getCell("B2")->setValue($class->short());
-    $objPHPExcel->getActiveSheet()->getCell("B3")->setValue("Room: " . $class->room->roomNumber);
-			
-    $objPHPExcel->getActiveSheet()->getRowDimension("1")->setVisible(TRUE);
-    $objPHPExcel->getActiveSheet()->getRowDimension("2")->setVisible(TRUE);
-    $objPHPExcel->getActiveSheet()->getRowDimension("3")->setVisible(TRUE);
-    foreach(Enrollment::GetEnrollmentForClass ($class->id) as $item) {
-      $cellValue=sprintf("B%d", $row);
-      $objPHPExcel->getActiveSheet()->getCell($cellValue)->setValue($item->student->id);
-      $cellValue=sprintf("C%d", $row);
-      $fullName=$item->student->fullName();
-      if ($class->course->department == Department::Kindergarten) {
-	$fullName = substr(Department::NameFromId($item->student->languagePreference), 0, 1) . " " . $fullName;
-      }
-      $objPHPExcel->getActiveSheet()->getCell($cellValue)->setValue($fullName);
-      $objPHPExcel->getActiveSheet()->getRowDimension($row)->setVisible(TRUE);
-      $row++;
-    }
-    $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
-    $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setVisible(true);
-    $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setVisible(TRUE);
-    $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setVisible(TRUE);
-    $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setVisible(TRUE);
-    $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setVisible(TRUE);
-
-    return $objPHPExcel;
-  }
-	
-  public static function AttendanceSheet($year) {
-    foreach (AvailableClass::GetAllYear($year) as $class) {
-      $excelDir = self::BaseDir . "/" . $class->session . "/attendance/" . 
-	Department::NameFromId($class->course->department) . "/excel/";
-      $pdfDir=str_replace("excel", "pdf", $excelDir);
-      if (!file_exists($excelDir) && !mkdir($excelDir, 0777, true)) die ("error creating directory $excelDir");
-      if (!file_exists($pdfDir) && !mkdir($pdfDir, 0777, true)) die ("error creating directory $pdfDir");
-			
-      $excelFile=$excelDir . $class->short() . ".xlsx";
-      $pdfFile=$excelDir . $class->short() . ".pdf";
-      print "$excelFile, $pdfFile \n";
-			
-      //			continue;
-      $objPHPExcel = self::AttendanceSheetFill($class);
-
-      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'PDF');
-      //			$objWriter->save($pdfFile);
-
-      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-      $objWriter->save($excelFile);
-      echo date('H:i:s') . " Peak memory usage: " . (memory_get_peak_usage(true) / 1024 / 1024) . " MBrn\no";
-    }
-  }
-
   public static function Validation($year) {
     print "1. Validate Registered Parents between enrollment and familytracker\n";
     // get list of families from enrollment
@@ -1219,7 +1136,6 @@ class TwoYearLayout {
   }
 }
 
-//Admission::AttendanceSheet(2011); exit();
 //Admission::admissionConfirmationEmail(2011);exit();
 //Admission::itemDelivery(); exit();
 Admission::Validation(2011); exit();

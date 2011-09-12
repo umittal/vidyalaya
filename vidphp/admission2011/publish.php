@@ -5,6 +5,7 @@ require_once "$libDir/db.inc";
 require_once "$libDir/vidyalaya.inc";
 
 require_once "../../Classes/PHPWord.php";
+require_once  "PHPExcel/PHPExcel/IOFactory.php";
 
 class WordTable {
   public $table = null;
@@ -58,6 +59,8 @@ class WordTable {
 
 
 class Publications {
+  const BaseDir = "/home/umesh/Dropbox/Vidyalaya-Roster";
+  const MAILINGLISTDIR="/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/mailinglist/";
 
   public static function SchoolDirectory() {
     $document = new WordTable();
@@ -186,19 +189,23 @@ class Publications {
 
       $document = new WordTable();
       $document->SetLandscape();
-      $text = $class->short() . "- " . Teachers::TeacherList($class->id);
-      $document->SetFooter($text);
-      $text = "Vidyalaya Inc. 2011-12 Roster";
-      $document->SetHeader($text);
 
       $table = $document->table;
       self::ClassDirectoryTable($table, $class, true);
+      $text = "Teachers: " . Teachers::TeacherListClassCsv($class->id);
+      $document->SetFooter($text);
+      $text = "Vidyalaya Inc. 2011-12 $short Directory";
+      $document->SetHeader($text);
       $document->filename = "$directory/ClassWide/$short.docx";
       $document->SaveDocument();
 
       $document = new WordTable(false);
       $table = $document->table;
       self::ClassDirectoryTable($table, $class, false);
+      $text = "Teachers: " . Teachers::TeacherListClassCsv($class->id);
+      $document->SetFooter($text);
+      $text = "Vidyalaya Inc. 2011-12 $short Directory";
+      $document->SetHeader($text);
       $document->filename = "$directory/ClassShort/$short.docx";
       $document->SaveDocument();
 
@@ -206,7 +213,6 @@ class Publications {
   }
 
 
-  const MAILINGLISTDIR="/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/mailinglist/";
 
   private static function  MailingListsClass($year) {
     foreach (AvailableClass::GetAllYear($year) as $item) {
@@ -339,9 +345,6 @@ class Publications {
       self::printParentContact($family->father, $family);
     }
   }
-
-
-  const rosterDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/roster/";
 
   public static function BadgeFile($year) {
     $filename = self::rosterDir . "studentbadge.csv";
@@ -531,10 +534,89 @@ class Publications {
     $document->SaveDocument();
   }
 
+
+  private static function AttendanceSheetFill($class) {
+    $inputFileName = "/home/umesh/Dropbox/Vidyalaya-Management/Admission/attendance2011.xlsx";
+    $activeSheetIndex=0;
+    $row =4;
+
+    /**  Identify the type of $inputFileName  **/
+    //		$inputFileType =PHPExcel_IOFactory::identify($inputFileName);
+    /**  Create a new Reader of the type that has been identified  **/
+    //		$objReader = PHPExcel_IOFactory::createReader($inputFileType);
+    /**  Load $inputFileName to a PHPExcel Object  **/
+    //		$objPHPExcel = $objReader->load($inputFileName);
+    $objPHPExcel = PHPExcel_IOFactory::load($inputFileName);
+    $objPHPExcel->setActiveSheetIndex($activeSheetIndex);
+    $objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
+    $objPHPExcel->getActiveSheet()->setShowGridlines(false);
+    $objPHPExcel->getActiveSheet()->setRightToLeft(FALSE);
+		
+    //		$objPHPExcel->getProperties()->setCreator("Umesh Mittal");
+    //		$objPHPExcel->getProperties()->setLastModifiedBy("Umesh Mittal");
+    //		$objPHPExcel->getProperties()->setTitle("Students");
+    //		$objPHPExcel->getProperties()->setSubject("Vidyalaya Students");
+    //		$objPHPExcel->getProperties()->setDescription("List of Vidyalaya Students by Classes");
+		
+		
+
+    $objPHPExcel->getActiveSheet()->setTitle($class->short());
+    $objPHPExcel->getActiveSheet()->getCell("B2")->setValue($class->short());
+    $objPHPExcel->getActiveSheet()->getCell("B3")->setValue("Room: " . $class->room->roomNumber);
+			
+    $objPHPExcel->getActiveSheet()->getRowDimension("1")->setVisible(TRUE);
+    $objPHPExcel->getActiveSheet()->getRowDimension("2")->setVisible(TRUE);
+    $objPHPExcel->getActiveSheet()->getRowDimension("3")->setVisible(TRUE);
+    foreach(Enrollment::GetEnrollmentForClass ($class->id) as $item) {
+      $cellValue=sprintf("B%d", $row);
+      $objPHPExcel->getActiveSheet()->getCell($cellValue)->setValue($item->student->id);
+      $cellValue=sprintf("C%d", $row);
+      $fullName=$item->student->fullName();
+      if ($class->course->department == Department::Kindergarten) {
+	$fullName = substr(Department::NameFromId($item->student->languagePreference), 0, 1) . " " . $fullName;
+      }
+      $objPHPExcel->getActiveSheet()->getCell($cellValue)->setValue($fullName);
+      $objPHPExcel->getActiveSheet()->getRowDimension($row)->setVisible(TRUE);
+      $row++;
+    }
+    $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
+    $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setVisible(true);
+    $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setVisible(TRUE);
+    $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setVisible(TRUE);
+    $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setVisible(TRUE);
+    $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setVisible(TRUE);
+
+    return $objPHPExcel;
+  }
+	
+  public static function AttendanceSheet($year) {
+    foreach (AvailableClass::GetAllYear($year) as $class) {
+      $excelDir = self::BaseDir . "/" . $class->session . "/attendance/" . 
+	Department::NameFromId($class->course->department) . "/excel/";
+      $pdfDir=str_replace("excel", "pdf", $excelDir);
+      if (!file_exists($excelDir) && !mkdir($excelDir, 0777, true)) die ("error creating directory $excelDir");
+      if (!file_exists($pdfDir) && !mkdir($pdfDir, 0777, true)) die ("error creating directory $pdfDir");
+      $excelFile=$excelDir . $class->short() . ".xlsx";
+      $pdfFile=$excelDir . $class->short() . ".pdf";
+
+      $objPHPExcel = self::AttendanceSheetFill($class);
+      
+      //PDF Writer is horrible, do not use it.
+      //      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'PDF');
+      //      $objWriter->save($pdfFile);
+
+      $objPHPExcel->getActiveSheet()->getHeaderFooter()->setOddFooter ("Teachers: " . Teachers::TeacherListClassCsv($class->id));
+      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+      $objWriter->save($excelFile);
+      //      echo date('H:i:s') . " Peak memory usage: " . (memory_get_peak_usage(true) / 1024 / 1024) . " MBrn\no";
+    }
+  }
+
+
 }	
 
 
-
+Publications::AttendanceSheet(2011); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
 //Publications::Roster(2011); exit();
 
@@ -544,12 +626,12 @@ class Publications {
 //Publications::CreateMailingLists(2011);exit();
 
 //Publications::VolunteerListForHandbook(2011); exit();
-Publications::TeacherListForHandbook(2011);exit();
+//Publications::TeacherListForHandbook(2011);exit();
 
 //Publications::SchoolDirectory(); exit();
 //Publications::TeacherDirectory(2011); exit (); // Directory of all Teachers
 //Publications::VolunteerDirectory(2011); exit (); // Directory of all Volunteers
-//Publications::ClassDirectory(2011); exit (); // Directory of all classes, with and without email
+Publications::ClassDirectory(2011); exit (); // Directory of all classes, with and without email
 
 
 

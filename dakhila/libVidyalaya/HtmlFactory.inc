@@ -484,7 +484,8 @@ function DisplayClassRoster($template, $classId) {
   $template->setVariable("LONG", $class->course->full);
   $template->setVariable("ROOM", $class->room->roomNumber);
   $template->setVariable("FACILITY", $class->room->facility->name);
-  $template->setVariable("TEACHERS", "to be developed");
+  $template->setVariable("TEACHERS", Teachers::TeacherListClassHtml($class->id));
+  $template->setVariable("COUNT", count(Enrollment::GetEnrollmentForClass ($class->id)));
   $template->parseCurrentBlock();
 
   foreach (Enrollment::GetEnrollmentForClass($classId)  as $item) {
