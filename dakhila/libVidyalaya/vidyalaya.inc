@@ -882,9 +882,10 @@ class Enrollment{
 
 // ************** 
 class Person { // a new concept to break away from praveen's students2003 and parents2003
-
   public $firstName=null;
   public $lastName=null;
+  public $gender="billu";
+  public $workPhone = null;
   public $cellPhone = null;
   public $email=null; // this needs to be turned unique somehow so it can be used as a reference
   public $MFS=null; // reference to praveen's mother, father, student
@@ -904,11 +905,15 @@ class Person { // a new concept to break away from praveen's students2003 and pa
   	return $this->firstName . " " . $this->lastName;
   }
 
+  public function id() {
+    return MFS::CodeFromId($this->MFS) . $this->mfsId;
+  }
 
   public static function PersonFromStudent($student) {
     $person = new Person();
     $person->firstName = $student->firstName;
     $person->lastName = $student->lastName;
+    $person->gender = $student->gender == 1 ? "Girl" : "Boy";
     $person->cellPhone = $student->cellPhone;
     $person->email = $student->email;
     $person->MFS = MFS::Student;
@@ -922,6 +927,8 @@ class Person { // a new concept to break away from praveen's students2003 and pa
     $person = new Person();
     $person->firstName = $parent->firstName;
     $person->lastName = $parent->lastName;
+    $person->gender = $mfs == MFS::Mother ? "Female" : "Male";
+    $person->workPhone = $parent->workPhone;
     $person->cellPhone = $parent->cellPhone;
     $person->email = $parent->email;
     $person->MFS = $mfs;
@@ -1505,6 +1512,12 @@ class FamilyTracker {
 	public static $objArray = Array ();
 	public static $students = Array ();
 
+	public static function CompareFamilyId($a, $b) {
+	  if ($a->family == $b->family) return 0;
+	  return ($a->family < $b->family) ? -1 : 1;
+	}
+
+
 	private static function firstTimeCall() {
 		if (!empty(self::$objArray)) return;
 		$query = "select * from FamilyTracker";
@@ -1513,6 +1526,17 @@ class FamilyTracker {
 			$key = $row["FamilyTracker.family"];
 			if (!array_key_exists($key, self::$objArray)) self::$objArray[$key] = new self($row);
 		}
+	}
+
+	private static function ArrayFromQuery($query) {
+	  $localarray = Array();
+		
+	  $result = VidDb::query($query);
+	  while ($row = mysql_fetch_alias_array($result)) {
+	    $localarray[] = new self($row);
+	  }
+	  usort ($localarray, "FamilyTracker::CompareFamilyId");
+	  return $localarray;
 	}
 
 	public static function GetItemById($key) {
@@ -1524,6 +1548,13 @@ class FamilyTracker {
 		self::firstTimeCall();
 		return self::$objArray;
 	}
+
+	public static function GetRegisteredFamiliesYear($year) {
+	  if ($year >= 2010) $year -= 2010;
+	  $query = "select * from FamilyTracker where year=$year and currentYear=" . EnumFamilyTracker::registered ;
+	  return self::ArrayFromQuery($query);
+	}
+
 	
 	public static function RegisteredFamilies() {
 	  $list = array();
@@ -1762,11 +1793,13 @@ function mysql_fetch_alias_array($result) {
 }
 
 // Function called once we have connection to run query and process data to populate students
-function CreateDictionary($connection) {
+function CreateDictionary() {
 
 	// load family category object
 	$query = "select * from Parent_Type";
-	if (!($result = mysql_query($query, $connection))) showerror();
+	//thankyouumesh	if (!($result = mysql_query($query, $connection))) showerror();
+	$result = VidDb::query($query);
+
 	while ($row = mysql_fetch_alias_array($result)) {
 		FamilyCategory::GetFamilyCategory($row);
 	}
@@ -1775,27 +1808,32 @@ function CreateDictionary($connection) {
 	$query = "select Parents2003.*, Email_Preferences.* from Parents2003
 		INNER JOIN Email_Preferences ON Parents2003.PRIMARY_EMAIL_FLAG=Email_Preferences.ID
 	";
-	if (!($result = mysql_query($query, $connection))) showerror();
+	//thankyouumesh	if (!($result = mysql_query($query, $connection))) showerror();
+	$result = VidDb::query($query);
+
 	while ($row = mysql_fetch_alias_array($result)) {
 		Family::GetFamily($row);
 	}
 	
 	// Load Courses
 	$query = "select * from LanguageGrades";
-	if (!($result = mysql_query($query, $connection))) showerror();
+	//thank you umesh if (!($result = mysql_query($query, $connection))) showerror();
+	$result = VidDb::query($query);
 	while ($row = mysql_fetch_alias_array($result)) {
 		Course::GetCourse($row, "l");
 	}
 	
 	$query = "select * from CultureGrades";
-	if (!($result = mysql_query($query, $connection))) showerror();
+	//thankyouumesh if (!($result = mysql_query($query, $connection))) showerror();
+	$result = VidDb::query($query);
 	while ($row = mysql_fetch_alias_array($result)) {
 		Course::GetCourse($row, "c");
 	}
 	
 	// load Student Status Enums
 	$query = "select * from Status";
-	if (!($result = mysql_query($query, $connection))) showerror();
+	//thankyouumesh if (!($result = mysql_query($query, $connection))) showerror();
+	$result = VidDb::query($query);
 	while ($row = mysql_fetch_alias_array($result)) {
 		StudentStatus::GetStudentStatus($row);
 	}
@@ -1804,7 +1842,8 @@ function CreateDictionary($connection) {
 	// Load Students
 	$query = LoadStudents("", "");
 	//$query = CreateDatabaseQueryRegisteredStudents(); // puts some additional constraint - not used
-	if (!($result = mysql_query($query, $connection))) showerror();
+	//thankyouumesh	if (!($result = mysql_query($query, $connection))) showerror();
+	$result = VidDb::query($query);
 	$i=0;
 
 	while ($row = mysql_fetch_alias_array($result)) {
@@ -1825,17 +1864,17 @@ function GetAllData() {
 			break;
 	}
 
-	$hostname = "vidyalaya.db.4718809.hostedresource.com";
-	$databasename = "vidyalaya";
-	$username = "vidyalaya";
-	$password = "Praveen38";
-	if (!$connection = @ mysql_connect($hostname, $username, $password))
-	die("Cannot connect using hostname=$hostname, user=$username, password=$password\n");
-	if (!mysql_selectdb($databasename, $connection))
-	showerror();
+	//	$hostname = "vidyalaya.db.4718809.hostedresource.com";
+	//	$databasename = "vidyalaya";
+	//	$username = "vidyalaya";
+	//	$password = "Praveen38";
+	//	if (!$connection = @ mysql_connect($hostname, $username, $password))
+	//	die("Cannot connect using hostname=$hostname, user=$username, password=$password\n");
+	//	if (!mysql_selectdb($databasename, $connection))
+	//	showerror();
 
 
-	$dictStudents = CreateDictionary($connection);
+	$dictStudents = CreateDictionary();
 
 	switch ( $sapi ) {
 		case "cli":

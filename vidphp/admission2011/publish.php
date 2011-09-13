@@ -57,7 +57,6 @@ class WordTable {
   }
 }
 
-
 class Publications {
   const BaseDir = "/home/umesh/Dropbox/Vidyalaya-Roster";
   const MAILINGLISTDIR="/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/mailinglist/";
@@ -145,7 +144,8 @@ class Publications {
     $table->addRow(200);
     $table->addCell(500, $styleCell)->addText('First', $fontStyle);
     $table->addCell(500, $styleCell)->addText('Last', $fontStyle);
-    $table->addCell(500, $styleCell)->addText('Age', $fontStyle);
+    if ($class->course->department != Department::Culture) 
+      $table->addCell(500, $styleCell)->addText('Age', $fontStyle);
     $table->addCell(500, $styleCell)->addText('Grade', $fontStyle);
     if ($email)
       $table->addCell(500, $styleCell)->addText('Email', $fontStyle);
@@ -160,7 +160,8 @@ class Publications {
       $table->addRow();
       $table->addCell(500)->addText($student->firstName);
       $table->addCell(500)->addText($student->lastName);
-      $table->addCell(500)->addText((int)$student->AgeAt(Calendar::CurrentSession));
+      if ($class->course->department != Department::Culture) 
+	$table->addCell(500)->addText((int)$student->AgeAt(Calendar::CurrentSession));
       $table->addCell(500)->addText($student->Grade());
       if ($email)
 	$table->addCell(500)->addText($student->email);
@@ -195,7 +196,7 @@ class Publications {
       self::ClassDirectoryTable($table, $class, true);
       $text = "Teachers: " . Teachers::TeacherListClassCsv($class->id);
       $document->SetFooter($text);
-      $text = "Vidyalaya Inc. 2011-12 $short Directory";
+      $text = "Vidyalaya Inc. 2011-12 $short Roster";
       $document->SetHeader($text);
       $document->filename = "$directory/ClassWide/$short.docx";
       $document->SaveDocument();
@@ -429,7 +430,6 @@ class Publications {
 
   private static function printOneStudent($student, $lc, $cc) {
     $printDir = "/home/umesh/student2011";
-    $dompdf = new DOMPDF();
     $html = "<html><head><style type='text/css'>td {padding-left:10px;}</style></head><body><img src='/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/PHHS2.png' width='700' height='680' alt='layout'>\n";
     //    $html .= "<h3>Student</h3>";
     $html .=  "<table>\n";
@@ -453,22 +453,21 @@ class Publications {
     }
 
     $html .= "</table></body></html>";
-    $pdf = HtmlToPdf($html);
-    $fileName = $printDir . "/" . $student->id . ".pdf";
+    $pdf = PrintFactory::HtmlToPdf($html);
+    $fileName = $printDir . "/Student-" . $student->id . ".pdf";
     file_put_contents("$fileName", $pdf);
-    echo "printed $fileName\n";
-    die ();
   }
 
-
-
-  public static function RosterSpa($year) {
-    $filename = self::rosterDir . "StudentsSpa.csv";
-    $fh = fopen("$filename", "w");
+  private static function RosterSpaStudents($year) {
+    $fh = tmpfile();
+    if (!$fh) die ("could not open $filename for writing");
     fwrite ($fh, "ID, First, Last, Language, , Culture, ,\n");
     $language = array(); $culture=array();
+
+
     foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake, $year) as $item) {
       $done[$item->student->id] = $item->student;
+      print "Printing Student " . $item->student->fullName() . "\n";
       if ($item->class->course->department != Department::Culture) {
 	if (array_key_exists($item->student->id, $language) )
 	  print "oh oh , i am going to overwrite language for $item->student->id\n";
@@ -507,6 +506,42 @@ class Publications {
       fputcsv($fh, $csv);
       self::printOneStudent($student, $lc, $cc);
     }
+
+    $filename = self::rosterDir . "StudentsSpa.csv";
+    fseek($fh, 0);
+    file_put_contents("$filename", fread($fh, 1024));
+    fclose($fh);
+  }
+
+  private static function RosterSpaTeachers($year) {
+
+    // todo: if somoene teaches multiple classes, it will print multiple pages. it should be fixed
+    $printDir = "/home/umesh/student2011";
+    foreach (Teachers::TeacherListYear($year) as $item) {
+      print "Printing Teacher " .$item->person->fullName() . "\n";
+      $html = "<html><head><style type='text/css'>td {padding-left:10px;}</style></head><body><img src='/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/PHHS2.png' width='700' height='680' alt='layout'>\n";
+
+      $html .=  "<table>\n";
+      $mfskey=MFS::CodeFromId($item->MFS) . $item->mfsId;
+      $html .= "<tr><td>ID</td><td>" . $mfskey . "</td>\n";
+      $html .= "<tr><td>Name</td><td>" . $item->person->fullName() ."</td>\n";
+      $html .=  "</table>\n";
+
+      $cc = $item->class;
+      $html .=  "<table>\n";
+      $html .= "<tr><th>Time</th><th>Class</th><th>Location</th><th>Teachers</th></tr>\n";
+      $html .= "<tr><td>$cc->startTime - $cc->endTime</td><td>". $cc->short() . "</td><td>" . $cc->room->roomNumber . "</td>";
+      $html .= "<td>" . Teachers::TeacherListClassHtml($cc->id) .  "\n";
+      $html .= "</table></body></html>";
+      $fileName = $printDir . "/Teacher-" . $mfskey . ".pdf";
+      file_put_contents("$fileName", PrintFactory::HtmlToPdf($html));
+    }    
+  }
+
+
+  public static function RosterSpa($year) {
+    //    self::RosterSpaStudents($year);
+    self::RosterSpaTeachers($year);
   }
 
 

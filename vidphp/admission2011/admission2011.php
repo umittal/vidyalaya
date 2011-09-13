@@ -3,6 +3,9 @@
 $libDir="../../dakhila/libVidyalaya/";
 require_once "$libDir/db.inc";
 require_once "$libDir/vidyalaya.inc";
+require_once "HTML/Template/ITX.php";
+require_once "$libDir/HtmlFactory.inc";
+require_once "../../MPDF53/mpdf.php";
 
 require("../../Classes/PHPMailer_v5.1/class.phpmailer.php");
 
@@ -588,6 +591,7 @@ class Admission {
   const DataFile = "/home/umesh/Dropbox/Vidyalaya-Management/Administration/2011.csv";
   const OrientationFile = "/home/umesh/workspace/vidphp/admission2011/orientation1.txt";
   const assesssmentFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/data/assessment.csv";
+  const rosterDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/roster/";
 
   private static function sendItemEmail($familyId, $cd, $pb, $bag) {
 		
@@ -730,7 +734,7 @@ CLOSING;
     }
     $done = array();
     // validate all registered familes from familytracker
-    foreach (FamilyTracker::RegisteredFamilies() as $item) {
+    foreach (FamilyTracker::GetRegisteredFamiliesYear($year) as $item) {
       if (array_key_exists($item->family, $enrolledFamily)) {
 	$done[$item->family] = 1;
       } else {
@@ -807,10 +811,183 @@ CLOSING;
       if(!array_key_exists($key, $teacherList))
 	print "Error: key $key is setup as teacher in volunteer but not found in teacher list\n";
     }
-
-
-
   }
+
+  public static function PrintVolunteers($year) {
+    $pdfDir = "/home/umesh/student2011";
+    foreach (Volunteers::GetAllYear($year) as $item) {
+      $full = $item->person->fullName();
+      $openingHtml = <<< AGREEMENT
+	<p>As part of providing Voluntary Services to Vidyalaya, I have read the Family Participation Agreement of Vidyalaya dated April 2011. 
+	I hereby agree to the Terms of the agreement and the Student Handbook.
+<table>
+<thead>
+<tr><th class="name">Name</th><th class="phone">Date</th><th class="name">Signature</th></tr>
+</thead>
+<tbody>
+	<tr><td>$full</td><td style="text-align: right;" class=input>&nbsp;/2011</td><td class=input>&nbsp;</td></tr>
+</tbody>
+</table> 
+<div style='font-size:50%'><p>
+
+Note: Please print, sign, date and bring this form to opening day, Septmber 18, 2011
+ Parsippany Hills High School. Review and mark any update to the personal information.</div>
+
+AGREEMENT;
+      $html = PrintFactory::GetHtmlForPersonDetail($item->person) . $openingHtml;
+
+      $mfskey=MFS::CodeFromId($item->MFS) . $item->mfsId;
+      $fileName = $pdfDir . "/Volunteer-" . $mfskey . ".pdf";
+      file_put_contents("$fileName", PrintFactory::HtmlToPdf($html));
+      die($fileName . "\n\n");
+    }
+  }
+
+  public static function OpeningDay($year) {
+    $fp = tmpfile();
+    if (!$fp) die ("could not open $filename for writing");
+    $pdfDir = "/home/umesh/student2011";
+    
+    // get all registered families
+    $family= array();
+    foreach (FamilyTracker::GetRegisteredFamiliesYear($year) as $item) {
+      $familyarray[$item->family] = $item->family;
+    }
+
+    $students = array(); $done = array();
+    foreach(Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake, $year) as $item) {
+      if (array_key_exists($item->student->id, $done)) continue;
+      $familyid= $item->student->family->id;
+      if (!array_key_exists($familyid, $familyarray)) die ("family id $familyid in enrollment is not registered");
+      if (array_key_exists($familyid, $students)) {
+	$students[$familyid] .= ", " . $item->student->id;
+      }else {
+	$students[$familyid] = $item->student->id;
+      }
+      $done[$item->student->id]=1;
+    }
+
+    $teachers= array();
+    foreach (Teachers::TeacherListYear($year) as $item) {
+      $key = MFS::CodeFromId($item->MFS). $item->mfsId;
+      $familyid = $item->person->home->id;
+      if (!array_key_exists($familyid, $familyarray)) continue; // they get printed elsewhere
+      if (array_key_exists($familyid, $teachers)) {
+	$teachers[$familyid] .= ", " . $key;
+      }else {
+	$teachers[$familyid] = $key;
+      }
+    }
+
+    $cashfile="/home/umesh/Dropbox/Vidyalaya-Management/Administration/foropeningday.csv";
+    if (($handle = fopen($cashfile, "r")) !== FALSE) {
+      $header = fgetcsv($handle, 0, ",");
+      $header = fgetcsv($handle, 0, ",");
+      $i=1;
+      $totalTuition=0;
+
+      while ((list($family,$Check , $base, $new , $DVD , $CD , $PB , $Bag , $Ann , $Total ,$foo, $ch1 , $ch2 , $ch3 )
+	      = fgetcsv($handle, 0, ",")) !== FALSE) {
+	if (!empty($family)) {
+
+	  $new = str_replace('$', "",$new);
+	  $DVD = str_replace('$', "",$DVD);
+	  $CD = str_replace('$', "",$CD);
+	  $PB = str_replace('$', "",$PB);
+	  $Bag = str_replace('$', "",$Bag);
+
+	  //	  if ($family==473) print "473:  DVD\n";
+	  if (empty($totalFamily[$family])) {
+	    $totalFamily[$family] =0;
+	    $totalnew[$family] = 0;
+	    $totalDVD[$family] = 0;
+	    $totalCD[$family] = 0;
+	    $totalPB[$family] = 0;
+	    $totalBag[$family] = 0;
+	  }
+	  $totalFamily[$family] +=$new+$DVD+$CD+$PB+$Bag;
+	  $totalnew[$family] += $new/50;
+	  $totalDVD[$family] += $DVD/10;
+	  $totalCD[$family] += $CD/10;
+	  $totalPB[$family] += $PB/10;
+	  $totalBag[$family] += $Bag/10;
+
+	}
+      }
+    }
+    foreach ($totalFamily as $familyid => $value){
+      if ($value == 0) continue; // no money
+      if (!array_key_exists($familyid, $familyarray)) die ("family id $familyid paid money but not registered");
+    }
+
+
+
+    fwrite($fp, "Fam, #, Stud, Teach, New, DVD, CD, PB, Bag, Parents\n");
+
+    foreach ($familyarray as $item) {
+      $csv = array();
+      $fileName = $pdfDir . "/Family-" . $item  . ".pdf";
+      $openingHtml = "<h3>Opening Day 2011 Item Delivery</h3>\n<table>";
+
+      $csv[]=$item;
+      $openingHtml .= "<tr><td>Family ID</td><td>$item</td></tr>\n";
+
+      $value = count(explode(",",  $students[$item]));
+      $csv[]= $value;
+      $openingHtml .= "<tr><td>Student Count</td><td>$value</td></tr>\n";
+
+      $value=$students[$item];
+      $csv[]=$value;
+      $openingHtml .= "<tr><td>Student Badges</td><td width='200px'>$value</td></tr>\n";
+
+      $value=array_key_exists($item, $teachers) ? $teachers[$item] : "";
+      $csv[]=$value;
+      $openingHtml .= "<tr><td>Teacher Badges</td><td>$value</td></tr>\n";
+
+      $value=$totalnew[$item] == 0 ? "" : $totalnew[$item];
+      $csv[]=$value;
+      $extraValue=$totalnew[$item] == 0 ? "" : "<span style='font-size:50%'>(Please tell us the T-shirt size(s))</span>";
+      $openingHtml .= "<tr><td>New Student Packages</td><td>$value $extraValue</td></tr>\n";
+
+      $value=$totalDVD[$item] == 0 ?  "": $totalDVD[$item];
+      $csv[]=$value;
+      $openingHtml .= "<tr><td>DVD</td><td>$value</td></tr>\n";
+
+      $value=$totalCD[$item] == 0 ?  "": $totalCD[$item];
+      $csv[]=$value;
+      $openingHtml .= "<tr><td>Audio CD</td><td>$value</td></tr>\n";
+
+      $value=$totalPB[$item] == 0 ?  "": $totalPB[$item];
+      $csv[]=$value;
+      $openingHtml .= "<tr><td>Prayer Book</td><td>$value</td></tr>\n";
+
+      $value=$totalBag[$item] == 0 ? "" : $totalBag[$item];
+      $csv[]=$value;
+      $openingHtml .= "<tr><td>Book Bag</td><td>$value</td></tr>\n";
+
+      $familyobj = Family::GetItemById($item);
+      $csv[]=$familyobj->parentsName();
+      $openingHtml .= "</table>\n <div style='font-size:50%'><p>Note: Please print and bring this form to opening day, Septmber 18, 2011 Parsippany Hills High School. Review and mark any update to the personal information.</div>";
+      $pdf = PrintFactory::HtmlToPdf(PrintFactory::GetHtmlForFamilyDetail($familyobj) . $openingHtml);
+
+
+      fputcsv($fp, $csv);
+      file_put_contents("$fileName", $pdf);
+
+      // now make the pdf
+      //  $mpdf=new mPDF();
+      //  $mpdf->WriteHTML($html);
+      //  return $mpdf->Output($pdfFile, "S");
+    }
+
+    $filename = self::rosterDir . "families.csv";
+    fseek($fp, 0);
+    file_put_contents("$fileName", fread($fp, 1024));
+    fclose($fp);
+
+    print "Total Families = " . count($familyarray) . ", Teaching families = " . count($teachers) . "\n";
+  }
+
 
 }
 
@@ -1134,9 +1311,12 @@ class TwoYearLayout {
   }
 }
 
+//Admission::OpeningDay(2011); exit();
+Admission::PrintVolunteers(2011); exit();
+
 //Admission::admissionConfirmationEmail(2011);exit();
 //Admission::itemDelivery(); exit();
-Admission::Validation(2011); exit();
+//Admission::Validation(2011); exit();
 
 
 //Evaluation::ProcessAllFiles(); exit();
@@ -1145,6 +1325,7 @@ Admission::Validation(2011); exit();
 //TwoYearLayout::checkFeePaid(); exit();
 //TwoYearLayout::assignClass(); exit();
 //TwoYearLayout::twoYearCsv(); exit();
+
 
 
 //OrientationCheck(); exit();

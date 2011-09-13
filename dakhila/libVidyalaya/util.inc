@@ -80,14 +80,6 @@ function GetSingleIntArgument() {
 
 }
 
-function HtmlToPdf($html) {
-	$html = str_replace('&nbsp;', '<span style="color:#fff;">x</span>',$html);
-	$dompdf = new DOMPDF();
-	$dompdf->load_html($html);
-	$dompdf->render();
-	return $dompdf->output();
-}
-
 function formatPhone($num) 
 { 
     $num = ereg_replace('[^0-9]', '', $num); 
@@ -101,6 +93,112 @@ function formatPhone($num)
     return $num; 
 }
 
+class PrintFactory {
+  function GetHtmlForFamilyDetail($family) {
+    // Header 
+    $template = new HTML_Template_ITX("/var/www/dakhila/templates");
+    $template->loadTemplatefile("Layout.tpl", true, true);
+    $template->addBlockFile('TOP', 'F_TOP', 'LayoutTop.tpl');
+    $template->touchBlock('F_TOP');
+    $html = $template->get();
+
+    // Family Detail Form - one per family
+    $template = new HTML_Template_ITX("/var/www/dakhila/templates");
+    $template->loadTemplatefile("Layout.tpl", true, true);
+    $template->addBlockFile('CONTENT', 'F_CONTENT', 'LayoutContent.tpl');
+    $template->touchBlock('F_CONTENT');
+    $template->setCurrentBlock('HEADER');
+    $template->setVariable("HEADER", '<a href=""><img src="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/images/Vheader2.jpg"
+		width="600" height="60" 
+		alt="php5 logo"/></a>');
+    $template->parseCurrentBlock();
+    $template->setCurrentBlock('FOOTER');
+    $template->setVariable("FOOTER", "Copyright (c) 2011 Vidyalya Inc.");
+    $template->parseCurrentBlock();
+
+    $template->addBlockFile('RESULT', 'F_RESULT', 'FamilyDetail.tpl');
+    $template->touchBlock('F_RESULT');
+    DisplayFamilyTemplate($template, $family, $students);
+    $html = $html . $template->get();	
+    return $html;
+  }
+
+  function GetHtmlForPersonDetail($person) {
+    // Header 
+    $template = new HTML_Template_ITX("/var/www/dakhila/templates");
+    $template->loadTemplatefile("Layout.tpl", true, true);
+    $template->addBlockFile('TOP', 'F_TOP', 'LayoutTop.tpl');
+    $template->touchBlock('F_TOP');
+    $html = $template->get();
+
+    // Family Detail Form - one per family
+    $template = new HTML_Template_ITX("/var/www/dakhila/templates");
+    $template->loadTemplatefile("Layout.tpl", true, true);
+    $template->addBlockFile('CONTENT', 'F_CONTENT', 'LayoutContent.tpl');
+    $template->touchBlock('F_CONTENT');
+    $template->setCurrentBlock('HEADER');
+    $template->setVariable("HEADER", '<a href=""><img src="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/images/Vheader2.jpg"
+		width="600" height="60" 
+		alt="php5 logo"/></a>');
+    $template->parseCurrentBlock();
+    $template->setCurrentBlock('FOOTER');
+    $template->setVariable("FOOTER", "Copyright (c) 2011 Vidyalya Inc.");
+    $template->parseCurrentBlock();
+
+    $template->addBlockFile('RESULT', 'F_RESULT', 'PersonDetail.tpl');
+    $template->touchBlock('F_RESULT');
+    DisplayPersonTemplate($template, $person);
+    $html = $html . $template->get();	
+    return $html;
+  }
+
+  function HtmlToPdf($html) {
+    $html = str_replace('&nbsp;', '<span style="color:#fff;">x</span>',$html);
+    $dompdf = new DOMPDF();
+    $dompdf->load_html($html);
+    $dompdf->render();
+    return $dompdf->output();
+  }
+
+  private static function footer() {
+    if ( isset($pdf) ) {
+          $font = Font_Metrics::get_font("helvetica", "bold");
+          $pdf->page_text(72, 18, "Header: {PAGE_NUM} of {PAGE_COUNT}", $font, 6, array(0,0,0));
+    }
+    if ( isset($pdf) ) {
+
+      // Open the object: all drawing commands will
+      // go to the object instead of the current page
+      $footer = $pdf->open_object();
+
+      $w = $pdf->get_width();
+      $h = $pdf->get_height();
+
+      // Draw a line along the bottom
+      $y = $h - 2 * $text_height - 24;
+      $pdf->line(16, $y, $w - 16, $y, $color, 1);
+
+      // Add an initals box
+      $font = Font_Metrics::get_font("helvetica", "bold");
+      $text = "Initials:";
+      $width = Font_Metrics::get_text_width($text, $font, $size);
+      $pdf->text($w - 16 - $width - 38, $y, $text, $font, $size, $color);
+      $pdf->rectangle($w - 16 - 36, $y - 2, 36, $text_height + 4, array(0.5,0.5,0.5), 0.5);
+
+      // Add a logo
+      $img_w = 2 * 72; // 2 inches, in points
+      $img_h = 1 * 72; // 1 inch, in points -- change these as required
+      $pdf->image("print_logo.png", "png", ($w - $img_w) / 2.0, $y - $img_h, $img_w, $img_h);
+
+      // Close the object (stop capture)
+      $pdf->close_object();
+
+      // Add the object to every page. You can
+      // also specify "odd" or "even"
+      $pdf->add_object($footer, "all");
+    }
+  }
+}
 
 Class Calendar {
 	const BaseYear = 2010

@@ -185,38 +185,9 @@ function printOneFamily($family) {
 	echo "printed $fileName\n";
 }
 
-function GetHtmlForFamilyDetail($family) {
-	// Header 
-	$template = new HTML_Template_ITX("/var/www/dakhila/templates");
-	$template->loadTemplatefile("Layout.tpl", true, true);
-	$template->addBlockFile('TOP', 'F_TOP', 'LayoutTop.tpl');
-	$template->touchBlock('F_TOP');
-	$html = $template->get();
-
-	// Family Detail Form - one per family
-	$template = new HTML_Template_ITX("/var/www/dakhila/templates");
-	$template->loadTemplatefile("Layout.tpl", true, true);
-	$template->addBlockFile('CONTENT', 'F_CONTENT', 'LayoutContent.tpl');
-	$template->touchBlock('F_CONTENT');
-	$template->setCurrentBlock('HEADER');
-	$template->setVariable("HEADER", '<a href=""><img src="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/images/Vheader2.jpg"
-		width="600" height="60" 
-		alt="php5 logo"/></a>');
-	$template->parseCurrentBlock();
-	$template->setCurrentBlock('FOOTER');
-	$template->setVariable("FOOTER", "Copyright (c) 2011 Vidyalya Inc.");
-	$template->parseCurrentBlock();
-
-	$template->addBlockFile('RESULT', 'F_RESULT', 'FamilyDetail.tpl');
-	$template->touchBlock('F_RESULT');
-	DisplayFamilyTemplate($template, $family, $students);
-	$html = $html . $template->get();	
-	return $html;
-}
-
 function printOneFamilyDetail($family) {
 	$printDir = "/home/umesh/student2011";
-	$pdf = HtmlToPdf(GetHtmlForFamilyDetail($family));
+	$pdf = PrintFactory::HtmlToPdf(PrintFactory::GetHtmlForFamilyDetail($family));
 	$fileName = $printDir . "/Family-" . $family->id . ".pdf";
 	file_put_contents("$fileName", $pdf);
 	echo "printed $fileName\n";

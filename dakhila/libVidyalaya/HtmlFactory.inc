@@ -41,8 +41,63 @@ function Layout(&$template) {
 	$template->setCurrentBlock('FOOTER');
 	$template->setVariable("FOOTER", "Copyright (c) 2011 Vidyalya Inc.");
 	$template->parseCurrentBlock();
+}
+
+// *****  Person Details
+function DisplayPersonTemplate (&$template, $person) {
+  $family=$person->home;
+	$templateName="HOME";
+	$template->setCurrentBlock($templateName);
+	$line2 = $family->address->addr2;
+	if (! empty($line2)) {
+		$template->setVariable("LINE2", ", ". $line2);
+	}
+	$template->setVariable("ID", $person->id());
+	$template->setVariable("LINE1", $family->address->addr1);
+	$template->setVariable("CITY", $family->address->city);
+	$template->setVariable("STATE", $family->address->state);
+	$template->setVariable("ZIP", $family->address->zipcode);
+	$template->setVariable("HOMEPHONE", $family->phone);
+	$template->parseCurrentBlock();
+
+	$templateName="PERSON";
+	$template->setCurrentBlock($templateName);
+	$template->parseCurrentBlock();
+	$template->setVariable("NAME", $person->fullName());
+	$template->setVariable("GENDER", $person->gender);
+	$template->setVariable("EMAIL", $person->email);
+	$template->setVariable("WORK", $person->workPhone);
+	$template->setVariable("CELL", $person->cellPhone);
+	$template->parseCurrentBlock();
+
+	if ($person->MFS == MFS::Student) {
+	$templateName="PARENTS";
+	$template->setCurrentBlock($templateName);
+
+	$template->setVariable("MF", "Father");
+	$template->setVariable("NAME", $family->father->fullName());
+	$template->setVariable("EMAIL", $family->father->email);
+	$template->setVariable("WORK", $family->father->workPhone);
+	$template->setVariable("CELL", $family->father->cellPhone);
+	$template->setVariable("ISCONTACTABLE", YesNoMap($family->father->IsContactable));
+	$template->parseCurrentBlock();
+
+	$template->setVariable("MF", "Mother");
+	$template->setVariable("EMAIL", $family->mother->email);
+	$template->setVariable("WORK", $family->mother->workPhone);
+	$template->setVariable("CELL", $family->mother->cellPhone);
+	$template->setVariable("NAME", $family->mother->fullName());
+	$template->setVariable("ISCONTACTABLE", YesNoMap($family->mother->IsContactable));
+	$template->parseCurrentBlock();
+
+	$templateName="SHOWPARENTS";
+	$template->setCurrentBlock($templateName);
+	$template->parseCurrentBlock();
+
+	}
 
 }
+
 
 // *****  Family Details
 function DisplayFamilyTemplate (&$template, $family, $students) {

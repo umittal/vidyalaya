@@ -60,11 +60,28 @@ class VidDb {
   private static function showerror() {
       die("Error " . mysql_errno() . " : " . mysql_error());
    }
+  
+  private static function showlocal($value) {
+    $sapi = php_sapi_name();
+    switch ( $sapi ) {
+    case "cli":
+      print "$value\n";
+      break;
+    }
+  }
    	 
   private static function connect() {
     if (!empty(self::$connection)) return;
-    if (!self::$connection =  mysql_connect(self::$hostname, self::$username, self::$password))
-      showerror("Cannot connect");
+    if (getenv('localvidyalaya')) {
+      self::showlocal( "\n\n\t*****Using local  database, may be out of sync");
+      self::showlocal( "\t**********************************************");
+      if (!self::$connection =  mysql_connect("localhost", self::$username, self::$password))
+	showerror("Cannot connect");
+    } else {
+      self::showlocal( "\n\n\t******Using production database");
+      if (!self::$connection =  mysql_connect(self::$hostname, self::$username, self::$password))
+	showerror("Cannot connect");
+    }
     if (!mysql_selectdb(self::$databasename, self::$connection))
       showerror();
   }
@@ -110,7 +127,7 @@ class VidDb {
     $sapi = php_sapi_name();
     switch ( $sapi ) {
     case "cli":
-      print "executing query: $query, count is " . count($result) . "\n";
+      //      print "executing query: $query, count is " . count($result) . "\n";
 
       break;
     }
