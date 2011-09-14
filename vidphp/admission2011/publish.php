@@ -3,6 +3,7 @@
 $libDir="../../dakhila/libVidyalaya/";
 require_once "$libDir/db.inc";
 require_once "$libDir/vidyalaya.inc";
+require_once "$libDir/reports.inc";
 
 require_once "../../Classes/PHPWord.php";
 require_once  "PHPExcel/PHPExcel/IOFactory.php";
@@ -292,16 +293,17 @@ class Publications {
     self::MailingListsAll($year);
   }
 
+
   public static function VolunteerListForHandbook($year) {
+    $fh = tmpfile();
+    if (!$fh) die ("could not open $filename for writing");
+
+    Reports::VolunteerListForHandbookHtml($year, false, $fh);
+
     $filename = self::rosterDir . "volunteer.html";
-    $fh = fopen("$filename", "w");
-    fwrite($fh,  "<p>Vidyalaya appreciates the following volunteers for their service.\n");
-    fwrite($fh, "<div id='teacherlist'>\n<table>\n");
-    fwrite($fh, "<tr><th class='rowhead' width='200px'>Name</th><th>Role</th></tr>\n");
-    foreach(Volunteers::GetAllYear($year) as $item) {
-      fwrite($fh, "<tr><td>" .  $item->person->fullName() . "</td><td>" . VolunteerRole::IdToString($item->role) . "</td></tr>\n"); 
-    }
-    fwrite($fh, "</table>\n</div>\n");
+    fseek($fh, 0);
+    file_put_contents("$filename", fread($fh, 1024));
+    print "wrote file $filename\n";
     fclose ($fh);
 
   }
@@ -331,6 +333,7 @@ class Publications {
     }
     fwrite($fh, "</table>\n</div>\n");
     fclose ($fh);
+    print "Wrote file $filename\n";
   }
 
 
@@ -739,7 +742,7 @@ class Publications {
 //Publications::RosterFromFile("/tmp/aa"); exit();
 //Publications::Roster(2011); exit();
 
-Publications::RosterSpa(2011); exit();
+//Publications::RosterSpa(2011); exit();
 
 //Publications::FullDumpFamilies();
 
@@ -747,7 +750,7 @@ Publications::RosterSpa(2011); exit();
 //Publications::CreateMailingLists(2011);exit();
 
 //Publications::VolunteerListForHandbook(2011); exit();
-//Publications::TeacherListForHandbook(2011);exit();
+Publications::TeacherListForHandbook(2011);exit();
 
 //Publications::SchoolDirectory(); exit();
 //Publications::TeacherDirectory(2011); exit (); // Directory of all Teachers

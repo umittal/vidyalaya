@@ -47,6 +47,18 @@ class VidBook {
 
 }
 
+class Reports {
+  public static function VolunteerListForHandbookHtml($year, $carryLinks, $fh) {
+    fwrite($fh,  "<p>Vidyalaya appreciates the following volunteers for their service.\n");
+    fwrite($fh, "<div id='teacherlist'>\n<table>\n");
+    fwrite($fh, "<tr><th class='rowhead' width='200px'>Name</th><th>Role</th></tr>\n");
+    foreach(Volunteers::GetAllYear($year) as $item) {
+      fwrite($fh, "<tr><td>" .  $item->person->fullName() . "</td><td>" . VolunteerRole::IdToString($item->role) . "</td></tr>\n"); 
+    }
+    fwrite($fh, "</table>\n</div>\n");
+  }
+}
+
 class RoomUtilization {
 	private static $objArray = Array();
 
