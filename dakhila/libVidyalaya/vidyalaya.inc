@@ -1192,6 +1192,17 @@ class Teachers {
     return implode(", ", $csv);
   }
 
+  public static function TeacherListClassTd($classId) {
+    $csv = array();
+    foreach (self::TeacherListClass($classId) as $teacher) {
+      $foo = $teacher->IsLead ? "<b>" . $teacher->person->fullName() ."</b>"  :  $teacher->person->fullName();
+      $foo .= "<br />" . $teacher->person->home->phone;
+      $foo .= "<br />" . $teacher->person->email;
+      $csv[] = $foo;
+    }
+    return implode("</td><td>", $csv);
+  }
+
 
   public static function TeacherListClass($classId) {
     $query = "select *

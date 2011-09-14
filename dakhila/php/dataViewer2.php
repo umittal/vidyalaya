@@ -4,6 +4,7 @@ require_once "HTML/Template/ITX.php";
 require_once "$rootDir/libVidyalaya/db.inc";
 require_once "$rootDir/libVidyalaya/vidyalaya.inc";
 require_once "$rootDir/libVidyalaya/HtmlFactory.inc";
+require_once "$rootDir/libVidyalaya/reports.inc";
 
 $command=$_GET["command"];
 if (empty($command)) $command="login";
@@ -391,6 +392,50 @@ EOT;
       break;
 
 		
+    // ************************************************************
+    case "Volunteers":
+      $year=2011;
+      $js = <<< NAMAKOOL
+<script type="text/javascript">
+$(document).ready( function() {
+    \$table = $("#maintable").tablesorter({widthFixed: true, widgets: ['zebra']
+	});
+
+});
+</script>
+NAMAKOOL;
+
+      $this->template->setCurrentBlock('RESULT');
+      $this->template->setVariable('RESULT', $js . Reports::VolunteerListV2($year, true));
+      $this->template->parseCurrentBlock();
+      print $this->template->get();
+      break;
+
+
+    // ************************************************************
+    case "Teachers":
+      $year=2011;
+      $js = <<< NAMAKOOL
+<script type="text/javascript">
+$(document).ready( function() {
+    \$table = $("#table1").tablesorter({widthFixed: true, widgets: ['zebra'],
+	  headers:{0:{sorter: false},1:{sorter: false},2:{sorter: false},3:{sorter: false}, }
+      });
+    \$table = $("#table2").tablesorter({widthFixed: true, widgets: ['zebra']});
+    \$table = $("#table3").tablesorter({widthFixed: true, widgets: ['zebra']});
+    \$table = $("#table4").tablesorter({widthFixed: true, widgets: ['zebra'] });
+
+});
+</script>
+NAMAKOOL;
+
+      $this->template->setCurrentBlock('RESULT');
+      $this->template->setVariable('RESULT', $js . Reports::TeacherListV2($year, true));
+      $this->template->parseCurrentBlock();
+      print $this->template->get();
+      break;
+
+
     // ************************************************************
     default:
       $html = "<p>Please specify a valid command for the data you want to see";

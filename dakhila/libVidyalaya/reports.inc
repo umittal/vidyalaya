@@ -48,6 +48,55 @@ class VidBook {
 }
 
 class Reports {
+  public static function VolunteerListV2($year, $carryLinks) {
+    $html = "<p>Vidyalaya appreciates the following volunteers for their service.\n";
+    $html .= '<table id="maintable" cellspacing="0" class="tablesorter" width="600px">' . "\n";
+    $html .= "<thead><tr><th>Name</th><th>Home</th><th>CELL</th><th>Role</th><th>Email</th></tr></thead><tbody>\n";
+    foreach(Volunteers::GetAllYear($year) as $item) {
+      $html .= "<tr><td>" .  $item->person->fullName() . "</td><td>";
+      $html .= $item->person->home->phone . "</td><td>" . $item->person->cellPhone . "</td><td>";
+      $html.=  VolunteerRole::IdToString($item->role) . "</td><td>" . $item->person->email . "</td></tr>\n"; 
+    }
+   $html .= "</tbody></table>\n";
+   return $html;
+  }
+
+  public static function TeacherListV2($year, $carryLinks) {
+    $teachercount=0; $done = array();
+    foreach (Teachers::TeacherListYear($year) as $teacher) {
+      $key = "$teacher->MFS:$teacher->mfsId";
+      if (!array_key_exists($key, $done)) {
+	$done[$key]=1;
+	$teachercount++;
+      }
+    }
+
+    $html="<p>The classes at Vidyalaya are made possible by the volunteerism of following $teachercount teachers.\n";
+
+    foreach (Department::GetAll() as $dept) {
+      $html .= "<h3>" . Department::NameFromId($dept) . "</h3>\n";
+      $html .= '<table id="table' . $dept .'" cellspacing="0" class="tablesorter">' . "\n";
+      $html .= "<thead><tr><th width=30px>Class</th><th>Room</th><th width=300px>Description</th>";
+      if ($dept == Department::Hindi) {
+	$html .= "<th colspan=3>Teachrs</th></tr></thead><tbody>\n";
+      } else {
+	$html .= "<th>Teachrs</th></tr></thead><tbody>\n";
+      }
+      foreach (AvailableClass::GetAllYearDepartment($dept, $year) as $class) {
+	$html .= "<tr><td>" .  $class->short() . "</td><td>" . $class->room->roomNumber;
+	$html .= "</td><td>" . $class->course->full . "</td><td>" ;
+	if ($dept == Department::Hindi) {
+	  $html .= Teachers::TeacherListClassTd($class->id) . "</td></tr>\n";
+	} else {
+	  $html .= Teachers::TeacherListClassHtml($class->id) . "</td></tr>\n";
+	}
+      }
+      $html .= "</tbody></table>\n";
+    }
+
+   return $html;
+  }
+  
   public static function VolunteerListForHandbookHtml($year, $carryLinks, $fh) {
     fwrite($fh,  "<p>Vidyalaya appreciates the following volunteers for their service.\n");
     fwrite($fh, "<div id='teacherlist'>\n<table>\n");

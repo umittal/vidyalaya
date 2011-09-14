@@ -82,6 +82,9 @@
 	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=Family&familyId=47">Family Detail</tr>
 	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=Student">Student Detail</tr>
 	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=Room">Room Detail</tr>
+	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=Teachers">Teachers</tr>
+	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=Volunteers">Volunteers</tr>
+	  <tr><td></td></tr>
 	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=Registration&familyId=47">Registration Form</tr>
 	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=MedicalForm&studentId=1446">Medical Form</tr>
 	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=RegistrationSummary">2011 Registration Summary</tr>
