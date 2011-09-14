@@ -6,7 +6,9 @@ require_once "$rootDir/libVidyalaya/vidyalaya.inc";
 require_once "$rootDir/libVidyalaya/HtmlFactory.inc";
 require_once "$rootDir/libVidyalaya/reports.inc";
 
-$command=$_GET["command"];
+
+
+$command=isset($_GET["command"]) ? $_GET["command"] : "login";
 if (empty($command)) $command="login";
 $dataviewer = new DataViewer("../templates");
 switch ($command) {
@@ -78,7 +80,7 @@ dojo.require("dijit.form.Form");
     <div class="formTitle">Dakhila Portal Login</div>
 
       <div class="formRow">
-      <label for="email">Email Address:<label>
+      <label for="email">Email Address:</label>
 <input type="text" size="35" name="email" id="email" 
            dojoType="dijit.form.ValidationTextBox" 
            required="true"  
@@ -90,7 +92,7 @@ dojo.require("dijit.form.Form");
 	</div>
 
       <div class="formRow">
-      <label for="password">Password:<label>
+      <label for="password">Password:</label>
        <input type="password" size="10" name="password" id="password" 
            dojoType="dijit.form.ValidationTextBox" 
            required="true"  

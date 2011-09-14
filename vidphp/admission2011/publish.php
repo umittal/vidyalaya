@@ -364,6 +364,8 @@ class Publications {
 	$language[$item->student->id] = $item->class;
       }
     }
+
+    fwrite($fh, "id, first, last, lc, lr, cc, cr\n");
     foreach ($list as $item) {
       $csv = array();
       $csv[] = $item->id;
@@ -382,6 +384,7 @@ class Publications {
     $filename = self::rosterDir . "teacherbadge.csv";
     $fh = fopen("$filename", "w");
 
+    fwrite($fh, "id, mfs, class, room, name\n");
     foreach (Teachers::TeacherListYear($year) as $item) {
       $csv = array();
       $csv[] = $item->mfsId;
@@ -683,7 +686,8 @@ class Publications {
 		
 
     $objPHPExcel->getActiveSheet()->setTitle($class->short());
-    $objPHPExcel->getActiveSheet()->getCell("B2")->setValue($class->short());
+    $shortValue = $class->course->department == Department::Culture ? $class->short() . " Attendance Sheet" : $class->short();
+    $objPHPExcel->getActiveSheet()->getCell("B2")->setValue($shortValue);
     $objPHPExcel->getActiveSheet()->getCell("B3")->setValue("Room: " . $class->room->roomNumber);
 			
     $objPHPExcel->getActiveSheet()->getRowDimension("1")->setVisible(TRUE);
@@ -746,11 +750,11 @@ class Publications {
 
 //Publications::FullDumpFamilies();
 
-//Publications::BadgeFile(2011); exit();
+Publications::BadgeFile(2011); exit();
 //Publications::CreateMailingLists(2011);exit();
 
 //Publications::VolunteerListForHandbook(2011); exit();
-Publications::TeacherListForHandbook(2011);exit();
+//Publications::TeacherListForHandbook(2011);exit();
 
 //Publications::SchoolDirectory(); exit();
 //Publications::TeacherDirectory(2011); exit (); // Directory of all Teachers
