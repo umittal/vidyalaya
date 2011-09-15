@@ -143,6 +143,87 @@ class Reports {
 
    return $html;
   }
+
+  public static function lcmatrix($year) {
+    $language = array(); $culture=array();
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake, $year) as $item) {
+      $done[$item->student->id] = $item->student;
+      //      print "Printing Student " . $item->student->fullName() . "\n";
+      if ($item->class->course->department != Department::Culture) {
+	if (array_key_exists($item->student->id, $language) )
+	  print "oh oh , i am going to overwrite language for $item->student->id\n";
+	$language[$item->student->id] = $item->class;
+      } else {
+	if (array_key_exists($item->student->id, $culture) )
+	  print "oh oh , i am going to overwrite culture for $item->student->id\n";
+	$culture[$item->student->id] = $item->class;
+      }
+    }
+
+    // Create LC map
+    $lcmap=array(); $ccarray=array();
+    foreach ($culture as $studentId => $class) {
+      $ccarray[$class->short()] =1;
+      $key = $language[$studentId]->short() . ':' .$class->short();
+      array_key_exists($key, $lcmap) ? $lcmap[$key]++ : $lcmap[$key]=1;
+    }
+    ksort($ccarray);
+    $i=0;
+
+    $html="<table id='table1' cellspacing='0' class='tablesorter'>\n";
+    $html .= "<thead><tr><th>LANG</th>";
+    //    printf("%5s", "LANG"); 
+    $vt=array();
+    foreach ($ccarray as $key=>$item) {
+      $vt[$i]=0;
+      $ccarray[$key]=$i++; 
+      //      printf("%5s", $key);
+      $html .= "<th>$key</th>";
+    }
+    //    printf(" TOTAL\n"); 
+    $html .= "<th>Total</th></tr></thead>\n";
+    $vt[$i]=0;
+
+    $lang2d=array();
+    $total=0; ksort($lcmap);
+    foreach ($lcmap as $key=>$count) {
+      $exp = explode(':', $key);
+      $j = $ccarray[$exp[1]];
+      $lang2d[$exp[0]][$j] = $count;
+      $total += $count;
+    }
+
+    foreach($lang2d as $key=>$v1) {
+      //      printf ("%5s", $key); 
+      $html .= "<tr><td>$key</td>";
+      $t =0;
+      for ($i=0; $i< count($ccarray); $i++) {
+	if (isset($v1[$i])) {
+	  //	  printf ("%5s", $v1[$i]);
+	  $html .= "<td> $v1[$i]</td>";
+	  
+	  $t += $v1[$i]; $vt[$i]+=$v1[$i];
+	} else { 
+	  //	  printf ("%5s", "");
+	  $html .= "<td></td>";
+	}
+      }
+      $vt[$i]+=$t; 
+      //      printf ("%5d\n", $t); 
+      $html .= "<td>$t</td></tr>\n";
+    }
+    //    print "TOTAL"; 
+    $html .= "<tr><td>Total</td>";
+    foreach ($vt as $c) {
+      //      printf("%5d", $c);
+      $html .= "<td>$c</td>";
+    }
+    $html .= "</tr>\n";
+    //    print "\n$total\n";
+    return $html;
+  }
+
+
   
   public static function VolunteerListForHandbookHtml($year, $carryLinks, $fh) {
     fwrite($fh,  "<p>Vidyalaya appreciates the following volunteers for their service.\n");

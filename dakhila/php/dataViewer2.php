@@ -460,6 +460,36 @@ NAMAKOOL;
       break;
 
     // ************************************************************
+    case "lcmatrix":
+      $style = <<<LOCALSTYLE
+<script type="text/javascript">
+$(document).ready( function() {
+    \$table = $("#table1").tablesorter({widthFixed: true, widgets: ['zebra'],
+	  headers:{0:{sorter: false},1:{sorter: false},2:{sorter: false},3:{sorter: false}, 4:{sorter: false},
+                   5:{sorter: false},6:{sorter: false},7:{sorter: false}, 8:{sorter: false},9:{sorter: false},
+         10:{sorter: false},11:{sorter: false},12:{sorter: false}, 13:{sorter: false},14:{sorter: false},15:{sorter: false}
+
+	}
+
+ });
+
+});
+</script>
+      <style type="text/css">
+	td {padding-left: 15px; text-align: right;padding-top: 5px;}
+	tr.odd {background-color: #F0F0F6;}
+</style>
+
+LOCALSTYLE;
+
+      $year=2011;
+      $this->template->setCurrentBlock('RESULT');
+      $this->template->setVariable('RESULT', $style . Reports::lcmatrix($year));
+      $this->template->parseCurrentBlock();
+      print $this->template->get();
+      break;		
+
+    // ************************************************************
     case "person":
       $mfs = isset($_GET['MFS']) ?  $_GET['MFS'] : null;
       $id = isset($_GET['id']) ?  $_GET['id'] : null;

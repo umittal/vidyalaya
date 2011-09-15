@@ -48,6 +48,17 @@
 	    </td><td>List of Students in any class</td>
 	  </tr>
 
+	  <tr><td>
+	      <button dojoType="dijit.form.Button" type="button" >
+		Language Culture Matrix
+		<script type="dojo/method" event="onClick" args="evt">
+		  window.open('/dakhila/php/dataViewer2.php?command=lcmatrix', '_self', 'location=no' );
+		</script>
+	      </button>
+
+	    </td><td>Common students between any two classes</td>
+	  </tr>
+
 	  
 	  <tr><td colspan=2>&nbsp;</td></tr>
 	  <tr><td colspan=2>Database Lookup</td></tr>
@@ -84,6 +95,7 @@
 	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=Room">Room Detail</tr>
 	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=Teachers">Teachers</tr>
 	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=Volunteers">Volunteers</tr>
+	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=lcmatrix">Language/Culture Matrix</tr>
 	  <tr><td></td></tr>
 	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=Registration&familyId=47">Registration Form</tr>
 	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=MedicalForm&studentId=1446">Medical Form</tr>

@@ -468,12 +468,12 @@ class Publications {
     $fh = tmpfile();
     if (!$fh) die ("could not open $filename for writing");
     fwrite ($fh, "ID, First, Last, Language, , Culture, ,\n");
+
+
     $language = array(); $culture=array();
-
-
     foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake, $year) as $item) {
       $done[$item->student->id] = $item->student;
-      print "Printing Student " . $item->student->fullName() . "\n";
+      //      print "Printing Student " . $item->student->fullName() . "\n";
       if ($item->class->course->department != Department::Culture) {
 	if (array_key_exists($item->student->id, $language) )
 	  print "oh oh , i am going to overwrite language for $item->student->id\n";
@@ -510,12 +510,12 @@ class Publications {
       }
       
       fputcsv($fh, $csv);
-      self::printOneStudent($student, $lc, $cc);
+      //      self::printOneStudent($student, $lc, $cc);
     }
 
     $filename = self::rosterDir . "StudentsSpa.csv";
     fseek($fh, 0);
-    file_put_contents("$filename", fread($fh, 1024));
+    //    file_put_contents("$filename", fread($fh, 1024));
     fclose($fh);
   }
 
@@ -546,7 +546,7 @@ class Publications {
 
 
   public static function RosterSpa($year) {
-    //    self::RosterSpaStudents($year);
+    self::RosterSpaStudents($year);
     self::RosterSpaTeachers($year);
   }
 
@@ -746,6 +746,7 @@ class Publications {
 //Publications::RosterFromFile("/tmp/aa"); exit();
 //Publications::Roster(2011); exit();
 
+Reports::lcmatrix(2011); exit();
 //Publications::RosterSpa(2011); exit();
 
 //Publications::FullDumpFamilies();
@@ -756,7 +757,7 @@ class Publications {
 //Publications::VolunteerListForHandbook(2011); exit();
 //Publications::TeacherListForHandbook(2011);exit();
 
-Publications::SchoolDirectory(); exit();
+//Publications::SchoolDirectory(); exit();
 //Publications::TeacherDirectory(2011); exit (); // Directory of all Teachers
 //Publications::VolunteerDirectory(2011); exit (); // Directory of all Volunteers
 //Publications::ClassDirectory(2011); exit (); // Directory of all classes, with and without email
