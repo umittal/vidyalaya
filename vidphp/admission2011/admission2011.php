@@ -1318,7 +1318,7 @@ Teachers::AddTeacher(79, "hetalapurva@gmail.com", 0) ; exit();
 
 //Admission::admissionConfirmationEmail(2011);exit();
 //Admission::itemDelivery(); exit();
-//Admission::Validation(2011); exit();
+Admission::Validation(2011); exit();
 
 
 //Evaluation::ProcessAllFiles(); exit();

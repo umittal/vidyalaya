@@ -304,7 +304,7 @@ SQLREGISTRATIONSUMMAY;
       $year = isset($_GET['year']) ?  $_GET['year'] : null;
       if ($year == null) $year=Calendar::CurrentYear();
       $facility = isset($_GET['facility']) ?  $_GET['facility'] : null;
-      if ($facility =="") $facility=Facility::Eastlake;
+      if ($facility =="") $facility=Facility::PHHS;
 
       $url = htmlentities($_SERVER['PHP_SELF']) . "?command=AvailableCourse";
 
@@ -336,8 +336,8 @@ SQLREGISTRATIONSUMMAY;
         autoComplete="false"
         forceValidOption="true"
 			      >
-		<option selected value="1">Eastlake Elementary School</option>
-		<option  value="2">Parsippany Hills High School</option>
+		<option value="1">Eastlake Elementary School</option>
+		<option selected  value="2">Parsippany Hills High School</option>
       </select>
    <input type="submit" name="submit" value="Under Construction"><br>
     </div>
@@ -369,7 +369,7 @@ EOT;
       $year = isset($_GET['year']) ?  $_GET['year'] : null;
       if ($year == null) $year=Calendar::CurrentYear();
       $facility = isset($_GET['facility']) ?  $_GET['facility'] : null;
-      if ($facility =="") $facility=Facility::Eastlake;
+      if ($facility =="") $facility=Facility::PHHS;
 
       $url = htmlentities($_SERVER['PHP_SELF']) . "?command=$command";
 

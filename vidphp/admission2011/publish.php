@@ -236,9 +236,10 @@ class Publications {
   }
 
   private static function MailingListsVolunteers($year) {
-    $filename="volunteers.txt";
+    $filename=self::MAILINGLISTDIR . "/volunteers.txt";
 
-    $fp=popen("sort -u --output=self::MAILINGLISTDIR/$filename", "w");
+    $fp=popen("sort -u --output=$filename", "w");
+    if (!$fp) die ("could not open $filename for writing\n");
     foreach(Volunteers::GetAllYear(2011) as $item) {
       switch ($item->MFS) {
       case MFS::Mother:
@@ -261,8 +262,9 @@ class Publications {
   }
 
   private static function MailingListsAll($year) {
-    $filename="allEmails.csv";
-    $fp=fopen("self::MAILINGLISTDIR/$filename", "w");
+    $filename=self::MAILINGLISTDIR . "/allEmails.csv";
+    $fp=fopen($filename, "w");
+    if (!$fp) die("Could not open $filemae for writing\n");
     foreach(Emails::GetAll() as $item) {
       $csv = array();
       $csv[] = $item->email;
@@ -746,13 +748,12 @@ class Publications {
 //Publications::RosterFromFile("/tmp/aa"); exit();
 //Publications::Roster(2011); exit();
 
-Reports::lcmatrix(2011); exit();
 //Publications::RosterSpa(2011); exit();
 
 //Publications::FullDumpFamilies();
 
 //Publications::BadgeFile(2011); exit();
-//Publications::CreateMailingLists(2011);exit();
+Publications::CreateMailingLists(2011);exit();
 
 //Publications::VolunteerListForHandbook(2011); exit();
 //Publications::TeacherListForHandbook(2011);exit();

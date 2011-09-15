@@ -29,7 +29,7 @@
 	      <button dojoType="dijit.form.Button" type="button" >
 		Available Courses
 		<script type="dojo/method" event="onClick" args="evt">
-		  window.open('/dakhila/php/dataViewer2.php?command=AvailableCourse&facility=1&year=2011', '_self', 'location=no' );
+		  window.open('/dakhila/php/dataViewer2.php?command=AvailableCourse&facility=2&year=2011', '_self', 'location=no' );
 		</script>
 	      </button>
 
@@ -77,7 +77,7 @@
 	      <button dojoType="dijit.form.Button" type="button" >
 		Rooms
 		<script type="dojo/method" event="onClick" args="evt">
-		  window.open('/dakhila/php/dataViewer2.php?command=Rooms&facility=1', '_self', 'location=no' );
+		  window.open('/dakhila/php/dataViewer2.php?command=Rooms&facility=2', '_self', 'location=no' );
 		</script>
 	      </button>
 	    </td><td>Rooms available to hold classes</td>
