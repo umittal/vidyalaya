@@ -748,7 +748,7 @@ class Publications {
 
 //Publications::RosterSpa(2011); exit();
 
-//Publications::FullDumpFamilies();
+Publications::FullDumpFamilies();
 
 Publications::BadgeFile(2011); exit();
 //Publications::CreateMailingLists(2011);exit();

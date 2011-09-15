@@ -61,6 +61,13 @@ class Reports {
    return $html;
   }
 
+  private static function TeacherDetail($teacher) {
+    $foo = $teacher->IsLead ? "<b>" . $teacher->person->fullName() ."</b>"  :  $teacher->person->fullName();
+    $foo .= "<br />" . $teacher->person->home->phone;
+    $foo .= "<br />" . $teacher->person->email;
+    return $foo;
+  }
+
   public static function TeacherListV2($year, $carryLinks) {
     $teachercount=0; $done = array();
     foreach (Teachers::TeacherListYear($year) as $teacher) {
@@ -76,20 +83,35 @@ class Reports {
     foreach (Department::GetAll() as $dept) {
       $html .= "<h3>" . Department::NameFromId($dept) . "</h3>\n";
       $html .= '<table id="table' . $dept .'" cellspacing="0" class="tablesorter">' . "\n";
-      $html .= "<thead><tr><th width=30px>Class</th><th>Room</th><th width=300px>Description</th>";
-      if ($dept == Department::Hindi) {
-	$html .= "<th colspan=3>Teachrs</th></tr></thead><tbody>\n";
-      } else {
-	$html .= "<th>Teachrs</th></tr></thead><tbody>\n";
-      }
+      $html .= "<thead><tr><th width=30px>Class</th><th>Room</th>";
+      $html .= "<th colspan=3>Teachers</th>";
+
+      $html .= "<th width=300px>Description</th></tr></thead><tbody>\n";
       foreach (AvailableClass::GetAllYearDepartment($dept, $year) as $class) {
-	$html .= "<tr><td>" .  $class->short() . "</td><td>" . $class->room->roomNumber;
-	$html .= "</td><td>" . $class->course->full . "</td><td>" ;
-	if ($dept == Department::Hindi) {
-	  $html .= Teachers::TeacherListClassTd($class->id) . "</td></tr>\n";
-	} else {
-	  $html .= Teachers::TeacherListClassHtml($class->id) . "</td></tr>\n";
+	
+	$i=0;$teacherlist = array(); foreach (Teachers::TeacherListClass($class->id) as $teacher) {$teacherlist[$i++] = $teacher;}
+	$rowcount=intval(count($teacherlist)/3);
+	if (count($teacherlist) %3 > 0 || $rowcount==0) $rowcount++;
+
+	$html .= "<tr><td rowspan=$rowcount valign='top'>" .  $class->short() . "</td>";
+	$html .= "<td rowspan=$rowcount valign='top'>" . $class->room->roomNumber . "</td>";
+	
+	for ($i=0; $i < 3; $i++) {
+	  if ($i < count($teacherlist)) {$html .= "<td width='150px'>" . self::TeacherDetail($teacherlist[$i]) . "</td>";}
+	  else {$html .= "<td width='150px'>&nbsp;</td>";}
 	}
+	
+	$html .= "<td rowspan=$rowcount valign='top'>" .  $class->course->full .  "</td></tr>\n";
+	for ($j=1; $j < $rowcount; $j++) {
+	  $html .= "<tr>";
+	for ($k=0; $k < 3; $k++) {
+	  if ($i < count($teacherlist)) {$html .= "<td width='150px'>" . self::TeacherDetail($teacherlist[$i]) . "</td>";}
+	  else {$html .= "<td width='150px'>&nbsp;</td>";}
+	  $i++;
+	}
+	  $html .= "</tr>\n";
+	}
+
       }
       $html .= "</tbody></table>\n";
     }

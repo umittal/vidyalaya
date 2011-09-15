@@ -423,9 +423,18 @@ $(document).ready( function() {
     \$table = $("#table1").tablesorter({widthFixed: true, widgets: ['zebra'],
 	  headers:{0:{sorter: false},1:{sorter: false},2:{sorter: false},3:{sorter: false}, }
       });
-    \$table = $("#table2").tablesorter({widthFixed: true, widgets: ['zebra']});
-    \$table = $("#table3").tablesorter({widthFixed: true, widgets: ['zebra']});
-    \$table = $("#table4").tablesorter({widthFixed: true, widgets: ['zebra'] });
+    \$table = $("#table2").tablesorter({widthFixed: true, widgets: ['zebra'],
+	  headers:{0:{sorter: false},1:{sorter: false},2:{sorter: false},3:{sorter: false}, }
+});
+    \$table = $("#table3").tablesorter({widthFixed: true, widgets: ['zebra'],
+	  headers:{0:{sorter: false},1:{sorter: false},2:{sorter: false},3:{sorter: false}, }
+});
+    \$table = $("#table4").tablesorter({widthFixed: true, widgets: ['zebra'],
+	  headers:{0:{sorter: false},1:{sorter: false},2:{sorter: false},3:{sorter: false}, }
+ });
+    \$table = $("#table5").tablesorter({widthFixed: true, widgets: ['zebra'],
+	  headers:{0:{sorter: false},1:{sorter: false},2:{sorter: false},3:{sorter: false}, }
+ });
 
 });
 </script>
