@@ -57,6 +57,8 @@ class VidDb {
   private static $password = "Praveen38";
   private static $connection = null;
 
+  public static $dbserver=null;
+
   private static function showerror() {
       die("Error " . mysql_errno() . " : " . mysql_error());
    }
@@ -72,15 +74,17 @@ class VidDb {
    	 
   private static function connect() {
     if (!empty(self::$connection)) return;
-    if (getenv('localvidyalaya')) {
+    if (getenv('localvidyalaya') || $_SERVER['SERVER_NAME'] == "localhost") {
       self::showlocal( "\n\n\t*****Using local  database, may be out of sync");
       self::showlocal( "\t**********************************************");
       if (!self::$connection =  mysql_connect("localhost", self::$username, self::$password))
 	showerror("Cannot connect");
+      self::$dbserver="localhost";
     } else {
       self::showlocal( "\n\n\t******Using production database");
       if (!self::$connection =  mysql_connect(self::$hostname, self::$username, self::$password))
 	showerror("Cannot connect");
+      self::$dbserver=self::$hostname;
     }
     if (!mysql_selectdb(self::$databasename, self::$connection))
       showerror();
@@ -113,6 +117,7 @@ class VidDb {
     $result = self::query($query);
     if (mysql_num_rows($result) != 1) return false;
     $_SESSION["loginUsername"] = $username; // Register the loginUsername
+    $_SESSION["dbserver"] = self::$dbserver; // database server I am connected to
     $_SESSION["loginIP"] = $_SERVER["REMOTE_ADDR"]; // Register the IP address that started this session
 
     return true;

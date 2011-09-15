@@ -27,6 +27,23 @@ class DataViewer {
   private $template = null;
   private $thispage = null;
 
+  private function SetMenu() {
+    $this->template->setCurrentBlock('MENU');
+    $table = "<table width='100%'><tr>";
+    $table .= "<td><a href=\"$this->thispage?command=home\">Home</a></td>";
+    $table .= "<td><a href=\"$this->thispage?command=Teachers\">Teachers</a></td>";
+
+    $username=$_SESSION["loginUsername"];
+    $dbserver=$_SESSION["dbserver"];
+    $logout = "<a href='" . $_SERVER['PHP_SELF'] . "?command='logout'>Logout</a>($username,$dbserver )";
+    $count=$_SESSION['count'];
+    $rightside = isset($_SESSION['loginUsername']) ? "$logout" : "Please Login $count";
+    $table .= "<td align='right'>$rightside</td>";
+    $table .= "</tr></table>\n";
+    $this->template->setVariable('MENU', $table);
+    $this->template->parseCurrentBlock();
+  }
+
   private function Layout() {
     $this->template->loadTemplatefile("Layout.tpl", true, true);
 
@@ -42,14 +59,6 @@ class DataViewer {
 		alt="php5 logo"/></a>');
     $this->template->parseCurrentBlock();
 
-    $this->template->setCurrentBlock('MENU');
-    $table = "<table width='100%'><tr>";
-    $table .= "<td><a href=\"$this->thispage?command=home\">Home</a></td>";
-    $table .= "<td><a href=\"$this->thispage?command=AvailableCourse&facility=1&year=2011\">Classes</a></td>";
-    $table .= "<td align='right'><a href=\"$this->thispage?command=logout\">Logout</a></td>";
-    $table .= "</tr></table>\n";
-    $this->template->setVariable('MENU', $table);
-    $this->template->parseCurrentBlock();
 
 	
     $this->template->addBlockFile('BOTTOM', 'F_BOTTOM', 'LayoutBottom.tpl');
@@ -124,6 +133,7 @@ LOGIN;
   // ************************************************************
   public function DoIt($command) {
     VidSession::sessionAuthenticate();
+    $this->SetMenu();
     switch ($command) {
 
     // ************************************************************
@@ -372,6 +382,9 @@ EOT;
     case "Room":
       $url = htmlentities($_SERVER['PHP_SELF']) . "?command=$command";
       $roomId = isset($_POST['ID']) ?  $_POST['ID'] : null;
+      if (empty($roomId) && isset($_GET["id"])) {
+	$roomId=$_GET["id"];
+      }
 
       $form = <<<EOT
 	<form method="post" action="$url">
@@ -421,19 +434,19 @@ NAMAKOOL;
 <script type="text/javascript">
 $(document).ready( function() {
     \$table = $("#table1").tablesorter({widthFixed: true, widgets: ['zebra'],
-	  headers:{0:{sorter: false},1:{sorter: false},2:{sorter: false},3:{sorter: false}, }
+	  headers:{0:{sorter: false},1:{sorter: false},2:{sorter: false},3:{sorter: false}, 4:{sorter: false}}
       });
     \$table = $("#table2").tablesorter({widthFixed: true, widgets: ['zebra'],
-	  headers:{0:{sorter: false},1:{sorter: false},2:{sorter: false},3:{sorter: false}, }
+	  headers:{0:{sorter: false},1:{sorter: false},2:{sorter: false},3:{sorter: false}, 4:{sorter: false}}
 });
     \$table = $("#table3").tablesorter({widthFixed: true, widgets: ['zebra'],
-	  headers:{0:{sorter: false},1:{sorter: false},2:{sorter: false},3:{sorter: false}, }
+	  headers:{0:{sorter: false},1:{sorter: false},2:{sorter: false},3:{sorter: false}, 4:{sorter: false}}
 });
     \$table = $("#table4").tablesorter({widthFixed: true, widgets: ['zebra'],
-	  headers:{0:{sorter: false},1:{sorter: false},2:{sorter: false},3:{sorter: false}, }
+	  headers:{0:{sorter: false},1:{sorter: false},2:{sorter: false},3:{sorter: false}, 4:{sorter: false}}
  });
     \$table = $("#table5").tablesorter({widthFixed: true, widgets: ['zebra'],
-	  headers:{0:{sorter: false},1:{sorter: false},2:{sorter: false},3:{sorter: false}, }
+	  headers:{0:{sorter: false},1:{sorter: false},2:{sorter: false},3:{sorter: false}, 4:{sorter: false}}
  });
 
 });
@@ -446,6 +459,30 @@ NAMAKOOL;
       print $this->template->get();
       break;
 
+    // ************************************************************
+    case "person":
+      $mfs = isset($_GET['MFS']) ?  $_GET['MFS'] : null;
+      $id = isset($_GET['id']) ?  $_GET['id'] : null;
+      $person = Person::PersonFromId($mfs, $id);
+      DisplayPerson($this->template, $person);
+      print $this->template->get();
+      break;		
+
+
+    // ************************************************************
+    case "help":
+      $query="select 1";
+      $result  = VidDb::query($query);
+
+      $html = "<p> I want to help you my son";
+      $a = $_SERVER['SERVER_NAME'];
+      $html .= "<p> server name is $a";
+      $a=$_SERVER['PHP_SELF'];
+      $html .= "<p> porgram name  $a";
+      $a=VidDb::$dbserver;
+      $html .= "<p> database server $a";
+      print $html;
+      break;
 
     // ************************************************************
     default:

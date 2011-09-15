@@ -62,7 +62,9 @@ class Reports {
   }
 
   private static function TeacherDetail($teacher) {
-    $foo = $teacher->IsLead ? "<b>" . $teacher->person->fullName() ."</b>"  :  $teacher->person->fullName();
+    $name = $teacher->IsLead ? "<b>" . $teacher->person->fullName() ."</b>"  :  $teacher->person->fullName();
+    $url=$_SERVER['PHP_SELF'] . "?command=person&MFS=$teacher->MFS&id=$teacher->mfsId";
+    $foo = "<a href='$url'>$name</a>";
     $foo .= "<br />" . $teacher->person->home->phone;
     $foo .= "<br />" . $teacher->person->email;
     return $foo;
@@ -78,23 +80,46 @@ class Reports {
       }
     }
 
+
     $html="<p>The classes at Vidyalaya are made possible by the volunteerism of following $teachercount teachers.\n";
 
     foreach (Department::GetAll() as $dept) {
-      $html .= "<h3>" . Department::NameFromId($dept) . "</h3>\n";
+      $classCount = array(); $total=0;
+      foreach (Enrollment::GetAllEnrollmentForDeptSession($dept, $year) as $item) {
+	if (empty($classCount[$item->class->id])) $classCount[$item->class->id]=0;
+	$classCount[$item->class->id]++;
+	$total++;
+      }
+
+      $deptTeachers = Teachers::TeacherListDepartment($dept, $year);
+
+      $avgStudentPerClass = $total/count($classCount); $avgStudentPerTeacher = $total/count($deptTeachers);
+      $html .= "<h3>" . Department::NameFromId($dept) . "</h3> (" . count($classCount) .  " classes, $total students, " . count($deptTeachers) . " Teachers";
+      $html .= sprintf(", Student Count (Average): Per Class: %.2f , Per Teacher: %.2f)\n",$avgStudentPerClass,  $avgStudentPerTeacher);
       $html .= '<table id="table' . $dept .'" cellspacing="0" class="tablesorter">' . "\n";
-      $html .= "<thead><tr><th width=30px>Class</th><th>Room</th>";
+      $html .= "<thead><tr><th>Class</th><th>#</th><th width=30px>Room</th>";
       $html .= "<th colspan=3>Teachers</th>";
 
       $html .= "<th width=300px>Description</th></tr></thead><tbody>\n";
       foreach (AvailableClass::GetAllYearDepartment($dept, $year) as $class) {
 	
-	$i=0;$teacherlist = array(); foreach (Teachers::TeacherListClass($class->id) as $teacher) {$teacherlist[$i++] = $teacher;}
+	$i=0;$teacherlist = array(); 
+
+	foreach ($deptTeachers as $teacher)  {
+	  if ($teacher->class->id == $class->id) 
+	    $teacherlist[$i++] = $teacher;
+	}
+
 	$rowcount=intval(count($teacherlist)/3);
 	if (count($teacherlist) %3 > 0 || $rowcount==0) $rowcount++;
 
 	$html .= "<tr><td rowspan=$rowcount valign='top'>" .  $class->short() . "</td>";
-	$html .= "<td rowspan=$rowcount valign='top'>" . $class->room->roomNumber . "</td>";
+
+	$url=$_SERVER['PHP_SELF'] . "?command=ClassRoster&classId=$class->id";
+	$html .= "<td rowspan=$rowcount valign='top'><a href='$url'>" . $classCount[$class->id] . "</a></td>";
+
+	$url=$_SERVER['PHP_SELF'] . "?command=Room&id=" . $class->room->id;
+	$html .= "<td rowspan=$rowcount valign='top'><a href='$url'>" . $class->room->roomNumber . "</a></td>";
 	
 	for ($i=0; $i < 3; $i++) {
 	  if ($i < count($teacherlist)) {$html .= "<td width='150px'>" . self::TeacherDetail($teacherlist[$i]) . "</td>";}

@@ -861,6 +861,19 @@ class Enrollment{
 		return self::ArrayFromQuery($query);	
 	}
 
+	public static function GetAllEnrollmentForDeptSession($dept, $year) {
+		if ($year >= 2010) $year -= 2010;
+		
+		$query = "select * 
+		from Enrollment
+			inner join AvailableClass on Enrollment.availableClass = AvailableClass.id
+			inner join Rooms on AvailableClass.room = Rooms.id
+                        inner join CourseCatalog on CourseCatalog.id = AvailableClass.course
+		where AvailableClass.year = $year and CourseCatalog.department = $dept
+		";
+		return self::ArrayFromQuery($query);	
+	}
+
 	public static function GetAllEnrollmentForRoom($roomId) {
 		$query = "select * 
 		from Enrollment
@@ -938,17 +951,16 @@ class Person { // a new concept to break away from praveen's students2003 and pa
     return $person;
   }
 
-  // actually this works for any object that has mfs and mfsid. This is an unfortunate benefit of lack of type checking
-  public static function PersonFromTeacher($teacher) {
-      switch ($teacher->MFS) {
+  public static function PersonFromId($mfs, $id) {
+      switch ($mfs) {
       case MFS::Mother:
-	$family = Family::GetItemById($teacher->mfsId);
-	return self::PersonFromParent($family->mother, $teacher->MFS, $teacher->mfsId);
+	$family = Family::GetItemById($id);
+	return self::PersonFromParent($family->mother, $mfs, $id);
       case MFS::Father:
-	$family = Family::GetItemById($teacher->mfsId);
-	return self::PersonFromParent($family->father, $teacher->MFS, $teacher->mfsId);
+	$family = Family::GetItemById($id);
+	return self::PersonFromParent($family->father, $mfs, $id);
       case MFS::Student:
-	$student = Student::GetItemById($teacher->mfsId);
+	$student = Student::GetItemById($id);
 	return self::PersonFromStudent($student);
       default: 
 	die ("unexpected type of item found in volunteers, id $teacher->mfsId, type = $teacher->MFS \n");
@@ -956,6 +968,10 @@ class Person { // a new concept to break away from praveen's students2003 and pa
     
   }
 
+  // actually this works for any object that has mfs and mfsid. This is an unfortunate benefit of lack of type checking
+  public static function PersonFromTeacher($teacher) {
+    return Person::PersonFromId($teacher->MFS, $teacher->mfsId);
+  }
 
   function __construct() {
   }

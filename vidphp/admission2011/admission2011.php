@@ -1311,8 +1311,10 @@ class TwoYearLayout {
   }
 }
 
+Teachers::AddTeacher(79, "hetalapurva@gmail.com", 0) ; exit();
+
 //Admission::OpeningDay(2011); exit();
-Admission::PrintVolunteers(2011); exit();
+//Admission::PrintVolunteers(2011); exit();
 
 //Admission::admissionConfirmationEmail(2011);exit();
 //Admission::itemDelivery(); exit();

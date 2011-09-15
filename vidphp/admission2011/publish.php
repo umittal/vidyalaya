@@ -748,15 +748,15 @@ class Publications {
 
 //Publications::RosterSpa(2011); exit();
 
-Publications::FullDumpFamilies();
+//Publications::FullDumpFamilies();
 
-Publications::BadgeFile(2011); exit();
+//Publications::BadgeFile(2011); exit();
 //Publications::CreateMailingLists(2011);exit();
 
 //Publications::VolunteerListForHandbook(2011); exit();
 //Publications::TeacherListForHandbook(2011);exit();
 
-//Publications::SchoolDirectory(); exit();
+Publications::SchoolDirectory(); exit();
 //Publications::TeacherDirectory(2011); exit (); // Directory of all Teachers
 //Publications::VolunteerDirectory(2011); exit (); // Directory of all Volunteers
 //Publications::ClassDirectory(2011); exit (); // Directory of all classes, with and without email

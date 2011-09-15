@@ -98,6 +98,15 @@ function DisplayPersonTemplate (&$template, $person) {
 
 }
 
+// ******** Student
+function DisplayPerson(&$template, $person) {
+  if ($person == null) return;
+	$template->addBlockFile('RESULT', 'F_RESULT', 'PersonDetail.tpl');
+	$template->touchBlock('F_RESULT');
+	DisplayPersonTemplate($template, $person);
+}
+
+
 
 // *****  Family Details
 function DisplayFamilyTemplate (&$template, $family, $students) {
@@ -474,7 +483,8 @@ function DisplayAvailableClass($template, $year, $facility) {
 		$templateName="CLASS";
 		$template->setCurrentBlock($templateName);
 
-		$classLink=sprintf("<a href=\"/dakhila/php/dataViewer2.php?command=ClassRoster&classId=%s\">%s</a>", $item->id, $item->id);
+		$url=$_SERVER['PHP_SELF'];
+		$classLink=sprintf("<a href=\"$url?command=ClassRoster&classId=%s\">%s</a>", $item->id, $item->id);
 		$template->setVariable("DEPARTMENT", Department::NameFromId( $item->course->department));
 		$template->setVariable("ROOM", $item->room->roomNumber);
 		$template->setVariable("ROOMID", $item->room->id);
