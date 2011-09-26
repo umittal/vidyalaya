@@ -83,7 +83,7 @@ class Publications {
     //$table->addCell(500, $styleCellBTLR)->addText('Row 5', $fontStyle);
 
     $families = array();
-    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake, 2011);
+    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, 2011);
 
     // Add more rows / cells
     foreach (FamilyTracker::RegisteredFamilies() as $item) {
@@ -113,9 +113,11 @@ class Publications {
       $table->addCell(2000)->addText($family->mother->fullName());
       $table->addCell(2000)->addText($family->father->fullName());
       $cell = $table->addCell(2000);
-      $cell->addText($family->address->addr1);
-      $cell->addText($family->address->city . ", ". $family->address->state . " " . $family->address->zipcode);
-      $cell->addText($family->phone);
+      if ($family->directory == 1) {
+	$cell->addText($family->address->addr1);
+	$cell->addText($family->address->city . ", ". $family->address->state . " " . $family->address->zipcode);
+	$cell->addText($family->phone);
+      }
       
       // Write Student First name in last column
       $cell = $table->addCell(2000);
@@ -235,6 +237,23 @@ class Publications {
     }
   }
 
+  private static function MailingListsTeachers($year) {
+    $fparray=array();
+    foreach (Teachers::TeacherListYear($year) as $item) {
+      $dept=$item->class->course->department;
+      if (empty($fparray[$dept])) $fparray[$dept]=tmpfile();
+      foreach(Emails::GetEmailArray($item->MFS, $item->mfsId) as $email) fwrite($fparray[$dept], $email . "\n");
+    }
+
+    foreach ($fparray as $dept => $fp) {
+      $filename=self::MAILINGLISTDIR . Department::NameFromId($dept) . ".txt";
+      saveTempFp($fp, $filename);
+      print "saved file $filename\n";
+    }
+
+    // copy files to real locations
+  }
+
   private static function MailingListsVolunteers($year) {
     $filename=self::MAILINGLISTDIR . "/volunteers.txt";
 
@@ -290,6 +309,8 @@ class Publications {
   }
 
   public static function CreateMailingLists($year) {
+    self::MailingListsTeachers($year);
+    return;
     self::MailingListsClass($year);
     self::MailingListsVolunteers($year);
     self::MailingListsAll($year);
@@ -304,7 +325,7 @@ class Publications {
 
     $filename = self::rosterDir . "volunteer.html";
     fseek($fh, 0);
-    file_put_contents("$filename", fread($fh, 1024));
+    file_put_contents("$filename", stream_get_contents($fh));
     print "wrote file $filename\n";
     fclose ($fh);
 
@@ -358,7 +379,7 @@ class Publications {
     $fh = fopen("$filename", "w");
 
     $list = array(); $language= array(); $culture= array();
-    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake, $year) as $item) {
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year) as $item) {
       $list[$item->student->id] = $item->student;
       if ($item->class->course->department == Department::Culture ) {
 	$culture[$item->student->id] = $item->class;
@@ -367,10 +388,9 @@ class Publications {
       }
     }
 
-    fwrite($fh, "id, first, last, lc, lr, cc, cr\n");
+    fwrite($fh, "first, last, lc, lr, cc, cr,id,lang \n");
     foreach ($list as $item) {
       $csv = array();
-      $csv[] = $item->id;
       $csv[] = $item->firstName;
       $csv[] = $item->lastName;
       $csv[] = $language[$item->id]->short();
@@ -379,6 +399,8 @@ class Publications {
 	$csv[] = $culture[$item->id]->short();
 	$csv[] = $culture[$item->id]->room->roomNumber;
       }
+      $csv[] = $item->id;
+      $csv[] = Department::NameFromId($item->languagePreference);
       fputcsv($fh, $csv);
     }
     fclose($fh);
@@ -438,7 +460,9 @@ class Publications {
 
   private static function printOneStudent($student, $lc, $cc) {
     $printDir = "/home/umesh/student2011";
-    $html = "<html><head><style type='text/css'>td {padding-left:10px;}</style></head><body><img src='/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/PHHS2.png' width='700' height='680' alt='layout'>\n";
+    $html = "<html><head><style type='text/css'>td {padding-left:10px;}</style></head><body>\n";
+    $html .= "<img src='/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/Layouts/PHHSLayout.jpg' width='632' height='700' alt='layout'>\n";
+
     //    $html .= "<h3>Student</h3>";
     $html .=  "<table>\n";
     $html .= "<tr><td>ID</td><td>$student->id (Family: ". $student->family->id . ", Home Phone: " . $student->family->phone .  ")</td>\n";
@@ -450,7 +474,7 @@ class Publications {
     $html .= "<p>&nbsp;</p>";
     $html .=  "<table>\n";
     $html .= "<tr><th>Time</th><th>Class</th><th>Location</th><th>Teachers</th></tr>\n";
-    $html .= "<tr><td>09:30 - 10:00</td><td>Prayers</td><td>Gym</td><td>Mukesh Dave et. al.</td>\n";
+    $html .= "<tr><td>09:30 - 10:00</td><td>Prayers</td><td>Cafeteria</td><td>Mukesh Dave et. al.</td>\n";
     if (!is_null($lc)) {
       $html .= "<tr><td>$lc->startTime - $lc->endTime</td><td>". $lc->short() . "</td><td>" . $lc->room->roomNumber . "</td>";
       $html .= "<td>" . Teachers::TeacherListClassHtml($lc->id) .  "\n";
@@ -473,7 +497,7 @@ class Publications {
 
 
     $language = array(); $culture=array();
-    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake, $year) as $item) {
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year) as $item) {
       $done[$item->student->id] = $item->student;
       //      print "Printing Student " . $item->student->fullName() . "\n";
       if ($item->class->course->department != Department::Culture) {
@@ -512,12 +536,12 @@ class Publications {
       }
       
       fputcsv($fh, $csv);
-      //      self::printOneStudent($student, $lc, $cc);
+      self::printOneStudent($student, $lc, $cc);
     }
 
     $filename = self::rosterDir . "StudentsSpa.csv";
     fseek($fh, 0);
-    //    file_put_contents("$filename", fread($fh, 1024));
+    file_put_contents("$filename", stream_get_contents($fh));
     fclose($fh);
   }
 
@@ -527,16 +551,17 @@ class Publications {
     $printDir = "/home/umesh/student2011";
     foreach (Teachers::TeacherListYear($year) as $item) {
       print "Printing Teacher " .$item->person->fullName() . "\n";
-      $html = "<html><head><style type='text/css'>td {padding-left:10px;}</style></head><body><img src='/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/PHHS2.png' width='700' height='680' alt='layout'>\n";
+      $html = "<html><head><style type='text/css'>td {padding-left:10px;}</style></head><body>\n";
+      $html .= "<img src='/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/Layouts/PHHSLayout.jpg' width='632' height='700' alt='layout'>\n";
 
       $html .=  "<table>\n";
       $mfskey=MFS::CodeFromId($item->MFS) . $item->mfsId;
       $html .= "<tr><td>ID</td><td>" . $mfskey . "</td>\n";
-      $html .= "<tr><td>Name</td><td>" . $item->person->fullName() ."</td>\n";
+      $html .= "<tr><td>Teacher Name</td><td>" . $item->person->fullName() ."</td>\n";
       $html .=  "</table>\n";
 
       $cc = $item->class;
-      $html .=  "<table>\n";
+      $html .=  "<p><table>\n";
       $html .= "<tr><th>Time</th><th>Class</th><th>Location</th><th>Teachers</th></tr>\n";
       $html .= "<tr><td>$cc->startTime - $cc->endTime</td><td>". $cc->short() . "</td><td>" . $cc->room->roomNumber . "</td>";
       $html .= "<td>" . Teachers::TeacherListClassHtml($cc->id) .  "\n";
@@ -548,8 +573,8 @@ class Publications {
 
 
   public static function RosterSpa($year) {
-    self::RosterSpaStudents($year);
-    self::RosterSpaTeachers($year);
+     self::RosterSpaStudents($year);
+     self::RosterSpaTeachers($year);
   }
 
 

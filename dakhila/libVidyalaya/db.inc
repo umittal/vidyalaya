@@ -129,13 +129,7 @@ class VidDb {
     //    error_log($query);
     if (!($result = mysql_query($query, self::$connection))) self::showerror();
 
-    $sapi = php_sapi_name();
-    switch ( $sapi ) {
-    case "cli":
-      //      print "executing query: $query, count is " . count($result) . "\n";
-
-      break;
-    }
+    self::showlocal($query);
     return $result;
   }
    	 

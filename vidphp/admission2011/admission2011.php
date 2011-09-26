@@ -317,8 +317,16 @@ class Mail {
 		return self::SetupMailCommon("Admission2011@vidyalaya.us", "Vidyalaya Admissions", "Praveen38");
 	}
 	
-	private static function SetupMailSPA() {
+	public static function SetupMailSPA() {
 		return self::SetupMailCommon("spa@vidyalaya.us", "Student and Parent Affairs", "vasudha");
+	}
+
+	public static function SetupMailInfo() {
+		return self::SetupMailCommon("info@vidyalaya.us", "Vidyalaya Information", "praveen");
+	}
+
+	public static function SetupMailUmesh() {
+		return self::SetupMailCommon("umesh@vidyalaya.us", "Vidyalaya Information", "Praveen38");
 	}
 	
 	private static function SetupMail() {
@@ -340,30 +348,29 @@ class Mail {
 		return $mail;
 	}
 
-	// set the TO address field of mail to family's email address
-	private static function SetFamilyAddress(&$mail, $family, $production) {
-		if ($production == 0 ) {
-			$mail->AddAddress("voting@vidyalaya.us", "Testing email");
-			return;
-		}
 
+	private static function SetEmailAddress(&$mail, $email, $name, $production) {
+	  if ($production == 0 ) {
+	    $mail->AddAddress("voting@vidyalaya.us", "Testing email");
+	    return;
+	  }
 
-		foreach (explode(";", $family->mother->email) as $toAddress) {
-			if (!empty($toAddress)) {
-				print "I will send to ". $family->id . ": Mother: " . $family->mother->fullName() . ": " .  $toAddress . "\n";
-				$mail->AddAddress($toAddress, $family->mother->fullName());
-			}
+	  foreach (explode(";", $email) as $toAddress) {
+	    if (!empty($toAddress))
+	      $mail->AddAddress($toAddress, $name);
+	  }
+	}
 
-		};
+	public static function SetPersonAddress(&$mail, $person, $production) {
+	  print "I will send to ". $person->id() . ": Person: " . $person->fullName() . ": " .  $person->email . "\n";
+	  self::SetEmailAddress($mail, $person->email, $person->fullName(), $production);
+	}
 
-		foreach (explode(";", $family->father->email) as $toAddress) {
-			if (!empty($toAddress)) {
-				print "I will send to ". $family->id . ": Father: " . $family->father->fullName() . ": " .  $toAddress . "\n";
-				$mail->AddAddress($toAddress, $family->father->fullName());
-			}
-
-		}
-
+	public  static function SetFamilyAddress(&$mail, $family, $production) {
+	  print "I will send to ". $family->id . ": Mother: " . $family->mother->fullName() . ": " .  $family->mother->email . "\n";
+	  self::SetEmailAddress($mail, $family->mother->email, $family->mother->fullName(), $production);
+	  print "I will send to ". $family->id . ": Father: " . $family->father->fullName() . ": " .  $family->father->email . "\n";
+	  self::SetEmailAddress($mail, $family->father->email, $family->father->fullName(), $production);
 	}
 
 	public static function  mailFamilyFromAdmission($family, $subject, $body, $production) {
@@ -664,6 +671,74 @@ ITEMEMAIL;
 
   // ***********************
 
+  private static function FamilyOpeningDay($familyId, $enrollment) {
+    $family = Family::GetItemById($familyId);
+
+    $body = <<<FAMILYOPENINGDAY
+      <p> (Please print the attachments in this email and bring it with you tomorrow)
+<p>
+It gives us immense pleasure to inform you that we are on track to have another great school year. First day of school is Sunday, September 18, 2011 at Parsippany Hills High School, 20 Rita Drive, Parsippany. (attached map)
+<p>
+ALL parents must come on this day for a mandatory meeting (auditorium). New parents please arrive at 8:30 AM (cafeteria, we will hand out material - print attachment) and continuing families please arrive at 9:00 AM (auditorium). Attached also you will find your room assignment. Your timeliness and patience will be greatly appreciated.
+<p>
+ALL students must come prepared to school with the following:
+<ul>
+<li> Prayer books (new kids will receive their free copy)
+<li> One inch 3-ring binder
+<li> Pencils with erasers
+</ul>
+
+<p>
+Next week, parents of KG and 1st Grade students will be getting a separate e-mail from their respective teachers about the additional arts/crafts supplies needed. All other course materials are provided to the students throughout the year.
+<p>
+ALL parents, We will send you a weekly Newsletter every Tuesday night, this will have messages from your language and culture teachers and will help you get prepared for any upcoming events. Also, please check our website www.vidyalaya.us for the latest calendar of events, newsletter, policies, curriculum, contact names, etc
+<p>
+Safe and Supporting environment: For our kids safety - we strongly recommend that no cars be parked for drop off or pickup in front of the school. Drive very carefully when around the school. As a volunteer organization we support eachother and make it a fun learning experience for our kids. We welcome new volunteers and have a variety of teams to choose from, contact us at SPA@vidyalaya.us and also bring the completed participation agreement.
+<p>
+Regards,
+<p>
+
+SPA (Student and Parent Affairs management team)<br />(sent by: Vasudha Sharma)
+
+FAMILYOPENINGDAY;
+
+    $footer="";
+      $production=1;
+      $subject = "Vidyalaya Opening Day, Family- $family->id";
+
+      print "Trying to send email to id " . $family->id . "\n";
+      //      if ($family->id != 436) return;
+      if ($production == 0) $subject = "[Test] $subject";
+      $mail = Mail::SetupMailSpa();
+      Mail::SetFamilyAddress(&$mail, $family, $production);
+      $mail->Subject = $subject;
+      $salutation = "<p>Dear " . $family->parentsName() . ",";
+      $mail->Body = $salutation . $body . $footer;
+      $mail->AltBody = "This is the body when user views in plain text format, opening day $family->id"; //Text Body
+
+      $filename="/home/umesh/student2011/Family-" . $family->id . ".pdf";
+      $mail->AddAttachment($filename); // attachment
+
+
+    $list = null; $done=array();
+    foreach($enrollment as $item) {
+      if (array_key_exists($item->student->id, $done)) continue;
+      if ($item->student->family->id == $familyId) {
+	$filename="/home/umesh/student2011/Student-" . $item->student->id . ".pdf";
+	$mail->AddAttachment($filename); // attachment
+
+	$done[$item->student->id] = 1;
+      }
+    }
+
+    if(!$mail->Send()) {
+      echo "Mailer Error: Family: $family->id: " . $mail->ErrorInfo . "\n";
+    }  else {
+      echo "Message has been sent, Family: $family->id:\n";
+    }
+  }
+
+
   private static function admissionConfirmationEmailFamily($familyId, $tuition, $enrollment) {
 		
     $family = Family::GetItemById($familyId);
@@ -706,7 +781,7 @@ CLOSING;
   }
 
   public static function admissionConfirmationEmail($year) {
-    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake, $year);
+    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year);
     $i=1;
     $fp = fopen("/tmp/familylist.csv", "w");
     foreach (FamilyTracker::RegisteredFamilies() as $item) {
@@ -719,7 +794,121 @@ CLOSING;
       $csv[]=$family->father->fullName();
       $csv[]=$family->address->OneLineAddress();
       fputcsv($fp, $csv);
-      self::admissionConfirmationEmailFamily($item->family, $item->tuition, $enrollment);
+      //      self::admissionConfirmationEmailFamily($item->family, $item->tuition, $enrollment);
+      self::FamilyOpeningDay($item->family, $enrollment);
+    }
+  }
+
+  public static function TeacherEmail($year) {
+    foreach (Teachers::TeacherListYear($year) as $item) {
+      $person=$item->person;
+      $classshort=$item->class->short();
+      $room=$item->class->room->roomNumber;
+      $body = <<<TEACHEREMAIL
+<p>(please print attachments as you consider necessary)
+<p>Thank you for volunteering to teach  $classshort class in room number $room at Parsippany Hills High School, 20 Rita Drive, Morris Plains (<a href="http://maps.google.com/maps?daddr=Parsippany-Troy+Hills+Township,+New+Jersey+(Parsippany+Hills+High+School)&hl=en&ll=40.861323,-74.456422&spn=0.002836,0.005681&sll=40.861371,-74.456422&sspn=0.002739,0.005681&geocode=CYyExFx_jj4jFXV_bwIdj-GP-yEx9DwpNb5Kzg&vpsrc=0&mra=mift&t=h&z=18">Directions</a>) starting September 18, 2011.  
+
+Please print attached  layout of school with your class information and bring it with you Sunday. Please be advised that the schedule for tomorrow will be as follows:  
+<ul>
+<li>8:30 New Parents Arrive
+<li>9:00 All Continuing Parents/Teachers Arrive
+<li>9:25 Prayer/Assembly Session
+<li>10:00 Language Class
+<li>11:00 Culture Class
+<li>11:30 KG Dismissal
+<li>11:45 All Other Classes Dismissal
+</ul>
+
+<p>
+Please arrive at school as early as possible so you have the opportunity to find your classroom and become familiar with the school layout prior to the Prayer/Assembly session.  New parents will arrive at 8:30 and Prayer/Assembly will start at 9:25am sharp.
+<ul>
+<li>Language teachers:</li> At the conclusion of Assembly/Prayer class, please escort your students from the Auditorium to your classroom.  At the end of the language class, please stay in your room until the Culture teacher arrives.  Students should never be left unattended in the classroom at any time.
+<p>
+<li>Culture teachers:</li> Please reach your designated classroom 5 minutes before the class begins to monitor the students, and stay in the classroom until all students have vacated at the end of class. 
+</ul>
+<p>
+The coordinators for specific teams may send additional communications as needed. We have attached the attendance sheet and a roster of students for your class. Please print these attachments and bring them with you.  
+<p>Looking forward to another great year,
+
+<p>(The above  message is sent by Umesh Mittal  on behalf of various team leaders for Teaching Volunteers.)
+
+
+TEACHEREMAIL;
+
+      $footer = "";
+      $subject="Welcome to Vidyalaya 2011";
+      $production=1;
+
+      print "Trying to send email to id " . $person->id() . "\n";
+      if ($person->id() != "F227") continue;
+      if ($production == 0) $subject = "[Test] $subject";
+      $mail = Mail::SetupMailUmesh();
+      Mail::SetPersonAddress($mail, $person, $production);
+      $mail->Subject = $subject;
+      $salutation = "<p>Dear " . $person->fullName() . ",";
+      $mail->Body = $salutation . $body . $footer;
+      $mail->AltBody = "This is the body when user views in plain text format"; //Text Body
+
+      $filename="/home/umesh/student2011/Teacher-" . $person->id() . ".pdf";
+      $mail->AddAttachment($filename); // attachment
+
+      $department=Department::NameFromId($item->class->course->department);
+      $filename="/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/attendance/$department/excel/$classshort.xlsx";
+      $mail->AddAttachment($filename); // attachment
+      $filename="/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/roster/word/ClassWide/$classshort.docx";
+      $mail->AddAttachment($filename); // attachment
+
+      if(!$mail->Send()) {
+	echo "Mailer Error: Person: " . $person->id(). ": " . $mail->ErrorInfo . "\n";
+      }  else {
+	echo "Message has been sent, Person: " .$person->id() . ":\n";
+      }
+    }
+  }
+
+
+
+  public static function VolunteerEmail($year) {
+    foreach (Volunteers::GetAllYear($year) as $item) {
+      $person=$item->person;
+      $body = <<<VOLUNTEEREMAIL
+<p>
+	<p>On behalf of Board of Trustees, Vidyalaya would like to thank you for volunteering at Vidyalaya. This year over 200 families have registered their kids to come to school. We appreciate your efforts to help us manage the school.
+<p>Attached please find your personal information that we have in our database along with the Participation Agreement signed by all participants. We request you to read the participation agreement,  mark any changes in the personal information sign and date  it at the bottom and bring it with you when you come to our facilities.
+
+<p>Regards,
+
+<p>Vidyalaya Inc.<br />(sent by: Umesh Mittal)<p>
+
+<p>ps: Please see the Google satellite image of the school below
+
+<img src="http://www.vidyalaya.us/modx/assets/images/phhs-maps.jpg"></img>
+
+VOLUNTEEREMAIL;
+      $footer = "";
+      $subject="Welcome to Vidyalaya 2011";
+
+
+      $production=1;
+      print "Trying to send email to id " . $person->id() . "\n";
+      //      if ($person->id() != "M9") continue;
+      if ($production == 0) $subject = "[Test] $subject";
+      $mail = Mail::SetupMailInfo();
+      Mail::SetPersonAddress($mail, $person, $production);
+      $mail->Subject = $subject;
+      $salutation = "<p>Dear " . $person->fullName() . ",";
+      $mail->Body = $salutation . $body . $footer;
+      $mail->AltBody = "This is the body when user views in plain text format"; //Text Body
+
+      $filename="/home/umesh/student2011/Volunteer-" . $person->id() . ".pdf";
+      $mail->AddAttachment($filename); // attachment
+      $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Management/Admission/ParticipationAgreement.pdf"); // attachment
+
+      if(!$mail->Send()) {
+	echo "Mailer Error: Person: " . $person->id(). ": " . $mail->ErrorInfo . "\n";
+      }  else {
+	echo "Message has been sent, Person: " .$person->id() . ":\n";
+      }
     }
   }
 	
@@ -728,7 +917,7 @@ CLOSING;
     print "1. Validate Registered Parents between enrollment and familytracker\n";
     // get list of families from enrollment
     $enrolledFamily = array();
-    foreach(Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake, $year) as $item) {
+    foreach(Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year) as $item) {
       $enrolledStudent[$item->student->id] = 1;
       $enrolledFamily[$item->student->family->id] = 1;
     }
@@ -811,6 +1000,8 @@ CLOSING;
       if(!array_key_exists($key, $teacherList))
 	print "Error: key $key is setup as teacher in volunteer but not found in teacher list\n";
     }
+
+    print "todo 5. validate student language preference and language assignment are aligned\n";
   }
 
   public static function PrintVolunteers($year) {
@@ -839,7 +1030,6 @@ AGREEMENT;
       $mfskey=MFS::CodeFromId($item->MFS) . $item->mfsId;
       $fileName = $pdfDir . "/Volunteer-" . $mfskey . ".pdf";
       file_put_contents("$fileName", PrintFactory::HtmlToPdf($html));
-      die($fileName . "\n\n");
     }
   }
 
@@ -855,7 +1045,7 @@ AGREEMENT;
     }
 
     $students = array(); $done = array();
-    foreach(Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake, $year) as $item) {
+    foreach(Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year) as $item) {
       if (array_key_exists($item->student->id, $done)) continue;
       $familyid= $item->student->family->id;
       if (!array_key_exists($familyid, $familyarray)) die ("family id $familyid in enrollment is not registered");
@@ -968,27 +1158,21 @@ AGREEMENT;
       $familyobj = Family::GetItemById($item);
       $csv[]=$familyobj->parentsName();
       $openingHtml .= "</table>\n <div style='font-size:50%'><p>Note: Please print and bring this form to opening day, Septmber 18, 2011 Parsippany Hills High School. Review and mark any update to the personal information.</div>";
-      $pdf = PrintFactory::HtmlToPdf(PrintFactory::GetHtmlForFamilyDetail($familyobj) . $openingHtml);
-
 
       fputcsv($fp, $csv);
-      file_put_contents("$fileName", $pdf);
 
-      // now make the pdf
-      //  $mpdf=new mPDF();
-      //  $mpdf->WriteHTML($html);
-      //  return $mpdf->Output($pdfFile, "S");
+            $pdf = PrintFactory::HtmlToPdf(PrintFactory::GetHtmlForFamilyDetail($familyobj) . $openingHtml);
+            file_put_contents("$fileName", $pdf);
     }
-
-    $filename = self::rosterDir . "families.csv";
+    
+    fflush($fp);
     fseek($fp, 0);
-    file_put_contents("$fileName", fread($fp, 1024));
+    $filename = self::rosterDir . "families.csv";
+    file_put_contents("$filename", stream_get_contents($fp));
     fclose($fp);
 
     print "Total Families = " . count($familyarray) . ", Teaching families = " . count($teachers) . "\n";
   }
-
-
 }
 
 
@@ -1109,7 +1293,7 @@ class TwoYearLayout {
   }
 	
   private static function currentYearFromDatabase () {
-    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake,2011) as $enrollment) {
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS,2011) as $enrollment) {
       if (empty(self::$objArray[$enrollment->student->id])) self::$objArray[$enrollment->student->id] = new TwoYearLayout();
       $twoyear = self::GetItemById($enrollment->student->id);
       //print "setting this year value for $enrollment->student->id\n";
@@ -1122,7 +1306,7 @@ class TwoYearLayout {
     $student = Student::GetItemById($studentId);
     if (empty($student)) print "student not found for id ==$studentId==";
     if (empty(self::$objArray[$studentId])) {
-      print "I am here for student $studentId, found in current year from file\n";
+      //      print "I am here for student $studentId, found in current year from file\n";
       self::$objArray[$studentId] = new TwoYearLayout();
       $twoyear = self::GetItemById($studentId);
       $twoyear->thisYear->updateFromStudent($student);
@@ -1311,14 +1495,18 @@ class TwoYearLayout {
   }
 }
 
-Teachers::AddTeacher(79, "hetalapurva@gmail.com", 0) ; exit();
+//Teachers::AddTeacher(79, "hetalapurva@gmail.com", 0) ; exit();
+//Admission::VolunteerEmail(2011);exit();
+Admission::TeacherEmail(2011);exit();
+
+
 
 //Admission::OpeningDay(2011); exit();
 //Admission::PrintVolunteers(2011); exit();
 
 //Admission::admissionConfirmationEmail(2011);exit();
 //Admission::itemDelivery(); exit();
-Admission::Validation(2011); exit();
+//Admission::Validation(2011); exit();
 
 
 //Evaluation::ProcessAllFiles(); exit();

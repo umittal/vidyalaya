@@ -1090,6 +1090,12 @@ Class Emails {
     }
   }
 
+  public static function GetEmailArray($mfs, $mfsId) {
+    $list = array();
+    foreach(self::GetAll() as $item) if ($item->MFS == $mfs && $item->mfsId == $mfsId) $list[] = $item->email;
+    return $list;
+  }
+
   private static function firstTimeCall() {
     if (!empty(self::$objArray)) return;
     foreach (Family::GetAll() as $family) {
@@ -1318,6 +1324,7 @@ class Family {
 	public $address=null;
 	public $phone=null;
 	public $category = null;
+	public $directory=null;
 	public $priority_date = null;
 
 	public static function CompareFatherLast($a, $b) {
@@ -1412,6 +1419,7 @@ class Family {
     $this->father = Parents::GetParent($row, "f");
     $this->phone = formatPhone($row["Parents2003.MH_PHONE"]);
     $this->priority_date = $row["Parents2003.priority_date"];
+    $this->directory = $row["Parents2003.DIRECTORY_FLAG"];
 
     $this->address = new Address();
     $this->address->SetVariablesFromRow($row);

@@ -146,7 +146,7 @@ class Reports {
 
   public static function lcmatrix($year) {
     $language = array(); $culture=array();
-    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake, $year) as $item) {
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year) as $item) {
       $done[$item->student->id] = $item->student;
       //      print "Printing Student " . $item->student->fullName() . "\n";
       if ($item->class->course->department != Department::Culture) {

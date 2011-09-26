@@ -94,6 +94,12 @@ function formatPhone($num)
     return $num; 
 }
 
+function saveTempFp ($fp, $filename) {
+  fseek($fp, 0);
+  file_put_contents("$filename", stream_get_contents($fp));
+  fclose ($fp);
+}
+
 class PrintFactory {
   function GetHtmlForFamilyDetail($family) {
     // Header 
@@ -244,6 +250,7 @@ class EnumFamilyTracker {
 	const sportsConflict=8;
 	const graduating=9;
 	const pendingInvitation=10;
+	const cancelled=11;
 
     public function enum($string){
     	
@@ -265,6 +272,7 @@ class EnumFamilyTracker {
     		case self::sportsConflict: return "Sports Conflict";
     		case self::graduating: return "All Graduating";
     		case self::pendingInvitation: return "To be invited";
+    		case self::cancelled: return "Cancelled";
     		
     		default: return "Unknown $id";
     	}
