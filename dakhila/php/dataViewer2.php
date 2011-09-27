@@ -298,6 +298,52 @@ SQLREGISTRATIONSUMMAY;
       print $this->template->get();
       break;		
 
+    case "FamilyTracker":
+      $url = htmlentities($_SERVER['PHP_SELF']) . "?command=FamilyTracker";
+      $year = isset($_POST['YEAR']) ?  $_POST['YEAR'] : null;
+      $previous = isset($_POST['PREVIOUS']) ?  $_POST['PREVIOUS'] : null;
+      $current = isset($_POST['CURRENT']) ?  $_POST['CURRENT'] : null;
+
+      $form = <<<EOT
+	<form method="post" action="$url">
+	Family ID: <input type="text" name="YEAR" value="$year"> 
+	Previous: <input type="text" name="PREVIOUS" value="$previous"> 
+	Current: <input type="text" name="CURRENT" value="$current"> 
+   <input type="submit" name="submit" value="GO"><br>
+</form>
+
+EOT;
+
+      $this->template->setCurrentBlock('QUERY');
+      $this->template->setVariable('QUERY', $form);
+      $this->template->parseCurrentBlock();
+      
+      $sql = "select * from FamilyTracker inner join Students2003 on FamilyTracker.family = Students2003.PARENT_ID where ";
+      $csv = array();
+      if ($_POST['YEAR'] != "") $csv[] = "year  = " . $_POST['YEAR'];
+      if ($_POST['PREVIOUS'] != "") $csv[] = "previousYear  = " . $_POST['PREVIOUS'];
+      if ($_POST['CURRENT'] != "") $csv[] = "currentYear  = " . $_POST['CURRENT'];
+
+      if (count($csv) != 0) {
+	$sql .= implode (" and  ", $csv);
+	$html = "";
+	$result = VidDb::query($sql);
+	$html .= "<table>\n";
+	while ($row = mysql_fetch_alias_array($result)) {
+	  $ryear=$row["FamilyTracker.year"];
+	  $family = Family::GetItemById($row["FamilyTracker.family"]);
+	  $student = Student::GetItemById($row["Students2003.ID"]);
+	  $html .= "<tr><td>" . $family->parentsName() . "</td><td>" . $student->fullName() . "</td><td>" . intval($student->Age()) . "</td><td>" . $student->Grade(). "</td><td>". $student->LanguageInterest() . "</td></tr>\n";
+	}
+	$html .= "</table>\n";
+
+	$this->template->setCurrentBlock('RESULT');
+	$this->template->setVariable("RESULT", $html);
+	$this->template->parseCurrentBlock();
+      }
+      print $this->template->get();
+      break;
+
 
     // ************************************************************
     case "AvailableCourse":
