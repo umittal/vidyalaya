@@ -240,17 +240,21 @@ Class Calendar {
 }
 
 class EnumFamilyTracker {
-	const registered = 1;
-	const waitlist = 2;
-	const pendingRegistration = 3;
-	const movingAway = 4;
-	const notInterested = 5;
-	const nextYear=6;
-	const tooExpensive=7;
-	const sportsConflict=8;
-	const graduating=9;
-	const pendingInvitation=10;
-	const cancelled=11;
+  const registered = 1;
+  const waitlist = 2;
+  const pendingRegistration = 3;
+  const movingAway = 4;
+  const notInterested = 5;
+  const nextYear=6;
+  const tooExpensive=7;
+  const sportsConflict=8;
+  const graduating=9;
+  const pendingInvitation=10;
+  const cancelled=11;
+  
+
+  public static $choices = Array(1 => "Registered", "Waitlist", "Pending", "Moved Out", "Not Interested", "Next Year",
+				 "Too Expensive", "Sports Conflict", "All Graduating", "To Be Invited", "Cancelled");
 
     public function enum($string){
     	

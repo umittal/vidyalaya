@@ -70,6 +70,18 @@ class DataViewer {
 
   }
 
+  private static function FamilyTrackerChoices($default) {
+    $choices = EnumFamilyTracker::$choices;
+    $choices[0] = "All";
+    $familyTrackerChoices = "";
+    //    $familyTrackerChoices = '<option value="0">All</option>\n';
+    foreach ( $choices as $value => $choice) {
+      $selected = $value == $default ? "selected" : "";
+      $familyTrackerChoices .= "<option value=$value $selected>$choice</option>\n"; 
+    }
+    return $familyTrackerChoices;
+  }
+
   // ************************************************************
   public function login() {
     $html = <<<LOGIN
@@ -304,11 +316,20 @@ SQLREGISTRATIONSUMMAY;
       $previous = isset($_POST['PREVIOUS']) ?  $_POST['PREVIOUS'] : null;
       $current = isset($_POST['CURRENT']) ?  $_POST['CURRENT'] : null;
 
+      $previousChoices = self::FamilyTrackerChoices($previous);
+      $currentChoices = self::FamilyTrackerChoices($current);
+
       $form = <<<EOT
 	<form method="post" action="$url">
-	Family ID: <input type="text" name="YEAR" value="$year"> 
-	Previous: <input type="text" name="PREVIOUS" value="$previous"> 
-	Current: <input type="text" name="CURRENT" value="$current"> 
+	Year: <input type="text" name="YEAR" value="$year"> 
+	Previous: 
+	<select dojoType="djit.form.FilteringSelect" id="previous" name="PREVIOUS">
+	$previousChoices
+	</select>
+	Current: 
+	<select dojoType="djit.form.FilteringSelect" id="current" name="CURRENT">
+	$currentChoices
+	</select>
    <input type="submit" name="submit" value="GO"><br>
 </form>
 
@@ -320,9 +341,13 @@ EOT;
       
       $sql = "select * from FamilyTracker inner join Students2003 on FamilyTracker.family = Students2003.PARENT_ID where ";
       $csv = array();
-      if ($_POST['YEAR'] != "") $csv[] = "year  = " . $_POST['YEAR'];
-      if ($_POST['PREVIOUS'] != "") $csv[] = "previousYear  = " . $_POST['PREVIOUS'];
-      if ($_POST['CURRENT'] != "") $csv[] = "currentYear  = " . $_POST['CURRENT'];
+      if (isset($_POST['YEAR']) && $_POST['YEAR'] != "") {
+	$year = $_POST['YEAR'];
+	if ($year >= 2010) $year -= 2010;
+	$csv[] = "year  = " . $year;
+      }
+      if (isset($_POST['PREVIOUS']) && $_POST['PREVIOUS'] != 0) $csv[] = "previousYear  = " . $_POST['PREVIOUS'];
+      if (isset($_POST['CURRENT']) && $_POST['CURRENT'] != 0) $csv[] = "currentYear  = " . $_POST['CURRENT'];
 
       if (count($csv) != 0) {
 	$sql .= implode (" and  ", $csv);

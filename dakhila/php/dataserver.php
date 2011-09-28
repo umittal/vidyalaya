@@ -74,7 +74,6 @@ class Dataserver {
     header("HTTP/1.0 200 ");
     print "class changed";
   }
-
 }
 ?>
 

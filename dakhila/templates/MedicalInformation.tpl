@@ -27,7 +27,7 @@
 <tr><th class="name">Name</th><th class="phone">Phone (10 digit)</th><th class="email">email</th></tr>
 </thead>
 <tbody>
-<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td class=input>&nbsp;</td><td class=input>&nbsp;</td><td class=input>&nbsp;</td></tr>
 </tbody>
 </table>
 
@@ -37,9 +37,9 @@
 <tr><th class="category">Type</th><th class="name">Name</th><th class="phone">Phone (10 digit)</th></tr>
 </thead>
 <tbody>
-<tr><td>Hospital</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-<tr><td>Primary Doctor</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-<tr><td>Dentist</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td>Hospital</td><td class=input>&nbsp;</td><td class=input>&nbsp;</td></tr>
+<tr><td>Primary Doctor</td><td class=input>&nbsp;</td><td class=input>&nbsp;</td></tr>
+<tr><td>Dentist</td><td class=input>&nbsp;</td><td class=input>&nbsp;</td></tr>
 </tbody>
 </table>
 
@@ -49,10 +49,10 @@
 <tr><th>Code</th><th>Condition</th><th>Yes</th><th>No</th></tr>
 </thead>
 <tbody>
-<tr><td>9901</td><td>Is the Student under a Physician&#39;s care now?</td><td>&nbsp;</td><td></td></tr>
-<tr><td>9902</td><td>Does the Student experience frequent chest pains or palpitations?</td><td></td><td></td></tr>
-<tr><td>9903</td><td>Does the Student has a recent history of fatigue or tiredness?</td><td></td><td></td></tr>
-<tr><td>9904</td><td>Is there a history of sudden death by a family member?</td><td></td><td></td></tr>
+<tr><td>9901</td><td>Is the Student under a Physician&#39;s care now?</td><td class=input>&nbsp;</td><td class=input></td></tr>
+<tr><td>9902</td><td>Does the Student experience frequent chest pains or palpitations?</td><td class=input></td><td class=input></td></tr>
+<tr><td>9903</td><td>Does the Student has a recent history of fatigue or tiredness?</td><td class=input></td><td class=input></td></tr>
+<tr><td>9904</td><td>Is there a history of sudden death by a family member?</td><td class=input></td><td class=input></td></tr>
 </tbody>
 </table>
 
@@ -63,13 +63,13 @@
 <tr><th>Code</th><th>*</th><th>Condition</th><th>Yes</th><th>No</th></tr>
 </thead>
 <tbody>
-<tr><td>9911</td><td>*</td><td>Has the Student ever been unconscious due to an injury?</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-<tr><td>9912</td><td>*</td><td>Has your child ever had a fracture or dislocation?</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-<tr><td>9913</td><td>*</td><td>Has your child ever had surgery?</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-<tr><td>9914</td><td>*</td><td>Does your child take prescription drugs?</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-<tr><td>9915</td><td>*</td><td>Does your child have any allergies?</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-<tr><td>9916</td><td>*</td><td>Does your child have sensitivities to any drugs?</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-<tr><td>9917</td><td>*</td><td>Does your child have any other physical problems or restrictions of which Vidyalaya should be aware?</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td>9911</td><td>*</td><td>Has the Student ever been unconscious due to an injury?</td><td class=input>&nbsp;</td><td class=input>&nbsp;</td></tr>
+<tr><td>9912</td><td>*</td><td>Has your child ever had a fracture or dislocation?</td><td class=input>&nbsp;</td><td class=input>&nbsp;</td></tr>
+<tr><td>9913</td><td>*</td><td>Has your child ever had surgery?</td><td class=input>&nbsp;</td><td class=input>&nbsp;</td></tr>
+<tr><td>9914</td><td>*</td><td>Does your child take prescription drugs?</td><td class=input>&nbsp;</td><td class=input>&nbsp;</td></tr>
+<tr><td>9915</td><td>*</td><td>Does your child have any allergies?</td><td class=input>&nbsp;</td><td class=input>&nbsp;</td></tr>
+<tr><td>9916</td><td>*</td><td>Does your child have sensitivities to any drugs?</td><td class=input>&nbsp;</td><td class=input>&nbsp;</td></tr>
+<tr><td>9917</td><td>*</td><td>Does your child have any other physical problems or restrictions of which Vidyalaya should be aware?</td><td class=input>&nbsp;</td><td class=input>&nbsp;</td></tr>
 </tbody>
 </table>
 
@@ -91,7 +91,7 @@
 </thead>
 <tbody>
 <!-- BEGIN PARENTS -->
-<tr><td>{PARENTSNAME}</td><td style="text-align: right;">&nbsp;/2011</td><td>&nbsp;</td></tr>
+<tr><td>{PARENTSNAME}</td><td style="text-align: right;" class=input>&nbsp;/2011</td><td class=input>&nbsp;</td></tr>
 <!-- END PARENTS -->
 </tbody>
 </table>
