@@ -112,7 +112,10 @@ function GetPdfForFamilyV2($family) {
 	
 	// Medical Information Form - one per student
 	foreach ($students as $id => $student) {
-			if ($student->family->id == $family->id && ($student->studentStatus->id == StudentStatus::Active || $student->studentStatus->id == StudentStatus::Waiting)) {
+			if ($student->family->id == $family->id 
+			    //			    && ($student->studentStatus->id == StudentStatus::Active || $student->studentStatus->id == StudentStatus::Waiting)
+
+) {
 				$html = $html . '<DIV style="page-break-after:always"></DIV>';
 				
 				$template = new HTML_Template_ITX("/var/www/dakhila/templates");
@@ -227,8 +230,8 @@ function printAllFamilies($students) {
 //printRosterYear (); exit();
 $entry = GetSingleIntArgument();
 print "printing  $entry\n";
-//printOneFamily (Family::GetItemById($entry));
-printOneFamilyDetail (Family::GetItemById($entry));
+printOneFamily (Family::GetItemById($entry));
+//printOneFamilyDetail (Family::GetItemById($entry));
 
 echo "\n";
 echo "Thank you for using my print program...\n";

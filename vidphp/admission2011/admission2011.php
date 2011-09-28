@@ -135,8 +135,9 @@ function NewFamilyOrientation($family) {
 }
 
 function PostOrientation($family) {
-  $mail = SetupMail();
-  SetFamilyAddress($mail, $family);
+  $production=0;
+  $mail = Mail::SetupMailSpa();
+  Mail::SetupMailAdmissions(&$mail, $family, $production);
 
   $mail->Subject = "Vidyalaya Admission 2011-12 - Family $family->id";
   
@@ -1497,7 +1498,7 @@ class TwoYearLayout {
 
 //Teachers::AddTeacher(79, "hetalapurva@gmail.com", 0) ; exit();
 //Admission::VolunteerEmail(2011);exit();
-Admission::TeacherEmail(2011);exit();
+//Admission::TeacherEmail(2011);exit();
 
 
 
@@ -1529,7 +1530,7 @@ if (array_key_exists('f', $out))
    die("you want me to execute " . $out['f'] . "\n");
 if (array_key_exists("function", $out)) 
   die("you want me to execute " . $out['function'] . "\n");
-die("I have nothing to do\n");
+//die("I have nothing to do\n");
 
 
 $students = GetAllData();

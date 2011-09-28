@@ -369,7 +369,8 @@ function DisplayRegistrationTemplate (&$template, $family) {
 
 	$children = $family->Children();
 	foreach ($children as $student) {
-		if ($student->studentStatus->id != StudentStatus::Inactive)	DisplayRegistrationChildren($template, $student);
+	  //		if ($student->studentStatus->id != StudentStatus::Inactive)	
+		  DisplayRegistrationChildren($template, $student);
 	}
 
 	$templateName="SIGNATURE";
