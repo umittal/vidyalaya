@@ -63,7 +63,36 @@ class Publications {
   const MAILINGLISTDIR="/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/mailinglist/";
   const rosterDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/roster/";
 
-  public static function SchoolDirectory() {
+  private static function InvolvedFamilies($year) {
+    // Enrolled Families + Volunteers
+    $families = array();
+
+    // Add more rows / cells
+    foreach (FamilyTracker::RegisteredFamilies() as $item) {
+      $families[$item->family] = Family::GetItemById($item->family);
+    }      
+    foreach(Volunteers::GetAllYear($year) as $item) {
+      switch ($item->MFS) {
+      case MFS::Mother:
+	$families[$item->mfsId] =  Family::GetItemById($item->mfsId);
+	break;
+      case MFS::Father:
+	$families[$item->mfsId] =  Family::GetItemById($item->mfsId);
+	break;
+      case MFS::Student:
+	$student = Student::GetItemById($item->mfsId);
+	$families[$student->family->id] = $student->family;
+	break;
+      default: 
+	die ("unexpected type of item found in volunteers\n");
+      }
+    }
+
+    usort ($families, "Family::CompareFatherLast");
+    return $families;
+  }
+
+  public static function SchoolDirectory($year) {
     $document = new WordTable();
     $table = $document->table;
     // Define font style for first row
@@ -82,31 +111,8 @@ class Publications {
     $table->addCell(2000, $styleCell)->addText('Students', $fontStyle);
     //$table->addCell(500, $styleCellBTLR)->addText('Row 5', $fontStyle);
 
-    $families = array();
-    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, 2011);
-
-    // Add more rows / cells
-    foreach (FamilyTracker::RegisteredFamilies() as $item) {
-      $families[$item->family] = Family::GetItemById($item->family);
-    }      
-    foreach(Volunteers::GetAllYear(2011) as $item) {
-      switch ($item->MFS) {
-      case MFS::Mother:
-	$families[$item->mfsId] =  Family::GetItemById($item->mfsId);
-	break;
-      case MFS::Father:
-	$families[$item->mfsId] =  Family::GetItemById($item->mfsId);
-	break;
-      case MFS::Student:
-	$student = Student::GetItemById($item->mfsId);
-	$families[$student->family->id] = $student->family;
-	break;
-      default: 
-	die ("unexpected type of item found in volunteers\n");
-      }
-    }
-
-    usort ($families, "Family::CompareFatherLast");
+    $families = self::InvolvedFamilies($year);
+    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year);
 
     foreach ($families as $family) {
       $table->addRow();
@@ -121,7 +127,7 @@ class Publications {
       
       // Write Student First name in last column
       $cell = $table->addCell(2000);
-      $list = null; $done=array();
+      $done=array();
       foreach($enrollment as $e) {
 	if (array_key_exists($e->student->id, $done)) continue;
 	if ($e->student->family->id == $family->id) {
@@ -136,6 +142,34 @@ class Publications {
     $directory="/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/roster/word";
     $document->filename = "$directory/2011.docx";
     $document->SaveDocument();
+  }
+
+  public static function FamilyListForHandbookDistribution($year) {
+    $fh = tmpfile();
+    if (!$fh) die ("could not open temporary file for writing");
+    fwrite ($fh, "ID, mother, father, kid1, kid2, kid3\n");
+    
+    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year);
+    foreach (self::InvolvedFamilies($year) as $family) {
+      $csv=array();
+      $csv[] = $family->id;
+      $csv[] = $family->mother->fullName();
+      $csv[] = $family->father->fullName();
+      $done=array();
+      foreach($enrollment as $e) {
+	if (array_key_exists($e->student->id, $done)) continue;
+	if ($e->student->family->id == $family->id) {
+	  $csv[] = $e->student->firstName;
+	  $done[$e->student->id] = 1;
+	}
+      }
+      fputcsv($fh, $csv);
+    }
+    $filename = self::rosterDir . "FamiliesForHandbookDistribution.csv";
+    fseek($fh, 0);
+    file_put_contents("$filename", stream_get_contents($fh));
+    fclose($fh);
+    
   }
 
   private static function ClassDirectoryTable($table, $class, $email) {
@@ -319,7 +353,7 @@ class Publications {
 
   public static function VolunteerListForHandbook($year) {
     $fh = tmpfile();
-    if (!$fh) die ("could not open $filename for writing");
+    if (!$fh) die ("could not open temporary file for writing");
 
     Reports::VolunteerListForHandbookHtml($year, false, $fh);
 
@@ -492,7 +526,7 @@ class Publications {
 
   private static function RosterSpaStudents($year) {
     $fh = tmpfile();
-    if (!$fh) die ("could not open $filename for writing");
+    if (!$fh) die ("could not open temporary file for writing");
     fwrite ($fh, "ID, First, Last, Language, , Culture, ,\n");
 
 
@@ -768,7 +802,7 @@ class Publications {
 
 }	
 
-
+Publications::FamilyListForHandbookDistribution(2011); exit();
 //Publications::AttendanceSheet(2011); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
 //Publications::Roster(2011); exit();
@@ -778,12 +812,12 @@ class Publications {
 //Publications::FullDumpFamilies();
 
 //Publications::BadgeFile(2011); exit();
-Publications::CreateMailingLists(2011);exit();
+//Publications::CreateMailingLists(2011);exit();
 
 //Publications::VolunteerListForHandbook(2011); exit();
 //Publications::TeacherListForHandbook(2011);exit();
 
-//Publications::SchoolDirectory(); exit();
+//Publications::SchoolDirectory(2011); exit();
 //Publications::TeacherDirectory(2011); exit (); // Directory of all Teachers
 //Publications::VolunteerDirectory(2011); exit (); // Directory of all Volunteers
 //Publications::ClassDirectory(2011); exit (); // Directory of all classes, with and without email

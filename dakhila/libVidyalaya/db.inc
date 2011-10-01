@@ -17,8 +17,10 @@ class VidSession {
   public static function startSession() {
     if (!isset($_SESSION["count"])) {
       session_start();
-      $_SESSION["count"]=0;
+      $_SESSION["count"]=1;
       $_SESSION["start"]= time();
+    } else {
+      $_SESSION["count"]++;
     }
   }
 

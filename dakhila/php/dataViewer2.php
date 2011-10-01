@@ -33,14 +33,24 @@ class DataViewer {
     $table .= "<td><a href=\"$this->thispage?command=home\">Home</a></td>";
     $table .= "<td><a href=\"$this->thispage?command=Teachers\">Teachers</a></td>";
 
-    $username=$_SESSION["loginUsername"];
-    $dbserver=$_SESSION["dbserver"];
-    $logout = "<a href='" . $_SERVER['PHP_SELF'] . "?command='logout'>Logout</a>($username,$dbserver )";
+    $logout = "<a href='" . $_SERVER['PHP_SELF'] . "?command='logout'>Logout</a>";
     $count=$_SESSION['count'];
     $rightside = isset($_SESSION['loginUsername']) ? "$logout" : "Please Login $count";
     $table .= "<td align='right'>$rightside</td>";
+
     $table .= "</tr></table>\n";
     $this->template->setVariable('MENU', $table);
+    $this->template->parseCurrentBlock();
+
+    $this->template->addBlockFile('BOTTOM', 'F_BOTTOM', 'LayoutBottom.tpl');
+    $this->template->touchBlock('F_BOTTOM');
+	
+    $username=$_SESSION["loginUsername"];
+    $dbserver=$_SESSION["dbserver"];
+    $count=$_SESSION['count'];
+
+    $this->template->setCurrentBlock('FOOTER');
+    $this->template->setVariable("FOOTER", "Copyright (c) 2011 Vidyalaya Inc., ($username,$dbserver, $count )");
     $this->template->parseCurrentBlock();
   }
 
@@ -55,19 +65,9 @@ class DataViewer {
 	
     $this->template->setCurrentBlock('HEADER');
     $this->template->setVariable("HEADER", '<a href=""><img src="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/images/Vheader2.jpg"
-		width="800" height="80" 
+		width="700" height="70" 
 		alt="php5 logo"/></a>');
     $this->template->parseCurrentBlock();
-
-
-	
-    $this->template->addBlockFile('BOTTOM', 'F_BOTTOM', 'LayoutBottom.tpl');
-    $this->template->touchBlock('F_BOTTOM');
-	
-    $this->template->setCurrentBlock('FOOTER');
-    $this->template->setVariable("FOOTER", "Copyright (c) 2011 Vidyalaya Inc.");
-    $this->template->parseCurrentBlock();
-
   }
 
   private static function FamilyTrackerChoices($default) {
@@ -376,6 +376,9 @@ EOT;
 	  $this->template->setVariable("AGE",intval($student->Age()));
 	  $this->template->setVariable("GRADE",$student->Grade());
 	  $this->template->setVariable("LANGUAGE",$student->LanguageInterest());
+	  $this->template->setVariable("PREVIOUS",EnumFamilyTracker::NameFromId($row["FamilyTracker.previousYear"]));
+	  $this->template->setVariable("CURRENT",EnumFamilyTracker::NameFromId($row["FamilyTracker.currentYear"]));
+	  $this->template->setVariable("YEAR",$ryear+2010);
 	  $this->template->parseCurrentBlock();
 
 
