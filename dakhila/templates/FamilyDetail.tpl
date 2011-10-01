@@ -33,10 +33,7 @@ dojo.require("dijit.Tooltip");
 
 
 <h3>Family Details</h3>
-<!-- 
-<p><a href="/dakhila/php/studentListByLanguage.php">Language</a>, <a href="/htdocs/php/studentListByCulture.php">Culture</a></p>
- -->
- 
+
 <ol>
 
 <li class="section">Home</li>
@@ -64,10 +61,16 @@ dojo.require("dijit.Tooltip");
 
 <li class="section">Children</li>
 <table>
-<thead><tr><th scope="col">ID<th>Gender<th>NAME<th>DOB<th>EMAIL<th width=30px>CELL</th></tr></thead>
+<thead><tr><th scope="col">ID<th>Gender<th>NAME<th>DOB</th><th>LANGUAGE</th><th>EMAIL<th width=30px>CELL</th></tr></thead>
 <!-- BEGIN CHILDREN -->
-<tr><td class="ou" onclick="showStudentDetails({ID})" onmouseover="this.style.cursor='pointer'">{ID}</td><td>{GENDER}</td><td>{NAME}</td><td nowrap="nowrap">{DOB}</td><td>{EMAIL}</td><td>{CELL}</td></tr>
-
+<tr><td class="ou" onclick="showStudentDetails({ID})" onmouseover="this.style.cursor='pointer'">{ID}</td>
+  <td>{GENDER}</td>
+  <td>{NAME}</td>
+  <td nowrap="nowrap">{DOB}</td>
+  <td>{LANGUAGE}</td>
+  <td>{EMAIL}</td>
+  <td>{CELL}</td>
+</tr>
 <!-- END CHILDREN -->
 </table>
 

@@ -71,12 +71,14 @@ class DataViewer {
   }
 
   private static function FamilyTrackerChoices($default) {
-    $choices = EnumFamilyTracker::$choices;
-    $choices[0] = "All";
+    if ($default == null) $default=0;
+    $choices = array_merge(array(0 => "All"),  EnumFamilyTracker::$choices);
+    //    $choices = EnumFamilyTracker::$choices;
+    //    $choices[0] = "All";
     $familyTrackerChoices = "";
     //    $familyTrackerChoices = '<option value="0">All</option>\n';
     foreach ( $choices as $value => $choice) {
-      $selected = $value == $default ? "selected" : "";
+      $selected = $value == $default ? "selected='selected'" : "";
       $familyTrackerChoices .= "<option value=$value $selected>$choice</option>\n"; 
     }
     return $familyTrackerChoices;
@@ -320,14 +322,17 @@ SQLREGISTRATIONSUMMAY;
       $currentChoices = self::FamilyTrackerChoices($current);
 
       $form = <<<EOT
+	<script>
+	dojo.require("dijit.form.Select");
+        </script>
 	<form method="post" action="$url">
 	Year: <input type="text" name="YEAR" value="$year"> 
 	Previous: 
-	<select dojoType="djit.form.FilteringSelect" id="previous" name="PREVIOUS">
+	<select id="previous" dojoType="dijit.form.Select" name="PREVIOUS">
 	$previousChoices
 	</select>
 	Current: 
-	<select dojoType="djit.form.FilteringSelect" id="current" name="CURRENT">
+	<select id="current" dojoType="dijit.form.Select" name="CURRENT">
 	$currentChoices
 	</select>
    <input type="submit" name="submit" value="GO"><br>
@@ -354,16 +359,32 @@ EOT;
 	$html = "";
 	$result = VidDb::query($sql);
 	$html .= "<table>\n";
+
+	$this->template->addBlockFile('RESULT', 'F_RESULT', 'FamilyTrackerDetails.tpl');
+	$this->template->touchBlock('F_RESULT');
+
 	while ($row = mysql_fetch_alias_array($result)) {
 	  $ryear=$row["FamilyTracker.year"];
 	  $family = Family::GetItemById($row["FamilyTracker.family"]);
 	  $student = Student::GetItemById($row["Students2003.ID"]);
+
+	  $this->template->setCurrentBlock("TRACKER");
+	  $this->template->setVariable("FAMILYID",$family->id);
+	  $this->template->setVariable("STUDENTID",$student->id);
+	  $this->template->setVariable("PARENT",$family->parentsName());
+	  $this->template->setVariable("STUDENT",$student->fullName());
+	  $this->template->setVariable("AGE",intval($student->Age()));
+	  $this->template->setVariable("GRADE",$student->Grade());
+	  $this->template->setVariable("LANGUAGE",$student->LanguageInterest());
+	  $this->template->parseCurrentBlock();
+
+
 	  $html .= "<tr><td>" . $family->parentsName() . "</td><td>" . $student->fullName() . "</td><td>" . intval($student->Age()) . "</td><td>" . $student->Grade(). "</td><td>". $student->LanguageInterest() . "</td></tr>\n";
 	}
 	$html .= "</table>\n";
 
-	$this->template->setCurrentBlock('RESULT');
-	$this->template->setVariable("RESULT", $html);
+	//	$this->template->setCurrentBlock('RESULT');
+	//	$this->template->setVariable("RESULT", $html);
 	$this->template->parseCurrentBlock();
       }
       print $this->template->get();
