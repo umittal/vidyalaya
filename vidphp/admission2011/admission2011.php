@@ -135,28 +135,32 @@ function NewFamilyOrientation($family) {
 }
 
 function PostOrientation($family) {
-  $production=0;
-  $mail = Mail::SetupMailSpa();
-  Mail::SetupMailAdmissions(&$mail, $family, $production);
+  $production=1;
+  $mail =   Mail::SetupMailAdmissions();
+  Mail::SetFamilyAddress(&$mail, $family, $production);
 
-  $mail->Subject = "Vidyalaya Admission 2011-12 - Family $family->id";
+  $subject = "Vidyalaya Admission (late) 2011-12 - Family $family->id";
+  if ($production == 0) $subject = "[Test] $subject";
+
+  $mail->Subject = $subject;
   
+  $salutation = "<p>Dear " . $family->parentsName() . ",";
+  $mail->Body = $salutation . file_get_contents("../../vidphp/admission2011/lateAdmission.html");
+  $mail->AltBody = "Family: $family->id"; //Text Body
+  $mail->AddReplyTo("umesh@vidyalaya.us", "Umesh Mittal");
+
+
   // attachments
   $customizedPdf = "/home/umesh/package2011/Family-". $family->id . ".pdf";
   if (!file_exists($customizedPdf)) die ("customized file $customizedPdf not found, aborting\n");
   $mail->AddAttachment("$customizedPdf"); // attachment
   
-  $attachDir = "/home/umesh/admissions";
-  $mail->AddAttachment("$attachDir/Volunteer2011.pdf"); // attachment
-  $mail->AddAttachment("$attachDir/ParticipationAgreement.pdf"); // attachment
+  $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Management/Admission/Volunteer2011.pdf"); // attachment
+  $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Management/Admission/ParticipationAgreement.pdf"); // attachment
+  $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/Layouts/phhslayout2011-12.pdf"); // attachment
 
-  //  $draft = "<p>This is a <u>draft</u> message being sent for review. Please send all comments, trivial/substantial. The real mail will come later.";
-  $draft="";
-  $salutation = "<p>Dear " . $family->parentsName() . ",";
-  $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/postorientation.html");
-  $mail->AltBody = "Family: $family->id"; //Text Body
 
-  	print "Family id: $family->id, Name: " . $family->parentsName() . "\n";
+  print "Family id: $family->id, Name: " . $family->parentsName() . "\n";
   
   //if ($family->id != 402) return;
 
@@ -314,7 +318,7 @@ class Mail {
 		return $mail;
 		
 	}
-	private static function SetupMailAdmissions() {
+	public static function SetupMailAdmissions() {
 		return self::SetupMailCommon("Admission2011@vidyalaya.us", "Vidyalaya Admissions", "Praveen38");
 	}
 	

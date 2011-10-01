@@ -203,6 +203,7 @@ function DisplayChildren(&$template, $student) {
 	$template->setVariable("ID", $student->id);
 	$template->setVariable("NAME", $student->fullName());
 	$template->setVariable("EMAIL", $student->email);
+	$template->setVariable("LANGUAGE", $student->LanguageInterest());
 	$template->setVariable("GENDER", GenderMap($student->gender));
 	$dob = empty($student->dateOfBirth) ? "Unknown" : date("Y-m-d", strtotime($student->dateOfBirth));
 	$template->setVariable("DOB",$dob);

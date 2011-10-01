@@ -34,7 +34,7 @@ function GetCommonTemplate ($template) {
 
 	$template->setCurrentBlock('HEADER');
 	$template->setVariable("HEADER", '<a href=""><img src="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/images/Vheader2.jpg"
-		width="800" height="80" 
+		width="700" height="70" 
 		alt="php5 logo"/></a>');
 	$template->parseCurrentBlock();
 
@@ -78,7 +78,7 @@ function GetPdfForFamilyV2($family) {
 	$template->touchBlock('F_CONTENT');
 	$template->setCurrentBlock('HEADER');
 	$template->setVariable("HEADER", '<a href=""><img src="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/images/Vheader2.jpg"
-		width="800" height="80" 
+		width="700" height="70" 
 		alt="php5 logo"/></a>');
 	$template->parseCurrentBlock();
 	$template->setCurrentBlock('FOOTER');
@@ -98,7 +98,7 @@ function GetPdfForFamilyV2($family) {
 	$template->touchBlock('F_CONTENT');
 	$template->setCurrentBlock('HEADER');
 	$template->setVariable("HEADER", '<a href=""><img src="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/images/Vheader2.jpg"
-		width="800" height="80" 
+		width="700" height="70" 
 		alt="php5 logo"/></a>');
 	$template->parseCurrentBlock();
 	$template->setCurrentBlock('FOOTER');
@@ -124,7 +124,7 @@ function GetPdfForFamilyV2($family) {
 				$template->touchBlock('F_CONTENT');
 				$template->setCurrentBlock('HEADER');
 				$template->setVariable("HEADER", '<a href=""><img src="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/images/Vheader2.jpg"
-					width="800" height="80" 
+					width="700" height="70" 
 					alt="php5 logo"/></a>');
 				$template->parseCurrentBlock();
 				$template->setCurrentBlock('FOOTER');
