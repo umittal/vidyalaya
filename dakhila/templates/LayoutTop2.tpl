@@ -15,6 +15,14 @@
 	<script type="text/javascript" src="/dakhila/js/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="/dakhila/js/jquery.uitablefilter.js"></script>
 
+        <script type="text/javascript">
+            dojo.require("dijit.MenuBar");
+            dojo.require("dijit.PopupMenuBarItem");
+            dojo.require("dijit.Menu");
+            dojo.require("dijit.MenuItem");
+            dojo.require("dijit.PopupMenuItem");
+        </script>
+
     <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/ui-lightness/jquery-ui.css" />
     <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dojox/grid/enhanced/resources/claro/EnhancedGrid.css" />
     <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dijit/themes/claro/claro.css">

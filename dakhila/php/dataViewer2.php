@@ -28,7 +28,6 @@ class DataViewer {
   private $thispage = null;
 
   private function SetMenu() {
-    $this->template->setCurrentBlock('MENU');
     $table = "<table width='100%'><tr>";
     $table .= "<td><a href=\"$this->thispage?command=home\">Home</a></td>";
     $table .= "<td><a href=\"$this->thispage?command=Teachers\">Teachers</a></td>";
@@ -39,7 +38,11 @@ class DataViewer {
     $table .= "<td align='right'>$rightside</td>";
 
     $table .= "</tr></table>\n";
-    $this->template->setVariable('MENU', $table);
+
+    $dojomenu = file_get_contents("../html/menu.inc");
+
+    $this->template->setCurrentBlock('MENU');
+    $this->template->setVariable('MENU', $dojomenu);
     $this->template->parseCurrentBlock();
 
     $this->template->addBlockFile('BOTTOM', 'F_BOTTOM', 'LayoutBottom.tpl');
