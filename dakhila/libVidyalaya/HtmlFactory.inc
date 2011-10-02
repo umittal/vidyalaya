@@ -111,6 +111,8 @@ function DisplayPerson(&$template, $person) {
 // *****  Family Details
 function DisplayFamilyTemplate (&$template, $family, $students) {
 
+  die("Do not use me, use DisplayFamilyTemplateV3 function\n");
+
 	$templateName="PARENTS";
 	$template->setCurrentBlock($templateName);
 
@@ -154,7 +156,6 @@ function DisplayFamilyTemplate (&$template, $family, $students) {
 }
 
 function DisplayFamilyTemplateV3 (&$template, $family) {
-
 	$templateName="PARENTS";
 	$template->setCurrentBlock($templateName);
 
@@ -194,6 +195,19 @@ function DisplayFamilyTemplateV3 (&$template, $family) {
 	if ($family->category->id == 5) $category = $category . ", Date: " . $family->priority_date;
 	$template->setVariable("CATEGORY", $category );
 	$template->parseCurrentBlock();
+
+	$templateName="TRACKER";
+	$template->setCurrentBlock($templateName);
+	foreach (FamilyTracker::FamilyHistory($family->id) as $item) {
+	  $template->setVariable("YEAR", $item->year+2010);
+	  $previous = EnumFamilyTracker::NameFromId($item->previousYear);
+	  if ($item->previousYear == EnumFamilyTracker::waitlist) $previous .= " ($family->priority_date)";
+	  $template->setVariable("PREVIOUS", $previous);
+	  $template->setVariable("CURRENT", EnumFamilyTracker::NameFromId($item->currentYear));
+	  $template->setVariable("TUITION", $item->tuition);
+	}
+	$template->parseCurrentBlock();
+
 }
 
 
@@ -216,12 +230,12 @@ function DisplayChildren(&$template, $student) {
 
 	foreach(Enrollment::GetEnrollmentStudent($student->id, 2011) as $item) {
 	  if ($item->class->course->department == Department::Culture ) {
-	    $template->setVariable("CULTURE", $item->class->short());
-	    $template->setVariable("CROOM", $item->class->room->roomNumber);
+	    $template->setVariable("CULTURE", $item->class->urlRoster());
+	   $template->setVariable("CROOM", $item->class->room->roomNumber);
 	    $template->setVariable("CTEACHER", Teachers::TeacherListClassHtml($item->class->id));
 	  } else {
 	    $template->setVariable("FIRSTNAME", $student->firstName);
-	    $template->setVariable("LANGUAGE", $item->class->short());
+	    $template->setVariable("LANGUAGE", $item->class->urlRoster());
 	    $template->setVariable("LROOM", $item->class->room->roomNumber);
 	    $template->setVariable("LTEACHER", Teachers::TeacherListClassHtml($item->class->id));
 	  }

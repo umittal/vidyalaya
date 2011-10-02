@@ -87,7 +87,7 @@ function GetPdfForFamilyV2($family) {
 
 	$template->addBlockFile('RESULT', 'F_RESULT', 'FamilyDetail.tpl');
 	$template->touchBlock('F_RESULT');
-	DisplayFamilyTemplate($template, $family, $students);
+	DisplayFamilyTemplateV3($template, $family);
 	$html = $html . $template->get();	
 	$html = $html . '<DIV style="page-break-after:always"></DIV>';
 	

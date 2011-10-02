@@ -89,4 +89,16 @@ dojo.require("dijit.Tooltip");
 </tbody>
 </table>
 
+<li class="section">Registration History</li>
+<table>
+<thead>
+<tr><th scope="col">Year<th>Previous<th>Current<th>Tuition</tr>
+</thead>
+<tbody>
+<!-- BEGIN TRACKER -->
+<tr><td>{YEAR}</td><td>{PREVIOUS}</td><td>{CURRENT}</td><td align="right">{TUITION}</td></tr>
+<!-- END TRACKER -->
+</tbody>
+</table>
+
 </ol>

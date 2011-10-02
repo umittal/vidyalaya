@@ -1522,7 +1522,7 @@ class Parents {
 
 // ******** Family Tracker
 class FamilyTracker {
-	const facility = 1;
+	const facility = 2;
 	const prevYear = 0;
 	const currYear = 1;
 
@@ -1590,6 +1590,11 @@ class FamilyTracker {
 	public static function CurrentYearStatus ($family){
 		self::firstTimeCall();
 		return self::$objArray[$family]->currentYear;
+	}
+
+	public static function FamilyHistory($familyId)  {
+	  $query = "Select * from FamilyTracker where family = $familyId order by year";
+	  return self::ArrayFromQuery($query);
 	}
 
 	public function __construct($row) {
