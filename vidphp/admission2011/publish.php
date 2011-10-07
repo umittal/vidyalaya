@@ -802,7 +802,100 @@ class Publications {
 
 }	
 
-Publications::FamilyListForHandbookDistribution(2011); exit();
+class Newsletter {
+  public static function Publish($date) {
+    $year="2011"; // todo: get year from date
+    $fh = tmpfile();
+    if (!$fh) die ("could not open temporary file for writing");
+
+    $directory= "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/Newsletter/$date/";
+
+    fwrite($fh, "<div id='newsletter'>\n");
+
+    // Step 1: publish dates
+    $expiration = "2011-10-23";
+    fwrite ($fh, "<p class='newsgate'> Expiration Date: $expiration\n");
+    fwrite ($fh, "<p class='newsgate'> Last Class: $date\n");
+    fwrite ($fh, "  <a name='top'>&nbsp;</a>\n");
+    fwrite ($fh, "\n");
+
+    // Step 2: availble table
+    $available = array(); $unavailable = "";
+    foreach (AvailableClass::GetAllYear($year) as $class) {
+      $short = $class->short();
+      $classfile=$directory . $short . ".html";
+      if (file_exists($classfile)) {
+	$available[] =  "<a href='[~[*id*]~]#$short'>$short</a>";
+      } else {
+	$unavailable .=  " $short";
+      }
+    }
+
+    $table = "<table>\n"; 
+    if (!empty($available)) $table .= "<tr><td>Available</td><td>" . implode(",", $available) . "</td></tr>\n";
+    if (!empty($unavailable)) $table .= "<tr><td>Pending</td><td>$unavailable</td></tr>\n";
+
+    $table .= "</table>\n";
+
+    fwrite($fh, $table);
+
+    // Step 3: Print Classes
+    foreach (AvailableClass::GetAllYear($year) as $class) {
+      $short = $class->short();
+      $description = htmlspecialchars($class->course->full);
+      $teachers = Teachers::TeacherListClassHtml($class->id);
+      $dept = strtolower(Department::NameFromId($class->course->department));
+      $color = Department::$colors[$class->course->department];
+
+
+
+      $classheader = <<<CLASSHEADER
+ <!--            *******************************  SECTION $short ******************** -->
+  <a name="$short">&nbsp;</a>
+  <div style="border: 1px $color dotted;">
+    <table>
+      <caption class="$dept">$short - $description - $teachers</caption>
+      <COLGROUP><COL width="10%"><COL width="90%">
+      <tr><td valign="top">Comments</td><td>
+
+CLASSHEADER;
+
+$classfooter = <<<CLASSFOOTER
+	</td></tr><tr><td valign="top">&nbsp;</td><td>
+    </td></tr>
+    </table>
+  </div>
+  <a href="[~[*id*]~]#top">top</a>
+<p>      
+
+
+CLASSFOOTER;
+
+
+      //insert class file
+$classfile=$directory . $short . ".html";
+if (file_exists($classfile)) {
+  fwrite ($fh, $classheader . "\n");
+  fwrite($fh, file_get_contents($classfile));
+  fwrite ($fh, $classfooter . "\n");
+}
+
+    }
+
+
+    fwrite($fh, "</div>\n");
+    fseek($fh, 0);
+
+    $filename = "/tmp/foo";
+    file_put_contents("$filename", stream_get_contents($fh));
+    print "check $filename\n";
+    fclose($fh);
+
+  }
+}
+
+Newsletter::Publish("2011-10-02");
+//Publications::FamilyListForHandbookDistribution(2011); exit();
 //Publications::AttendanceSheet(2011); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
 //Publications::Roster(2011); exit();

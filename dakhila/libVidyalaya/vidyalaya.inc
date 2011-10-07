@@ -25,7 +25,17 @@ class Department {
 	, Telugu = 3
 	, Culture = 4
 	, Kindergarten = 5
+	, Prayer = 6
 	;
+
+	public static $colors = Array (
+				       Department::Hindi => "#0033cc", 
+				       Department::Gujarati => "#AA7", 
+				       Department::Telugu => "#dd1100", 
+				       Department::Culture => "#ff0066", 
+				       Department::Kindergarten => "#AA7", 
+				       Department::Prayer => "##AA7", 
+				       );
 
 	public function Name() {
 		return Department::NameFromId($this->id);
@@ -49,6 +59,7 @@ class Department {
 			case 3: return "Telugu";
 			case 4: return "Culture";
 			case 5: return "Kindergarten";
+			case 6: return "Prayers";
 			default: return "Unknown";
 		}
 	}
@@ -59,7 +70,8 @@ class Department {
 			case "G": return Department::NameFromId(2);
 			case "T": return Department::NameFromId(3);
 			case "C": return Department::NameFromId(4);
-			case "C": return Department::NameFromId(5);
+			case "K": return Department::NameFromId(5);
+			case "P": return Department::NameFromId(6);
 			default: return "unknown";
 		}
 	}
@@ -71,6 +83,7 @@ class Department {
 			case "T": return 3;
 			case "C": return 4;
 			case "K": return 5;
+			case "P": return 6;
 			default: return null;
 		}
 	}
@@ -518,6 +531,7 @@ class AvailableClass {
 	    if ($item->year == $year) $list[$item->id]=$item;
 	  }
 	  
+	  uasort ($list, "AvailableClass::CompareShort");
 	  return $list;
 	}
 	 
@@ -528,7 +542,7 @@ class AvailableClass {
 	    if ($item->course->department == $dept) $list[$item->id]=$item;
 	  }
 	  
-	  usort ($list, "AvailableClass::CompareShort");
+	  uasort ($list, "AvailableClass::CompareShort");
 	  return $list;
 	}
 	 
@@ -1206,7 +1220,8 @@ class Teachers {
     return implode(", ", $csv);
   }
 
-  public static function TeacherListClassHtml($classId) {
+  public static function TeacherListClassHtml($classId)
+ {
     $csv = array();
     foreach (self::TeacherListClass($classId) as $teacher) {
       $csv[] = $teacher->IsLead ? "<b>" . $teacher->person->fullName() ."</b>"  :  $teacher->person->fullName();

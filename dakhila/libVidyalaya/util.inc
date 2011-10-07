@@ -100,6 +100,7 @@ function saveTempFp ($fp, $filename) {
   fclose ($fp);
 }
 
+
 class PrintFactory {
   function GetHtmlForFamilyDetail($family) {
     // Header 
