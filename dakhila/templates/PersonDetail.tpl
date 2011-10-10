@@ -3,7 +3,7 @@
 <ol>
 <li class="section">Home</li>
 
-<table>
+<table class="tablesorter">
 <!-- BEGIN HOME -->
 <tr><td>ID</td><td>{ID} (Home: {HOMEPHONE})</td></tr>
 <tr><td rowspan=2>Address</td><td>{LINE1} {LINE2}</td></tr>
@@ -12,7 +12,7 @@
 </table>
 
 <li class="section">Person</li>
-<table>
+<table class="tablesorter" >  	  	  
 <!-- BEGIN PERSON -->
 <tr><td>Name</td><td>{NAME}</td></tr>
 <tr><td>Gender</td><td>{GENDER}</td></tr>
@@ -28,8 +28,8 @@
 
 
 
-<table>  	  	  
- <thead><tr><th>M/F<th>NAME<th>EMAIL<th>WORK<th>CELL<th>Call</tr></thead>
+<table class="tablesorter" >  	  	  
+ <thead><tr><th>M/F<th>NAME<th>EMAIL<th>WORK<th>CELL<th>Directory</tr></thead>
 <!-- BEGIN PARENTS -->
 <tr><td>{MF} </td><td>{NAME}</td><td> {EMAIL}</td><td>{WORK}</td><td>{CELL}</td><td>{ISCONTACTABLE}</td></tr>
 <!-- END PARENTS -->  	  	  
