@@ -156,7 +156,7 @@ dojo.require("dijit.Tooltip");
 
 
 <table>  	  	  
- <thead><tr><th>M/F<th>NAME<th>EMAIL<th>WORK<th>CELL<th>Call</tr></thead>
+ <thead><tr><th>M/F<th>NAME<th>EMAIL<th>WORK<th>CELL<th>Directory</tr></thead>
 <!-- BEGIN FATHER -->
 <tr><td>Father </td><td>{NAME}</td><td> {EMAIL}</td><td>{WORK}</td><td>{CELL}</td><td>{ISCONTACTABLE}</td></tr>
 <!-- END FATHER -->  	  	  
@@ -180,6 +180,16 @@ dojo.require("dijit.Tooltip");
 <tr><td>{SESSION}</td><td colspan=2>{KG}</td></tr>
 <!-- END KINDERGARTEN -->
 </tbody>
+</table>
+
+<li class="section">Contacts</li>
+<table>
+<thead>
+<tr><th>Type</th><th>Phone</th><th>Name</th><th>Address</th><th>Email</th></tr>
+</thead>
+<!-- BEGIN OTHERCONTACT -->
+<tr><td>{TYPE}</td><td>{PHONE}</td><td>{NAME}</td><td>{ADDR}</td><td>{EMAIL}</td></tr>
+<!-- END OTHERCONTACT -->
 </table>
 
 </ol>

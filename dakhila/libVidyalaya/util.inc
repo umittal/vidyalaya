@@ -3,6 +3,7 @@
 require_once "vidyalaya.inc";
 $dompdfDir = realpath(dirname(__FILE__)."/../../dompdf2");
 require_once("$dompdfDir/dompdf_config.inc.php");
+require_once("../../Classes/PHPMailer_v5.1/class.phpmailer.godaddy");
 
 // returns true if $str begins with $sub
 function beginsWith( $str, $sub ) {
@@ -99,7 +100,6 @@ function saveTempFp ($fp, $filename) {
   file_put_contents("$filename", stream_get_contents($fp));
   fclose ($fp);
 }
-
 
 class PrintFactory {
   function GetHtmlForFamilyDetail($family) {
@@ -283,6 +283,183 @@ class EnumFamilyTracker {
     	}
     }
 }
+
+class Mail {
+  private static function SetupMailCommon($email, $name, $password) {
+    $mail = new PHPMailer(false);
+    $mail->IsSMTP(); // send via SMTP
+    $mail->SMTPAuth = true; // turn on SMTP authentication
+    $mail->Username = $email; // SMTP username
+    $mail->Password = $password; // SMTP password
+    $mail->From = $email;
+    $mail->FromName = $name;
+    //		$mail->AddReplyTo($email,$name);
+    $mail->AddReplyTo("umesh@vidyalaya.us", "Umesh Mittal");
+    $mail->IsHTML(true); // send as HTML
+    $mail->WordWrap = 50; // set word wrap
+
+    return $mail;
+  }
+
+  public static function SetupMailAdmissions() {
+    return self::SetupMailCommon("Admission2011@vidyalaya.us", "Vidyalaya Admissions", "Praveen38");
+  }
+	
+  public static function SetupMailSPA() {
+    return self::SetupMailCommon("spa@vidyalaya.us", "Student and Parent Affairs", "vasudha");
+  }
+
+  public static function SetupMailInfo() {
+    return self::SetupMailCommon("info@vidyalaya.us", "Vidyalaya Information", "praveen");
+  }
+
+  public static function SetupMailUmesh() {
+    return self::SetupMailCommon("umesh@vidyalaya.us", "Vidyalaya Information", "Praveen38");
+  }
+
+	
+  private static function SetupMail() {
+
+    $email = "Admission2011@vidyalaya.us";
+    $name = "Vidyalaya Admissions";
+
+    $mail = new PHPMailer(false);
+    $mail->IsSMTP(); // send via SMTP
+    $mail->SMTPAuth = true; // turn on SMTP authentication
+    $mail->Username = $email; // SMTP username
+    $mail->Password = "Praveen38"; // SMTP password
+    $mail->From = $email;
+    $mail->FromName = $name;
+    $mail->AddReplyTo($email,$name);
+    $mail->IsHTML(true); // send as HTML
+    $mail->WordWrap = 50; // set word wrap
+
+    return $mail;
+  }
+
+
+  private static function SetEmailAddress(&$mail, $email, $name, $production) {
+    if ($production == 0 ) {
+      $mail->AddAddress("voting@vidyalaya.us", "Testing email");
+      return;
+    }
+
+    foreach (explode(";", $email) as $toAddress) {
+      if (!empty($toAddress))
+	$mail->AddAddress($toAddress, $name);
+    }
+  }
+
+  public static function SetPersonAddress(&$mail, $person, $production) {
+    //    print "I will send to ". $person->id() . ": Person: " . $person->fullName() . ": " .  $person->email . "\n";
+    self::SetEmailAddress($mail, $person->email, $person->fullName(), $production);
+  }
+
+  public  static function SetFamilyAddress(&$mail, $family, $production) {
+    print "I will send to ". $family->id . ": Mother: " . $family->mother->fullName() . ": " .  $family->mother->email . "\n";
+    self::SetEmailAddress($mail, $family->mother->email, $family->mother->fullName(), $production);
+    print "I will send to ". $family->id . ": Father: " . $family->father->fullName() . ": " .  $family->father->email . "\n";
+    self::SetEmailAddress($mail, $family->father->email, $family->father->fullName(), $production);
+  }
+
+  public static function  mailFamilyFromAdmission($family, $subject, $body, $production) {
+    $footer = "<p>Vidyalaya Management Team<br>Umesh Mittal</p>";
+    self::mailFamily($family, $subject, $body, $production, $footer);
+  }
+
+
+  public static function  mailFamily($family, $subject, $body, $production, $footer) {
+    if ($production == 0) $subject = "[Test] $subject";
+
+    $mail = self::SetupMailSPA();
+    self::SetFamilyAddress($mail, $family, $production);
+
+    $mail->Subject = $subject;
+    $salutation = "<p>Dear " . $family->parentsName() . ",";
+    $mail->Body = $salutation . $body . $footer;
+
+    $mail->AltBody = "This is the body when user views in plain text format"; //Text Body
+		
+    if(!$mail->Send()) {
+      echo "Mailer Error: Family: $family->id: " . $mail->ErrorInfo . "\n";
+    }  else {
+      echo "Message has been sent, Family: $family->id:\n";
+    }
+  }
+
+  public static function mailResetPasswordCode($email, $person, $url, $ip, $production) {
+    $subject = "Password Reset for Dakhila Portal";
+    if ($production == 0) $subject = "[Test] $subject";
+    $mail = self::SetupMailUmesh();
+    self::SetPersonAddress(&$mail, $person, $production);
+
+    $mail->Subject = $subject;
+    $salutation = "<p>Dear " . $person->fullName() . ",\n";
+    $body = "<p>Request received from $ip </p>\n";
+    $body .= "<p>Please click <a href='$url'>here</a> to set your password for Dakhila Portal at Vidyalaya. Follow the instructions to reset your password from the same machine. <p> Please <a href='/dakhila/php/dataViewer2.php?command=login'>login</a> again  with the new password\n";
+    $footer = "<p>Sincerely,<p>info@vidyalaya.us<p>\n";
+
+    $mail->Body = $salutation . $body . $footer;
+    $mail->AltBody = "Password reset code for email , " . $email; //Text Body
+    if(!$mail->Send()) {
+      echo "Mailer Error: Id: $person->mfsId: " . $mail->ErrorInfo . "\n";
+    }  else {
+      //      echo "Message has been sent, Family: $person->mfsId:\n";
+    }
+
+  }
+	
+  public static function  mailEvaluation($studentId, $html, $production) {
+    $student = Student::GetItemById($studentId);
+    $family = $student->family;
+    
+    $footer = "<p>Asmita Mistry<br>On behalf of the Language Curriculum Team</p>";	
+    $subject = "Language Evaluation 2010-11: " . $student->fullName();
+    if ($production == 0) $subject = "[Test] $subject";
+    
+    $mail = self::SetupMailSPA();
+    self::SetFamilyAddress($mail, $family, $production);
+    $mail->Subject = $subject;
+    $salutation = "<p>Dear " . $family->parentsName() . ",";
+    
+    $name = $student->fullName();
+    
+    $body = <<<EOT
+		
+		<p>Attached please find the language evaluation report for $name for the 2010-11 school year. 
+		Also please find the class assignment for the upcoming school year if you have already registered. 
+		We also want to take this opportunity to thank the teachers for their voluntary contribution.
+
+		<p>Should you have any questions or concerns, please respond to this email at the 
+		earliest. 
+		Please forward any questions or comments to spa@vidyalaya.us.  The SPA team will 
+		coordinate with the Language Curriculum Team to address your concerns.
+
+<p>Have a great summer!
+
+<p>Regards,
+EOT;
+		
+    $mail->Body = $salutation . $body . $footer;
+    
+    
+    $filename = "/tmp/evalution-" . $studentId. ".pdf";
+    file_put_contents($filename, HtmlToPdf($html));
+    $mail->AddAttachment($filename); // attachment
+    
+    $mail->AltBody = "This is the body when user views in plain text format"; //Text Body
+    
+    if(!$mail->Send()) {
+      echo "Mailer Error: Family: $family->id: " . $mail->ErrorInfo . "\n";
+    }  else {
+      echo "Message has been sent, Family: $family->id:\n";
+    }
+    
+    unlink($filename);
+  }
+}
+
+
 
 
 ?>

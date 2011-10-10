@@ -92,7 +92,7 @@ class VidDb {
       showerror();
   }
 
-  private function mysqlclean($input, $maxlength) {
+  public function mysqlclean($input, $maxlength) {
     //     if (isset($array["{$index}"])) {
        $input = substr($input, 0, $maxlength);
         $input = mysql_real_escape_string($input, self::$connection);
@@ -101,7 +101,36 @@ class VidDb {
 	//     return NULL;
    }
 
-  public static function authenticateUser($username, $password)
+  public static function updatePassword ($email, $password) {
+    self::connect();
+    $email = self::mysqlclean($email, 50);
+    $password = self::mysqlclean($password, 10);
+    if (!isset($email) || !isset($password)) return false;
+
+    $query="select * from users where email='$email' ";
+    $result = mysql_fetch_alias_array(VidDb::query($query));
+    
+    $password_digest = md5(trim($password));
+    if (empty($result)) {
+      $query="insert into users values ('$email', '$password_digest')";
+    } else {
+      $query="update users set password = '$password_digest' where email = '$email'";
+    }
+    self::query($query);
+
+    $query = "SELECT password FROM users WHERE email = '{$email}' AND password = '{$password_digest}'";
+    $result = self::query($query);
+    if (mysql_num_rows($result) != 1) return false;
+    return true;
+  }
+
+  public static function authenticateUser($username, $password) {
+    if ($username != "umesh@vidyalaya.us") return false;
+    return self::authenticateOrdinaryUser($username, $password);
+  }
+
+
+  public static function authenticateOrdinaryUser($username, $password)
   {
     self::connect();
     VidSession::startSession();

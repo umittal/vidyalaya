@@ -289,6 +289,28 @@ function DisplayStudentTemplate (&$template, $student) {
 	$template->setVariable("ISCONTACTABLE", YesNoMap($family->father->IsContactable));
 	$template->parseCurrentBlock();
 
+	$templateName="OTHERCONTACT";
+	foreach ($student->contacts as $key => $phone) {
+	  $template->setCurrentBlock($templateName);
+	  $template->setVariable("TYPE",  $key);
+	  if ($phone == null) {
+	    $template->setVariable("PHONE",  "Add me");
+	  } else {
+	    $contact = OtherContacts::ObjectFromKey($phone);
+	    $template->setVariable("PHONE",  formatPhone($phone));
+	    $template->setVariable("NAME",  $contact->name);
+	    $address = $contact->addr1;
+	    if ($contact->addr2 != null) $addres .= "<br /> $contact->addr2";
+	    if ($contact->zip != null) {
+	      $zip = Zipcodes::ObjectFromKey($contact->zip);
+	      $address .= "<br /> $zip->city $zip->state, $zip->zipcodes";
+	    }
+	    $template->setVariable("ADDR",  $address);
+
+	    $template->setVariable("EMAIL",  $contact->email);
+	  }
+	  $template->parseCurrentBlock();
+	}
 
 	$templateName="MOTHER";
 	$template->setCurrentBlock($templateName);

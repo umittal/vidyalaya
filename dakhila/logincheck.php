@@ -13,6 +13,12 @@ if (VidDb::authenticateUser($username, $password)) {
   exit();
 } 
 
+if (VidDb::authenticateOrdinaryUser($username, $password)) {
+  header("Location: /dakhila/php/userdata.php?command=home"); // Relocate back to the first page of the application
+  exit();
+} 
+
+
   // The authentication failed: setup a logout message
   $_SESSION["message"] = "Could not connect to the application as {" . $username . "}";
   header("Location: /dakhila/php/dataViewer2.php?command=logout");

@@ -123,6 +123,7 @@ class Student {
   public $studentStatus=null;
   public $languagePreference=null;
   public $firstGradeYear = null;
+  public $contacts = array();
 
   public static $objArray = Array ();
   
@@ -234,6 +235,11 @@ class Student {
     $this->gender = $row["Students2003.GENDER"];
     $this->email = $row["Students2003.EMAIL"];
     $this->cellPhone = $row["Students2003.cellphone"];
+    $this->contacts = array();
+    $this->contacts["Emergency"] = $row["Students2003.EmergencyContact"];
+    $this->contacts["Primary"] = $row["Students2003.PrimaryDoctor"];
+    $this->contacts["Dentist"] = $row["Students2003.Dentist"];
+    $this->contacts["Hospital"] = $row["Students2003.Hospital"];
 
 
     $dob = $row["Students2003.DOB"];
@@ -937,6 +943,7 @@ class Person { // a new concept to break away from praveen's students2003 and pa
   }
 
   public static function PersonFromStudent($student) {
+    if ($student == null) return null;
     $person = new Person();
     $person->firstName = $student->firstName;
     $person->lastName = $student->lastName;
@@ -951,6 +958,7 @@ class Person { // a new concept to break away from praveen's students2003 and pa
   }
 
   public static function PersonFromParent($parent, $mfs, $id) {
+    if ($parent == null) return null;
     $person = new Person();
     $person->firstName = $parent->firstName;
     $person->lastName = $parent->lastName;
@@ -977,9 +985,13 @@ class Person { // a new concept to break away from praveen's students2003 and pa
 	$student = Student::GetItemById($id);
 	return self::PersonFromStudent($student);
       default: 
-	die ("unexpected type of item found in volunteers, id $teacher->mfsId, type = $teacher->MFS \n");
+	return null;
       }
     
+  }
+
+  public static function PersonFromEmail($email) {
+    return Person::PersonFromId(Emails::GetMFS($email), Emails::Getmfsid($email));
   }
 
   // actually this works for any object that has mfs and mfsid. This is an unfortunate benefit of lack of type checking
@@ -1083,6 +1095,125 @@ class MFS {
     default: 
       return "?";
     }
+  }
+}
+
+// ************** 
+Class ResetCode {
+  public $code=null; //unique code
+  public $MFS=null; // reference to praveen's mother, father, student
+  public $mfsId =null; //reference to id in parents2003 or students2003
+  public $start=null; //when it was created
+  public $end=null; //when it was created
+  public $ip=null; // ip addres
+  public $isValid=null;
+  public $email=null;
+  
+  public static function ObjectFromCodeIp($code, $ip) {
+    self::updateValidateFlag();
+  
+    if ($code == null) return null;
+    $query = "select * from ResetCode where code='$code' and ip='$ip' and isValid=true";
+    return new self(mysql_fetch_alias_array(VidDb::query($query)));
+  }
+
+  private static function updateValidateFlag() {
+    $now=time();
+    $query = "update ResetCode set isValid=false where end < $now";
+    VidDb::query($query);
+  }
+  
+  public static function InsertCode($person, $ip, $email) {
+
+    self::updateValidateFlag();
+    // return if a valid code is still there
+    $query="select * from ResetCode where isValid=true and MFS=$person->MFS and mfsId=$person->mfsId and ip='$ip'";
+    $result = mysql_fetch_alias_array(VidDb::query($query));
+    
+    if (!empty($result)) {
+      $reset = new self ($result);
+      return $reset->code;
+    }
+
+    // create a new code
+    $code=uniqid(rand(), true);
+    $start = time();
+    $end= $start + (60*60); // one hour
+    $query = "insert into ResetCode values ('$code', $person->MFS, $person->mfsId, $start, $end, '$ip', true, '$email' )";
+    VidDb::query($query);
+    return $code;
+    
+  }
+
+  public static function SetPassword($old, $ip, $password) {
+    self::updateValidateFlag();
+    $query="select * from ResetCode where isValid=true and email='$old->email' and code='$old->code' and ip='$ip'";
+    $result = mysql_fetch_alias_array(VidDb::query($query));
+    
+    if (empty($result)) return false; // no valid row found
+
+    return VidDb::updatePassword ($old->email, $password);
+
+  }
+
+  public function __construct($row) {
+    if ($row==null) return null;
+    $this->code = $row["ResetCode.code"];
+    $this->MFS = $row["ResetCode.MFS"];
+    $this->mfsId = $row["ResetCode.mfsId"];
+    $this->start = $row["ResetCode.start"];
+    $this->end = $row["ResetCode.end"];
+    $this->ip = $row["ResetCode.ip"];
+    $this->isValid = $row["ResetCode.isValid"];
+    $this->email = $row["ResetCode.email"];
+  }
+}
+
+// ************** 
+Class OtherContacts {
+  public $phone = null;
+  public $name = null;
+  public $addr1 = null;
+  public $addr2 = null;
+  public $zip = null;
+  public $email = null;
+
+  public static function ObjectFromKey($phone) {
+    if ($phone == null) return null;
+    $query = "select * from OtherContacts where phone=$phone";
+    return new self(mysql_fetch_alias_array(VidDb::query($query)));
+  }
+
+  public function __construct($row) {
+    if ($row==null) return;
+    $this->phone = $row["OtherContacts.phone"];
+    $this->name = $row["OtherContacts.name"];
+    $this->addr1 = $row["OtherContacts.addr1"];
+    $this->addr2 = $row["OtherContacts.addr2"];
+    $this->zip = $row["OtherContacts.zip"];
+    $this->email = $row["OtherContacts.email"];
+  }
+
+}
+
+Class Zipcodes {
+  public $zipcodes = null;
+  public $city=null;
+  public $state=null;
+  public $county=null;
+
+  public static function ObjectFromKey($zip) {
+    if ($zip == null) return null;
+    $query = "select * from zipcodes where zipcodes=$zip";
+    return new self(mysql_fetch_alias_array(VidDb::query($query)));
+  }
+
+  public function __construct($row) {
+    if ($row==null) return;
+    $this->zipcodes = $row["zipcodes.zipcodes"];
+    $this->city = $row["zipcodes.city"];
+    $this->state = $row["zipcodes.state"];
+    $this->county = $row["zipcodes.county"];
   }
 }
 
@@ -1370,8 +1501,9 @@ class Family {
 	}
 
 	public static function GetItemById($key) {
-		self::firstTimeCall();
-		return self::$objArray[$key];
+	  self::firstTimeCall();
+	  if (!array_key_exists($key, self::$objArray)) return null;
+	  return self::$objArray[$key];
 	}
 
 	public static function GetAllFamilies() {
