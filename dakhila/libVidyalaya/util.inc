@@ -3,7 +3,7 @@
 require_once "vidyalaya.inc";
 $dompdfDir = realpath(dirname(__FILE__)."/../../dompdf2");
 require_once("$dompdfDir/dompdf_config.inc.php");
-require_once("../../Classes/PHPMailer_v5.1/class.phpmailer.godaddy");
+require_once("../../Classes/PHPMailer_v5.1/class.phpmailer.php");
 
 // returns true if $str begins with $sub
 function beginsWith( $str, $sub ) {
@@ -288,9 +288,22 @@ class Mail {
   private static function SetupMailCommon($email, $name, $password) {
     $mail = new PHPMailer(false);
     $mail->IsSMTP(); // send via SMTP
-    $mail->SMTPAuth = true; // turn on SMTP authentication
-    $mail->Username = $email; // SMTP username
-    $mail->Password = $password; // SMTP password
+
+    $server = $_SERVER['SERVER_NAME'];
+    $sapi = php_sapi_name();
+     if (preg_match('/^www.vidyalaya.us/',$server ) && $sapi != "cli")  {
+      $mail->SMTPAuth = false; // turn on SMTP authentication
+      $mail->Host = "relay-hosting.secureserver.net";
+      $mail->Port = "25";
+      $mail->SMTPSecure = "";
+    } else {
+      $mail->SMTPAuth = true; // turn on SMTP authentication
+      $mail->Username = $email; // SMTP username
+      $mail->Password = $password; // SMTP password
+      $mail->Host = "smtp.gmail.com";
+      $mail->Port = "465";
+      $mail->SMTPSecure = "ssl";
+    }
     $mail->From = $email;
     $mail->FromName = $name;
     //		$mail->AddReplyTo($email,$name);
@@ -393,10 +406,11 @@ class Mail {
     $mail = self::SetupMailUmesh();
     self::SetPersonAddress(&$mail, $person, $production);
 
+    $server=  $_SERVER['SERVER_NAME'];
     $mail->Subject = $subject;
     $salutation = "<p>Dear " . $person->fullName() . ",\n";
     $body = "<p>Request received from $ip </p>\n";
-    $body .= "<p>Please click <a href='$url'>here</a> to set your password for Dakhila Portal at Vidyalaya. Follow the instructions to reset your password from the same machine. <p> Please <a href='/dakhila/php/dataViewer2.php?command=login'>login</a> again  with the new password\n";
+    $body .= "<p>Please click <a href='$url'>here</a> to set your password for Dakhila Portal at Vidyalaya. Follow the instructions to reset your password from the same machine. <p> Please <a href='$server/dakhila/php/dataViewer2.php?command=login'>login</a> again  with the new password\n";
     $footer = "<p>Sincerely,<p>info@vidyalaya.us<p>\n";
 
     $mail->Body = $salutation . $body . $footer;

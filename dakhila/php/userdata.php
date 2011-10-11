@@ -134,7 +134,7 @@ RESETFORM;
 	$person=Person::PersonFromEmail($email);
 	$code = ResetCode::InsertCode($person, $this->ip, $email);
 	$url="$this->thispage?command=resetpassword&code=$code";
-	Mail::mailResetPasswordCode($email, $person, $url, $this->ip, 0);
+	Mail::mailResetPasswordCode($email, $person, $url, $this->ip, 1);
 	$html .= "Please see email sent to $email and follow instructions to reset the password.\n";
 	$html .= "Click <a href='/dakhila/php/dataViewer2.php?command=login'>login</a> to login\n";
       }
