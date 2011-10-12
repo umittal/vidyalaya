@@ -7,7 +7,7 @@ require_once "HTML/Template/ITX.php";
 require_once "$libDir/HtmlFactory.inc";
 require_once "../../MPDF53/mpdf.php";
 
-require("../../Classes/PHPMailer_v5.1/class.phpmailer.php");
+//require("../../Classes/PHPMailer_v5.1/class.phpmailer.php");
 
 
 function SetupMail() {
@@ -1356,7 +1356,7 @@ class TwoYearLayout {
 
 //Admission::admissionConfirmationEmail(2011);exit();
 //Admission::itemDelivery(); exit();
-//Admission::Validation(2011); exit();
+Admission::Validation(2011); exit();
 
 
 //Evaluation::ProcessAllFiles(); exit();

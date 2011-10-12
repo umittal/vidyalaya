@@ -3,7 +3,8 @@
 require_once "vidyalaya.inc";
 $dompdfDir = realpath(dirname(__FILE__)."/../../dompdf2");
 require_once("$dompdfDir/dompdf_config.inc.php");
-require_once("../../Classes/PHPMailer_v5.1/class.phpmailer.php");
+$phpMailerDir = realpath(dirname(__FILE__)."/../../Classes/PHPMailer_v5.1");
+require_once("$phpMailerDir/class.phpmailer.php");
 
 // returns true if $str begins with $sub
 function beginsWith( $str, $sub ) {
