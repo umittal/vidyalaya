@@ -92,7 +92,7 @@ class VidDb {
       showerror();
   }
 
-  public function mysqlclean($input, $maxlength) {
+  public static function mysqlclean($input, $maxlength) {
     //     if (isset($array["{$index}"])) {
        $input = substr($input, 0, $maxlength);
         $input = mysql_real_escape_string($input, self::$connection);

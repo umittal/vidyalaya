@@ -39,6 +39,95 @@ class UserData {
     break;		
   }
 
+  public function editor() {
+    VidSession::sessionAuthenticate();
+    $this->SetMenu();
+    $email = $_SESSION["loginUsername"];
+    $person = Person::PersonFromEmail($email); 
+    if (is_null($person)) {
+      print "person is not defined, I did not want to be here\n";
+      print $this->template->get();
+      break;
+    }
+
+    $name = $person->fullName();
+    $content = isset($_POST['content']) ?  $_POST['content'] : null;
+    $classId = isset($_POST['classId']) ?  $_POST['classId'] : null;
+    $role = isset($_POST['role']) ?  $_POST['role'] : null;
+    $date = isset($_POST['date']) ?  $_POST['date'] : "2001-09-11";
+
+
+    $class = AvailableClass::GetItemById($classId);
+    $short = is_null($class) ? "" : $class->short();
+
+    if ( !empty($content) && !is_null($class))  {
+      $content = VidDb::mysqlclean($content, 5000);
+      Newsletter::Save($content, $class, $date, $person, $role);
+    }
+
+    if (empty($content)) {
+      $newsletter = Newsletter::Get($class, $date, $role);
+      $content = $newsletter->content;
+      //      print "<p>found content: $content\n";
+    }
+
+    $html = <<<TINYMCE
+<script type="text/javascript" src="/js/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript">
+tinyMCE.init({
+       // General options
+        mode : "textareas",
+        theme : "advanced",
+        plugins : "autolink,lists,spellchecker,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template",
+
+        // Theme options
+        theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
+        theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
+        theme_advanced_buttons3 : "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
+        theme_advanced_buttons4 : "insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak,|,insertfile,insertimage",
+        theme_advanced_toolbar_location : "top",
+        theme_advanced_toolbar_align : "left",
+        theme_advanced_statusbar_location : "bottom",
+        theme_advanced_resizing : true,
+
+        // Skin options
+        skin : "o2k7",
+        skin_variant : "silver",
+
+        // Example content CSS (should be your site CSS)
+      //  content_css : "css/example.css",
+
+        // Drop lists for link/image/media/template dialogs
+        template_external_list_url : "js/template_list.js",
+        external_link_list_url : "js/link_list.js",
+        external_image_list_url : "js/image_list.js",
+        media_external_list_url : "js/media_list.js",
+
+        // Replace values for the template plugin
+        template_replace_values : {
+                username : "Some User",
+                staffid : "991234"
+        }
+});
+</script>
+
+<form method="post" action="$this->thispage?command=editor">
+    Class: <input type="text" name="class" value="$short" readonly="readonly"/>
+    Role: <input type="text" name="role" value="$role" readonly="readonly"/>
+    <input type="text" name="classId" value="$classId" readonly="readonly">$classId</input>
+    Date: <input type="text" name="date" value="$date" readonly="readonly"/>
+        <p>     
+                <textarea name="content" cols="80" rows="15">$content</textarea>
+                <input type="submit" value="Save" />
+        </p>
+</form>
+TINYMCE;
+    $this->template->setCurrentBlock('RESULT');
+    $this->template->setVariable("RESULT", $html);
+    $this->template->parseCurrentBlock();
+    print $this->template->get();
+  }
+
   private function PersonFromCode($code) {
     if (is_null($code)) return null;
     $reset = ResetCode::ObjectFromCodeIp($code, $this->ip);

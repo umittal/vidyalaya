@@ -483,8 +483,8 @@ class AvailableClass {
 
 
 	public function IsChangeAllowed() {
-	  if ($this->session == "2011-12") return true;
 	  return false;
+	  if ($this->session == "2011-12") return true;
 	}
 
 	public function short() {
@@ -496,8 +496,9 @@ class AvailableClass {
 	
 
 	public static function GetItemById($key) {
+	  if (is_null($key)) return null;
 	 	self::firstTimeCall();
-	 	return self::$objArray[$key];
+	 	return array_key_exists($key, self::$objArray) ? self::$objArray[$key] : null;
 	 }	
 
 	public static function GetItemByShort($short, $session) {
@@ -1099,6 +1100,70 @@ class MFS {
 }
 
 // ************** 
+Class Newsletter {
+  public $date=null;
+  public $content=null;
+  public $classId = null;
+  public $timestamp = null;
+  public $MFS = null;
+  public $mfsId = null;
+  public $role = null;
+
+  public static function Save($content, $class, $date, $person, $role) {
+    $time = time();
+    $query="select * from Newsletter where date='$date' and classId = $class->id and role=$role ";
+    //    print "<p>$query\n";
+    $result = VidDb::query($query); $num_rows = mysql_num_rows($result);
+    if ($num_rows == 0) {
+      $query="insert into Newsletter values ('$date', '$content', $class->id, $time, $person->MFS, $person->mfsId, $role)";
+    }
+    if ($num_rows == 1) {
+      $query="update Newsletter  set content = '$content', timestamp = $time, MFS = $person->MFS, mfsId=$person->mfsId 
+              where date='$date' and classId = $class->id and role=$role";
+
+    }
+    //    print "<p>$query\n";
+    $result = VidDb::query($query); 
+    $query="select * from Newsletter where date='$date' and classId = $class->id and role=$role ";
+    //    print "<p>$query\n";
+    $result = VidDb::query($query); $num_rows = mysql_num_rows($result);
+    if ($num_rows == 0) {
+      print "<p> Something bad happened while inserting newsletter entry, row count is zero\n";
+      return null;
+    }
+    if ($num_rows == 1) {
+      return new self(mysql_fetch_alias_array($result[0]));
+    }
+    print "<p>My index should not be broken, I should not be here\n";
+    return null;
+  }
+
+  public static function Get($class, $date, $role) {
+    $query="select * from Newsletter where date='$date' and classId = $class->id and role=$role ";
+    //    print "<p>$query\n";
+    $result = VidDb::query($query); $num_rows = mysql_num_rows($result);
+    //    print "<p> num rows = $num_rows";
+    if ($num_rows == 0) return "";
+    if ($num_rows == 1) {
+      return new self(mysql_fetch_alias_array($result));
+    }
+    print "<p>My index should not be broken, I should not be here\n";
+    return "";
+  }
+
+  public function __construct($row) {
+    if ($row==null) return null;
+    $this->date = $row["Newsletter.date"];
+    $this->content = $row["Newsletter.content"];
+    $this->classId = $row["Newsletter.classId"];
+    $this->timestamp = $row["Newsletter.timestamp"];
+    $this->MFS = $row["Newsletter.MFS"];
+    $this->mfsId = $row["Newsletter.mfsId"];
+    $this->role = $row["Newsletter.role"];
+  }
+}
+
+// ************** 
 Class ResetCode {
   public $code=null; //unique code
   public $MFS=null; // reference to praveen's mother, father, student
@@ -1339,6 +1404,18 @@ class Teachers {
               inner join AvailableClass on teachers.classId = AvailableClass.id
               inner join CourseCatalog on AvailableClass.course = CourseCatalog.id
               where AvailableClass.year = $year and CourseCatalog.department = $department
+             ";
+    return self::ArrayFromQuery($query);
+  }
+
+  public static function GetTeacherFromPerson($person, $year) {
+    if ($year >= 2010) $year -= 2010;
+    $query = "select *
+              from teachers
+              inner join AvailableClass on teachers.classId = AvailableClass.id
+              where AvailableClass.year = $year 
+                    and teachers.MFS = $person->MFS
+                    and teachers.mfsId = $person->mfsId
              ";
     return self::ArrayFromQuery($query);
   }

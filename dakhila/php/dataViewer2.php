@@ -541,11 +541,43 @@ LOCALSTYLE;
 
     // ************************************************************
     case "person":
-      $mfs = isset($_GET['MFS']) ?  $_GET['MFS'] : null;
-      $id = isset($_GET['id']) ?  $_GET['id'] : null;
-      $person = Person::PersonFromId($mfs, $id); 
-      if ($person != null) 
+      $email = isset($_POST['email']) ?  $_POST['email'] : null;
+      $form = <<<EOT
+    <script>
+      dojo.require("dojo.parser");  
+       dojo.require("dijit.form.Button"); 
+dojo.require("dijit.form.Form");
+      dojo.require("dijit.form.ValidationTextBox");    
+    </script>
+<div class="formContainer">
+      <form method="POST" action="$this->thispage?command=person" dojoType="dijit.form.Form" >
+      <div class="formRow">
+      <label for="email">Email Address:</label>
+<input type="text" size="35" name="email" id="email"  value="$email"
+           dojoType="dijit.form.ValidationTextBox" 
+           required="true"  
+	regExp="\b[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}\b"
+           promptMessage="Enter email address."
+           invalidMessage="Invalid Email Address." 
+           trim="true"
+/>
+	      <button dojoType="dijit.form.Button" type="submit" >
+	Go
+	      </button>
+	</div>
+</div>
+</form>
+EOT;
+      $this->template->setCurrentBlock('QUERY');
+      $this->template->setVariable('QUERY', $form);
+      $this->template->parseCurrentBlock();
+
+      if (!is_null($email)) {
+      $person = Person::PersonFromEmail($email);
+      //      $person = Person::PersonFromId($mfs, $id); 
+      if (!is_null($person))
 	DisplayPerson($this->template, $person);
+      }
       print $this->template->get();
       break;		
 

@@ -70,31 +70,68 @@ function DisplayPersonTemplate (&$template, $person) {
 	$template->setVariable("CELL", $person->cellPhone);
 	$template->parseCurrentBlock();
 
-	if ($person->MFS == MFS::Student) {
-	$templateName="PARENTS";
-	$template->setCurrentBlock($templateName);
+	if ($person->MFS != MFS::Student) {
+	  $templateName="FAMILYLINK";
+	  $template->setCurrentBlock($templateName);
+	  $template->setVariable("ID", $person->mfsId);
+	  $template->parseCurrentBlock();
+	} else {
+	  $templateName="STUDENTLINK";
+	  $template->setCurrentBlock($templateName);
+	  $template->setVariable("ID", $person->mfsId);
+	  $template->parseCurrentBlock();
 
-	$template->setVariable("MF", "Father");
-	$template->setVariable("NAME", $family->father->fullName());
-	$template->setVariable("EMAIL", $family->father->email);
-	$template->setVariable("WORK", $family->father->workPhone);
-	$template->setVariable("CELL", $family->father->cellPhone);
-	$template->setVariable("ISCONTACTABLE", YesNoMap($family->father->IsContactable));
-	$template->parseCurrentBlock();
 
-	$template->setVariable("MF", "Mother");
-	$template->setVariable("EMAIL", $family->mother->email);
-	$template->setVariable("WORK", $family->mother->workPhone);
-	$template->setVariable("CELL", $family->mother->cellPhone);
-	$template->setVariable("NAME", $family->mother->fullName());
-	$template->setVariable("ISCONTACTABLE", YesNoMap($family->mother->IsContactable));
-	$template->parseCurrentBlock();
+	  $templateName="PARENTS";
+	  $template->setCurrentBlock($templateName);
 
-	$templateName="SHOWPARENTS";
-	$template->setCurrentBlock($templateName);
-	$template->parseCurrentBlock();
+	  $template->setVariable("MF", "Father");
+	  $template->setVariable("ID", $family->id);
+	  $template->setVariable("NAME", $family->father->fullName());
+	  $template->setVariable("EMAIL", $family->father->email);
+	  $template->setVariable("WORK", $family->father->workPhone);
+	  $template->setVariable("CELL", $family->father->cellPhone);
+	  $template->setVariable("ISCONTACTABLE", YesNoMap($family->father->IsContactable));
+	  $template->parseCurrentBlock();
 
+	  $template->setVariable("MF", "Mother");
+	  $template->setVariable("ID", $family->id);
+	  $template->setVariable("EMAIL", $family->mother->email);
+	  $template->setVariable("WORK", $family->mother->workPhone);
+	  $template->setVariable("CELL", $family->mother->cellPhone);
+	  $template->setVariable("NAME", $family->mother->fullName());
+	  $template->setVariable("ISCONTACTABLE", YesNoMap($family->mother->IsContactable));
+	  $template->parseCurrentBlock();
+
+	  $templateName="SHOWPARENTS";
+	  $template->setCurrentBlock($templateName);
+	  $template->parseCurrentBlock();
 	}
+
+	$isDirty = false;
+	$teachers = Teachers::GetTeacherFromPerson($person, Calendar::CurrentYear());
+	if (!is_null($teachers)) {
+	  
+	  $isDirty=true;
+	  $templateName="ROLE";
+	  $template->setCurrentBlock($templateName);
+
+	  foreach ($teachers as $teacher) {
+	    $template->setVariable("ROLE", "Teacher");
+	    $template->setVariable("CLASS", $teacher->class->short()); 
+	    $template->setVariable("ROOM", $teacher->class->room->roomNumber); 
+	    $template->setVariable("ROLE", 0); 
+	    $template->setVariable("CLASSID", $teacher->class->id); 
+	    $template->parseCurrentBlock();
+	  }
+	}
+
+	if ($isDirty) {
+	  $templateName="VOLUNTEERROLES";
+	  $template->setCurrentBlock($templateName);
+	  $template->parseCurrentBlock();
+	}
+
 
 }
 
