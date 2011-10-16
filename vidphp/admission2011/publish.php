@@ -344,7 +344,6 @@ class Publications {
 
   public static function CreateMailingLists($year) {
     self::MailingListsTeachers($year);
-    return;
     self::MailingListsClass($year);
     self::MailingListsVolunteers($year);
     self::MailingListsAll($year);
@@ -802,7 +801,7 @@ class Publications {
 
 }	
 
-class Newsletter {
+class NewsletterHtml {
   public static function Publish($date) {
     $year="2011"; // todo: get year from date
     $fh = tmpfile();
@@ -894,13 +893,13 @@ if (file_exists($classfile)) {
   }
 }
 
-Newsletter::Publish("2011-10-02");
+//NewsletterHtml::Publish("2011-10-23");
 //Publications::FamilyListForHandbookDistribution(2011); exit();
 //Publications::AttendanceSheet(2011); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
 //Publications::Roster(2011); exit();
 
-//Publications::RosterSpa(2011); exit();
+Publications::RosterSpa(2011); exit();
 
 //Publications::FullDumpFamilies();
 

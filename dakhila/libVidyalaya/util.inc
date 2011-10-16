@@ -127,7 +127,7 @@ class PrintFactory {
 
     $template->addBlockFile('RESULT', 'F_RESULT', 'FamilyDetail.tpl');
     $template->touchBlock('F_RESULT');
-    DisplayFamilyTemplate($template, $family, $students);
+    DisplayFamilyTemplateV3($template, $family);
     $html = $html . $template->get();	
     return $html;
   }

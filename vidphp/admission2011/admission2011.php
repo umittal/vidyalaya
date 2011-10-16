@@ -645,7 +645,71 @@ CLOSING;
       $csv[]=$family->address->OneLineAddress();
       fputcsv($fp, $csv);
       //      self::admissionConfirmationEmailFamily($item->family, $item->tuition, $enrollment);
-      self::FamilyOpeningDay($item->family, $enrollment);
+      //      self::FamilyOpeningDay($item->family, $enrollment);
+    }
+  }
+
+  // if a family wants to receive email regarding class assignment
+  public static function FamilyClassAssignment($year) {
+    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year);
+    $families = array();
+    if (($fp=fopen("/tmp/mayank.csv", "r"))!=FALSE) {
+      while (($data = fgetcsv($fp, 1000, ",")) != FALSE) {
+	$pos = count($data) - 2;
+	$student = Student::GetItemById($data[$pos]);
+	//	print "$pos, Student: $data[$pos], family: " . $student->family->id . "\n";
+	if (is_null($student)) {
+	  print "\t **** NOT FOUND \n";
+	  continue;
+	}
+	$families[$student->family->id] = $student->family;
+      }
+    }
+
+    foreach ($families as $family) {
+      //      print $family->id . ", " . $family->parentsName() . "\n";
+      $body = <<<FAMILYUPDATE
+	<p>Attached please find confirmation of update in the enrollment of your family. Please let me know if there is any update to the family detail form.
+ <p>Please print the student sheet and put it in the student's bag for easy reference.
+<p>
+Regards,
+<p>
+Vidyalaya Administration<br /> (sent by: Umesh Mittal)
+
+FAMILYUPDATE;
+      $footer="";
+      $production=1;
+      $subject = "Vidyalaya Update, Family- $family->id";
+      print "Trying to send email to id " . $family->id . "\n";
+      if ($production == 0) $subject = "[Test] $subject";
+      $mail = Mail::SetupMailSpa();
+      Mail::SetFamilyAddress(&$mail, $family, $production);
+      $mail->Subject = $subject;
+      $salutation = "<p>Dear " . $family->parentsName() . ",";
+      $mail->Body = $salutation . $body . $footer;
+      $mail->AltBody = "This is the body when user views in plain text format, opening day $family->id"; //Text Body
+
+      $filename="/home/umesh/student2011/Family-" . $family->id . ".pdf";
+      $mail->AddAttachment($filename); // attachment
+
+
+      $list = null; $done=array();
+      foreach($enrollment as $item) {
+	if (array_key_exists($item->student->id, $done)) continue;
+	if ($item->student->family->id == $family->id) {
+	  $filename="/home/umesh/student2011/Student-" . $item->student->id . ".pdf";
+	  $mail->AddAttachment($filename); // attachment
+
+	  $done[$item->student->id] = 1;
+	}
+      }
+
+      if(!$mail->Send()) {
+	echo "Mailer Error: Family: $family->id: " . $mail->ErrorInfo . "\n";
+      }  else {
+	echo "Message has been sent, Family: $family->id:\n";
+      }
+
     }
   }
 
@@ -919,7 +983,7 @@ AGREEMENT;
       }
     }
 
-    $cashfile="/home/umesh/Dropbox/Vidyalaya-Management/Administration/foropeningday.csv";
+    $cashfile="/home/umesh/Dropbox/Vidyalaya-Management/Administration/2011.csv";
     if (($handle = fopen($cashfile, "r")) !== FALSE) {
       $header = fgetcsv($handle, 0, ",");
       $header = fgetcsv($handle, 0, ",");
@@ -1354,17 +1418,20 @@ class TwoYearLayout {
 //Admission::OpeningDay(2011); exit();
 //Admission::PrintVolunteers(2011); exit();
 
-//Admission::admissionConfirmationEmail(2011);exit();
+//Admission::admissionConfirmationEmail(2011);exit(); // has thing in there to decide which email to send
+Admission::FamilyClassAssignment(2011); exit(); //to resend class assignment email to parents
 //Admission::itemDelivery(); exit();
-Admission::Validation(2011); exit();
 
 
 //Evaluation::ProcessAllFiles(); exit();
 
 
-//TwoYearLayout::checkFeePaid(); exit();
+//FamilyTracker::loadPayments();exit();
+//FamilyTracker::UpdateFamilyTracker(); exit();
 //TwoYearLayout::assignClass(); exit();
+//TwoYearLayout::checkFeePaid(); exit();
 //TwoYearLayout::twoYearCsv(); exit();
+//Admission::Validation(2011); exit();
 
 
 
