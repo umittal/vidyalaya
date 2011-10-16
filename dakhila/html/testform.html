@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+	<link rel="stylesheet" href="/dakhila/css/blue/style.css" type="text/css" id="" media="print, projection, screen" />
+	<link rel="stylesheet" href="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/site.css" type="text/css" media="screen print" />
+
+	<title>Vidyalaya </title>
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dojo/dojo.xd.js" djConfig="parseOnLoad: true"></script>
+        <script type="text/javascript">
+            dojo.require("dijit.MenuBar");
+            dojo.require("dijit.PopupMenuBarItem");
+            dojo.require("dijit.Menu");
+            dojo.require("dijit.MenuItem");
+            dojo.require("dijit.PopupMenuItem");
+        </script>
+
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/ui-lightness/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dojox/grid/enhanced/resources/claro/EnhancedGrid.css" />
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dijit/themes/claro/claro.css">
+      <style type="text/css">
+       @import "http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/resources/dojo.css"; 
+       </style>
+
+
+</head>
+
+<body class=" claro ">
+
+
+
+      <style type="text/css">
+       @import "/dakhila/css/form.css"; 
+       </style>
+    <script>
+      dojo.require("dojo.parser");  
+       dojo.require("dijit.form.Button"); 
+dojo.require("dijit.form.Form");
+      dojo.require("dijit.form.ValidationTextBox");    
+    </script>
+
+<div style="position:absolute; top:50%; left:25%; right:25%; overflow:auto; text-align:left">
+<div class="formContainer">
+      <form method="POST" action="http://wwww.vidyalaya.us/dakhila/php/userdata.php?command=formhelp" dojoType="dijit.form.Form" >
+    <div class="formTitle">Form Testing</div>
+
+      <div class="formRow">
+      <label for="email">Email Address:</label>
+<input type="text" size="35" name="email" id="email" 
+           dojoType="dijit.form.ValidationTextBox" 
+           required="true"  
+	regExp="\b[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}\b"
+           promptMessage="Enter email address."
+           invalidMessage="Invalid Email Address." 
+           trim="true"
+/>
+	</div>
+
+      <div class="formRow">
+      <label for="password">Password:</label>
+       <input type="password" size="10" name="password" id="password" 
+           dojoType="dijit.form.ValidationTextBox" 
+           required="true"  
+           promptMessage="Enter password."
+           trim="true"
+
+/>
+	</div>
+	      <button dojoType="dijit.form.Button" type="submit" >
+	Test
+	      </button>
+
+<p>
+<a href="http://wwww.vidyalaya.us/dakhila/php/userdata.php?command=register">New User Registration</a>
+
+</form>
+</div>
+	      
+
+      <p><i>The access to this system is restricted to authorized users. If you are not an authorized user, please exit immediately. 
+      To request a login to this system, please send an email to info@vidyalaya.us</i>
+</div>
+
+
+</body>
+</html>

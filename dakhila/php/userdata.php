@@ -39,6 +39,32 @@ class UserData {
     break;		
   }
 
+  public function formhelp() {
+    VidSession::sessionAuthenticate();
+    $this->SetMenu();
+    $html = "";
+
+    $html .= "<h3>Form Parameters are </h3>";
+    $html .= "<ol>\n";
+    foreach ($_POST as $key => $value) {
+      $html .= "<li>$key</li>$value\n";
+    }
+    $html .= "</ol>\n";
+
+
+    $html .= "<h3>Server Parameters are </h3>";
+    $html .= "<ol>\n";
+    foreach ($_SERVER as $key => $value) {
+      $html .= "<li>$key</li>$value\n";
+    }
+    $html .= "</ol>\n";
+
+    $this->template->setCurrentBlock('RESULT');
+    $this->template->setVariable("RESULT", $html);
+    $this->template->parseCurrentBlock();
+    print $this->template->get();
+  }
+
   public function editor() {
     VidSession::sessionAuthenticate();
     $this->SetMenu();
@@ -276,3 +302,5 @@ RESETFORM;
     $this->Layout();
   }
 }
+
+?>
