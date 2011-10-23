@@ -36,7 +36,6 @@ class UserData {
     if (!is_null($person)) 
       DisplayPerson($this->template, $person);
     print $this->template->get();
-    break;		
   }
 
   public function formhelp() {
@@ -84,6 +83,13 @@ class UserData {
 
 
     $class = AvailableClass::GetItemById($classId);
+    if (is_null($class)) {
+      $this->template->setCurrentBlock('RESULT');
+      $this->template->setVariable("RESULT", "Sorry, you currently do not have the edit privileges yet");
+      $this->template->parseCurrentBlock();
+      print $this->template->get();
+      return;
+    }
     $short = is_null($class) ? "" : $class->short();
 
     if ( !empty($content) && !is_null($class))  {

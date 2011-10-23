@@ -132,6 +132,49 @@ function DisplayPersonTemplate (&$template, $person) {
 	  $template->parseCurrentBlock();
 	}
 
+	// check for open events
+	$events = Items::OpenEvents();
+	if (!is_null($events)) {
+	  $templateName="EVENTREGISTRATION";
+	  $template->setCurrentBlock($templateName);
+	  foreach($events as $event) {
+	    $template->setVariable("ID", $event->id);
+	    $template->setVariable("URL", $event->url);
+	    $template->setVariable("EVENT", $event->description);
+	    $template->setVariable("DATE", $event->when);
+	    $template->setVariable("COST", $event->cost);
+
+	    
+	    $template->setVariable("MFS", $person->MFS);
+	    $template->setVariable("MFSID", $person->mfsId);
+	    $template->setVariable("ITEM", $event->id);
+	    $registration = ItemRegistration::RegisteredOpenItems($person->MFS, $person->mfsId, $event->id);
+	    if (is_null($registration)) {
+	      $action="register"; $actionlabel="Register"; $status=""; $display="inline";
+	    } else {
+	      $action="nothing"; $actionlabel="No Further Action"; $display="none";
+	      $count=count($registration);
+	      if ($count == 1) {
+		$reg = $registration[0];
+		$status = $reg->statusText;
+	      } else {
+		$status = "$count items found";
+	      }
+	    }
+	    $template->setVariable("ACTION", $action);
+	    $template->setVariable("ACTIONLABEL", $actionlabel);
+	    $template->setVariable("STATUS", $status);
+	    $template->setVariable("DISPLAY", $display);
+
+	    $template->parseCurrentBlock();
+	  }
+
+	  $templateName="SHOWEVENTS";
+	  $template->setCurrentBlock($templateName);
+	  $template->parseCurrentBlock();
+
+	}
+
 
 }
 

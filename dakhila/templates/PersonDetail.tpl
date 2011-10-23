@@ -4,6 +4,7 @@
     <script>
          dojo.require("dijit.form.TextBox");    
 dojo.require("dijit.form.Form");
+    dojo.require("dijit.form.Button");
 	function showStudentDetails(studentId) {
 	var form=dijit.byId("studentForm");
 	var idfield=dijit.byId("studentId");
@@ -23,6 +24,15 @@ dojo.require("dijit.form.Form");
 	idfield.attr("value", role);
 	var idfield=dijit.byId("classId");
 	idfield.attr("value", classId);
+	if (form) {form.submit();} else {alert ("form not found");}
+      }
+
+	function registerevent(mfs, mfsid, item, action) {
+	var form=dijit.byId("registereventform");
+	var idfield=dijit.byId("MFS");	idfield.attr("value", mfs);
+	var idfield=dijit.byId("mfsId");	idfield.attr("value", mfsid);
+	var idfield=dijit.byId("itemId");	idfield.attr("value", item);
+	var idfield=dijit.byId("action");	idfield.attr("value", action);
 	if (form) {form.submit();} else {alert ("form not found");}
       }
 
@@ -49,6 +59,18 @@ dojo.require("dijit.form.Form");
 	Class ID: <input type="text" dojoType="dijit.form.TextBox" name="classId" id="classId"> 
 	<input type="submit" name="go" value="GO"><br>
 	</form>
+
+	<form method="post" action="/dakhila/php/dataserver.php?command=RegisterEvent" style="display:none" id="registereventform"
+	dojoType="dijit.form.Form"
+	>
+	MFS: <input type="text" dojoType="dijit.form.TextBox" name="MFS" id="MFS"> 
+	MFS ID: <input type="text" dojoType="dijit.form.TextBox" name="mfsId" id="mfsId"> 
+	ITEM ID: <input type="text" dojoType="dijit.form.TextBox" name="itemId" id="itemId"> 
+	Action: <input type="text" dojoType="dijit.form.TextBox" name="action" id="action"> 
+	<input type="submit" name="go" value="GO"><br>
+	</form>
+
+	
 
 <h3>Person Details</h3>
  
@@ -102,6 +124,26 @@ dojo.require("dijit.form.Form");
 <!-- END ROLE -->  	  	  
 </table>
 <!-- END VOLUNTEERROLES -->  	  	  
+
+<!-- BEGIN SHOWEVENTS -->
+<li class="section">Events</li>
+<table class="tablesorter" >  	  	  
+ <thead><tr><th>ID<th>Event<th>Date</th><th>Cost</th><th>Status</th><th>Action</th></tr></thead>
+<!-- BEGIN EVENTREGISTRATION -->
+<tr><td>{ID} </td><td><a href="{URL}">{EVENT}</a></td><td> {DATE}</td><td>{COST}</td><td>{STATUS}</td><td>
+<div style="display:{DISPLAY}">
+<button data-dojo-type="dijit.form.Button" type="button" >
+    <script type="dojo/method" event="onClick" args="evt">
+        // Do something:
+        registerevent({MFS}, {MFSID}, {ITEM}, "{ACTION}");
+    </script>
+    {ACTIONLABEL}
+</button>
+</div>
+</td></tr>
+<!-- END EVENTREGISTRATION -->  	  	  
+</table>
+<!-- END SHOWEVENTS -->  	  	  
 
 
 </ol>

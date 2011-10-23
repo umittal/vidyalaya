@@ -3,7 +3,10 @@
         <span>
             File
         </span>
-        <div dojoType="dijit.Menu" id="toolsMenu">
+        <div dojoType="dijit.Menu" id="home">
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/userdata.php?command=home"'>
+                Home
+            </div>
             <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/userdata.php?command=editor"'>
                 Newsletter
             </div>
@@ -14,7 +17,7 @@
         <span>
             Tools
         </span>
-        <div dojoType="dijit.Menu" id="toolsMenu">
+        <div dojoType="dijit.Menu" id="logout">
             <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=logout"'>
                 Logout
             </div>

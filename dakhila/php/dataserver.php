@@ -23,6 +23,11 @@ case "CourseCatalog":
 case "ChangeClass":
   Dataserver::ChangeClass();
   break;
+case "RegisterEvent":
+  Dataserver::RegisterEvent();
+  $ref = $_SERVER['HTTP_REFERER'];
+  header( 'refresh: 0; url='.$ref);
+  break;
 default:
 
   break;
@@ -48,6 +53,22 @@ class Dataserver {
     header("HTTP/1.0 400 Bad Request ");
     error_log( $message);
     exit();
+  }
+
+  public static function RegisterEvent() {
+    $MFS=$_POST["MFS"];
+    $mfsId=$_POST["mfsId"];
+    $itemId=$_POST["itemId"];
+    $action=$_POST["action"];
+    if ($action == "" || $itemId == "" || $mfsId == "" || $MFS == "") return;
+    switch ($action) {
+    case "register":
+      ItemRegistration::RegisterInterst($MFS, $mfsId, $itemId);
+      break;
+    default:
+      print"dont know what to do";
+      break;
+    }
   }
 
   public static function ChangeClass() {

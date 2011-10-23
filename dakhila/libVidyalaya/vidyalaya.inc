@@ -1100,6 +1100,137 @@ class MFS {
 }
 
 // ************** 
+class ItemType {
+  const Event = 1
+    , Merchandise = 2
+    ;
+
+  public static function CodeFromId($id) {
+    switch ($id) {
+    case ItemType::Event:
+      return "Event";
+    case ItemType::Merchandise:
+      return "Merchandise";
+    default: 
+      return "?";
+    }
+  }
+}
+
+// ************** 
+Class Items {
+  public $id=null;
+  public $description=null;
+  public $when=null;
+  public $start=null;
+  public $end=null;
+  public $portal=null;
+  public $documentId=null;
+  public $itemType=null;
+  public $cost=null;
+  public $url=null;
+
+  private static function ArrayFromQuery($query) {
+    $localarray = Array();
+    $result = VidDb::query($query); 
+    $num_rows = mysql_num_rows($result);
+    if ($num_rows == 0) return null;
+
+    while ($row = mysql_fetch_alias_array($result)) {
+      $localarray[] = new self($row);
+    }
+    return $localarray;
+  }
+
+  public static function OpenEvents() {
+    $time = time();
+    $query = "select * from items where start < $time and end > $time and itemType = " . ItemType::Event;
+    return self::ArrayFromQuery($query);
+  }
+
+  public function __construct($row) {
+    if ($row==null) return null;
+    $this->id = $row["items.id"];
+    $this->description = $row["items.description"];
+    $this->when = $row["items.when"];
+    $this->start = $row["items.start"];
+    $this->end = $row["items.end"];
+    $this->portal = $row["items.portal"];
+    $this->documentId = $row["items.documentId"];
+    $this->itemType = ItemType::CodeFromId($row["items.itemType"]);
+    $this->cost = $row["items.Cost"];
+    $this->url = "http://www.vidyalaya.us/" . $this->portal . "/" . $this->documentId;
+  }
+
+}
+
+// ************** 
+class ItemRegistrationStatus {
+  const Interested = 1
+    , Registered = 2
+    , CancelRequest = 4
+    , Cancelled = 8
+    ;
+
+  public static function CodeFromId($id) {
+    if ($id & self::Cancelled) return "Cancelled";
+    if ($id & self::CancelRequest) return "Cancellation Requested";
+    if ($id & self::Registered) return "Registration Completed";
+    if ($id & self::Interested) return "Interested";
+    return "unknown";
+  }
+  
+}
+
+// ************** 
+Class ItemRegistration {
+  public $itemId=null;
+  public $MFS=null;
+  public $mfsId=null;
+  public $amountRequired=0;
+  public $amountPaid=0;
+  public $statusId=0;
+  public $statusText=null;
+  public $lastUpdate=null;
+
+  private static function ArrayFromQuery($query) {
+    $localarray = Array();
+    $result = VidDb::query($query); 
+    $num_rows = mysql_num_rows($result);
+    if ($num_rows == 0) return null;
+    while ($row = mysql_fetch_alias_array($result)) {
+      $localarray[] = new self($row);
+    }
+    return $localarray;
+  }
+
+  public static function RegisteredOpenItems($MFS, $mfsId, $eventId) {
+    $query= "select * from itemRegistration where MFS=$MFS and mfsId=$mfsId and itemId=$eventId";
+    return self::ArrayFromQuery($query);
+  }
+
+  public static function RegisterInterst($MFS, $mfsId, $eventId) {
+    $time=time();
+    $status= ItemRegistrationStatus::Interested;
+    $query="insert into itemRegistration values ($eventId, $MFS, $mfsId, 0, 0, $status, $time)";
+    $result = VidDb::query($query); 
+  }
+
+  public function __construct($row) {
+    if ($row==null) return null;
+    $this->itemId = $row["itemRegistration.itemId"];
+    $this->MFS = $row["itemRegistration.MFS"];
+    $this->mfsId = $row["itemRegistration.mfsId"];
+    $this->amountRequired = $row["itemRegistration.AmountRequired"];
+    $this->amountPaid = $row["itemRegistration.AmountPaid"];
+    $this->statusId = $row["itemRegistration.Status"];
+    $this->statusText = ItemRegistrationStatus::CodeFromId($this->statusId);
+    $this->lastUpdate = strftime("%c", $row["itemRegistration.lastUpdate"]);
+  }
+
+}
+
+// ************** 
 Class Newsletter {
   public $date=null;
   public $content=null;
