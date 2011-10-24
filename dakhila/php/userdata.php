@@ -79,7 +79,7 @@ class UserData {
     $content = isset($_POST['content']) ?  $_POST['content'] : null;
     $classId = isset($_POST['classId']) ?  $_POST['classId'] : null;
     $role = isset($_POST['role']) ?  $_POST['role'] : null;
-    $date = isset($_POST['date']) ?  $_POST['date'] : "2001-09-11";
+    $date = isset($_POST['date']) ?  $_POST['date'] : "2011-10-23";
 
 
     $class = AvailableClass::GetItemById($classId);

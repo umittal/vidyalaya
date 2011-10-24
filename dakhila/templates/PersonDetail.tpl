@@ -132,6 +132,8 @@ dojo.require("dijit.form.Form");
 <!-- BEGIN EVENTREGISTRATION -->
 <tr><td>{ID} </td><td><a href="{URL}">{EVENT}</a></td><td> {DATE}</td><td>{COST}</td><td>{STATUS}</td><td>
 <div style="display:{DISPLAY}">
+
+<!-- BEGIN ACTIONBUTTON -->
 <button data-dojo-type="dijit.form.Button" type="button" >
     <script type="dojo/method" event="onClick" args="evt">
         // Do something:
@@ -139,9 +141,10 @@ dojo.require("dijit.form.Form");
     </script>
     {ACTIONLABEL}
 </button>
+<!-- END ACTIONBUTTON -->
 </div>
 </td></tr>
-<!-- END EVENTREGISTRATION -->  	  	  
+<!-- END EVENTREGISTRATION -->
 </table>
 <!-- END SHOWEVENTS -->  	  	  
 

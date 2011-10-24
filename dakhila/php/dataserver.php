@@ -65,6 +65,9 @@ class Dataserver {
     case "register":
       ItemRegistration::RegisterInterst($MFS, $mfsId, $itemId);
       break;
+    case "decline":
+      ItemRegistration::Decline($MFS, $mfsId, $itemId);
+      break;
     default:
       print"dont know what to do";
       break;

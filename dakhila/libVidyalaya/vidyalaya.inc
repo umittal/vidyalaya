@@ -1170,9 +1170,11 @@ class ItemRegistrationStatus {
     , Registered = 2
     , CancelRequest = 4
     , Cancelled = 8
+    , Decline = 16
     ;
 
   public static function CodeFromId($id) {
+    if ($id & self::Decline) return "Not Interested";
     if ($id & self::Cancelled) return "Cancelled";
     if ($id & self::CancelRequest) return "Cancellation Requested";
     if ($id & self::Registered) return "Registration Completed";
@@ -1212,6 +1214,13 @@ Class ItemRegistration {
   public static function RegisterInterst($MFS, $mfsId, $eventId) {
     $time=time();
     $status= ItemRegistrationStatus::Interested;
+    $query="insert into itemRegistration values ($eventId, $MFS, $mfsId, 0, 0, $status, $time)";
+    $result = VidDb::query($query); 
+  }
+
+  public static function Decline($MFS, $mfsId, $eventId) {
+    $time=time();
+    $status= ItemRegistrationStatus::Decline;
     $query="insert into itemRegistration values ($eventId, $MFS, $mfsId, 0, 0, $status, $time)";
     $result = VidDb::query($query); 
   }
