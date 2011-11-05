@@ -2,7 +2,7 @@
 
 $rootDir = $_SERVER["DOCUMENT_ROOT"] . "/dakhila";
 
-function authenticateUser($connection, $username, $password)
+function authenticateUserOld($connection, $username, $password)
 {
   // Test the username and password parameters
   if (!isset($username) || !isset($password))
@@ -30,7 +30,7 @@ function authenticateUser($connection, $username, $password)
 // Connects to a session and checks that the user has
 // authenticated and that the remote IP address matches
 // the address used to create the session.
-function sessionAuthenticate()
+function sessionAuthenticateOld()
 {
   // Check if the user hasn't logged in
   if (!isset($_SESSION["loginUsername"]))

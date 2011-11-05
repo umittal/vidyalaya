@@ -102,6 +102,14 @@ class DataViewer {
   // ************************************************************
   public function DoIt($command) {
     VidSession::sessionAuthenticate();
+    if ($_SESSION["loginUsername"] != "umesh@vidyalaya.us") {
+      $html = "<p>Sorry, only administrators are permitted access to this page, please click the back button on your browser</p>";
+      $this->template->setCurrentBlock('RESULT');
+      $this->template->setVariable('RESULT', $html);
+      $this->template->parseCurrentBlock();
+      print $this->template->get();
+      return;
+    }
     $this->SetMenu();
     switch ($command) {
 
