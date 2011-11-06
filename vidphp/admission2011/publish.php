@@ -893,13 +893,106 @@ if (file_exists($classfile)) {
   }
 }
 
+class EventManager {
+
+  private static function EventMail($family, $body) {
+    $footer="<p>Regards,<p>Vidyalaya Event Management<br />(sent by: Umesh Mittal)</p>";
+    $production=1;
+    $subject = "AVG Visit Event, Family- $family->id";
+    print "Trying to send email to id " . $family->id . "\n";
+    if ($production == 0) $subject = "[Test] $subject";
+    $mail = Mail::SetupMailSpa();
+    Mail::SetFamilyAddress(&$mail, $family, $production);
+    $mail->Subject = $subject;
+    $salutation = "<p>Dear " . $family->parentsName() . ",";
+    $mail->Body = $salutation . $body . $footer;
+    $mail->AltBody = "This is the body when user views in plain text format, opening day $family->id"; //Text Body
+
+    if(!$mail->Send()) {
+      echo "Mailer Error: Family: $family->id: " . $mail->ErrorInfo . "\n";
+    }  else {
+      echo "Message has been sent, Family: $family->id:\n";
+    }
+
+
+  }
+
+  // let us do some workflow here
+  private static function workflow($registration) {
+    $person = Person::PersonFromId($registration->MFS, $registration->mfsId);
+    if ($registration->statusId & ItemRegistrationStatus::Decline ) {
+      if ($registration->statusId & ItemRegistrationStatus::DeclineAcknowledged) return;
+      $body = file_get_contents("event1.decline.html");
+      self::EventMail($person->home, $body);
+      ItemRegistration::UpdateStatus($registration, ItemRegistrationStatus::DeclineAcknowledged);
+      return;
+    }
+
+    if ($registration->statusId & ItemRegistrationStatus::CancelRequest ) {
+      print "do not know how to handle cancel\n";
+      return;
+    }
+
+    if ($registration->statusId & ItemRegistrationStatus::Interested ) {
+      if ($registration->statusId & ItemRegistrationStatus::InterestAcknowledged) return;
+      $body = file_get_contents("event1.interested.html");
+      self::EventMail($person->home, $body);
+      ItemRegistration::UpdateStatus($registration, ItemRegistrationStatus::InterestAcknowledged);
+      return;
+    }
+  }
+
+  private static function UnknownReminder($status) {
+    // create unknown list
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, 2011) as $enrollment) { // registered students
+      $familyId = $enrollment->student->family->id;
+      if (!array_key_exists($familyId, $status)) {
+	$status[$familyId] = 0;
+	$body = file_get_contents("event1.announce.html");
+	self::EventMail($enrollment->student->family, $body);
+      }
+    }
+
+    foreach (Volunteers::GetAllYear(2011) as $item) { // volunteers
+      $familyId = $item->person->home->id;
+      if (!array_key_exists($familyId, $status)) {
+	$status[$familyId] = 0;
+	$body = file_get_contents("event1.announce.html");
+	self::EventMail($item->person->home, $body);
+      }
+    }
+  }
+
+  public static function ReportParticipation($eventId) {
+    $status = array();
+    foreach(ItemRegistration::EventRegistration($eventId) as $registration) {
+      $person = Person::PersonFromId($registration->MFS, $registration->mfsId);
+      if (array_key_exists($person->home->id, $status)) {
+	print "duplicate for family " . $person->home->id . ", ignored\n";
+      } else {
+	$status[$person->home->id] = $registration->statusId;
+	self::workflow($registration);
+      }
+    }
+
+
+    // self::UnknownReminder($status);
+    foreach ($status as $familyId => $response) {
+      $family = Family::GetItemById($familyId);
+      //      print "$familyId, " . $family->parentsName() . ", " . ItemRegistrationStatus::CodeFromId($response) . "\n";
+    }
+  }
+}
+
+
+EventManager::ReportParticipation(1); exit();
 //NewsletterHtml::Publish("2011-10-23");
 //Publications::FamilyListForHandbookDistribution(2011); exit();
 //Publications::AttendanceSheet(2011); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
 //Publications::Roster(2011); exit();
 
-Publications::RosterSpa(2011); exit();
+//Publications::RosterSpa(2011); exit();
 
 //Publications::FullDumpFamilies();
 

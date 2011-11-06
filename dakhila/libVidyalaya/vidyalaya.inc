@@ -1171,15 +1171,24 @@ class ItemRegistrationStatus {
     , CancelRequest = 4
     , Cancelled = 8
     , Decline = 16
+    , InterestAcknowledged = 256
+    , CancelAcknowledged = 512
+    , DeclineAcknowledged = 512
     ;
 
   public static function CodeFromId($id) {
-    if ($id & self::Decline) return "Not Interested";
-    if ($id & self::Cancelled) return "Cancelled";
-    if ($id & self::CancelRequest) return "Cancellation Requested";
-    if ($id & self::Registered) return "Registration Completed";
-    if ($id & self::Interested) return "Interested";
-    return "unknown";
+    $csv = array();
+    if ($id & self::Decline) $csv[] = "Not Interested";
+    if ($id & self::Cancelled) $csv[] =  "Cancelled";
+    if ($id & self::CancelRequest) $csv[] = "Cancellation Requested";
+    if ($id & self::Registered) $csv[] = "Registration Completed";
+    if ($id & self::Interested) $csv[] = "Interested";
+    if ($id & self::InterestAcknowledged) $csv[] = "Interest Acknowledged";
+    if ($id & self::CancelAcknowledged) $csv[] = "Cancellation Acknowledged";
+    if ($id & self::DeclineAcknowledged) $csv[] = "Decline Acknowledged";
+    if (count($csv) == 0 ) return "unknown";
+    return implode(", ", $csv);
+
   }
   
 }
@@ -1206,6 +1215,11 @@ Class ItemRegistration {
     return $localarray;
   }
 
+  public static function EventRegistration($eventId) {
+    $query= "select * from itemRegistration where  itemId=$eventId";
+    return self::ArrayFromQuery($query);
+  }
+
   public static function RegisteredOpenItems($MFS, $mfsId, $eventId) {
     $query= "select * from itemRegistration where MFS=$MFS and mfsId=$mfsId and itemId=$eventId";
     return self::ArrayFromQuery($query);
@@ -1222,6 +1236,17 @@ Class ItemRegistration {
     $time=time();
     $status= ItemRegistrationStatus::Decline;
     $query="insert into itemRegistration values ($eventId, $MFS, $mfsId, 0, 0, $status, $time)";
+    $result = VidDb::query($query); 
+  }
+
+  public static function UpdateStatus($item, $new) {
+    $time=time();
+    $eventId = $item->itemId;
+    $MFS =  $item->MFS;
+    $mfsId = $item->mfsId;
+    $oldstatus = $item->statusId;
+    $status =  $oldstatus | $new;
+    $query="update itemRegistration set Status = $status, lastUpdate = $time  where itemId=$eventId and MFS= $MFS and mfsId= $mfsId and Status = $oldstatus";
     $result = VidDb::query($query); 
   }
 

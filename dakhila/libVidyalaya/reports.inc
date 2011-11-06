@@ -144,6 +144,52 @@ class Reports {
    return $html;
   }
 
+  private static function EventRSVPTable ($items, &$html, $lastUpdate, $heading) {
+    usort ($items, "Family::CompareFatherLast");
+    $html .= "<h3>$heading</h3>\n";
+    $html .= '<table id="' . $heading . '" cellspacing="0" class="tablesorter" width="600px">' . "\n";
+    $html .= "<thead><tr><th>#</th><th>ID</th><th>Time</th><th>Parents</th><th>Paid</th></tr></thead><tbody>\n";
+    $i=1;
+    foreach($items as $family) {
+      $time = $lastUpdate[$family->id];
+      $html .= "<tr> <td align=right>$i</td><td align=right>$family->id</td><td>$time</td> <td>" .  $family->parentsName() . "</td><td></td></tr>";
+      $i++;
+    }
+    $html .= "</tbody></table>\n";
+  }
+
+  public static function EventRSVP($eventId) {
+    $interest = array(); $cancel=array(); $decline=array(); $lastUpdate=array();
+    foreach(ItemRegistration::EventRegistration($eventId) as $registration) {
+      $person = Person::PersonFromId($registration->MFS, $registration->mfsId);
+      if (!array_key_exists($person->home->id, $lastUpdate)) {
+	$lastUpdate[$person->home->id] = $registration->lastUpdate;
+	if ($registration->statusId & ItemRegistrationStatus::Decline) {
+	  $decline[] = $person->home;
+	} else if ($registration->statusId & ItemRegistrationStatus::CancelRequest) {
+	  $cancel[] = $person->home;
+	} else if ($registration->statusId & ItemRegistrationStatus::Interested) {
+	  $interest[] = $person->home;
+	  //	  print "<p>I was here for " . $person->home->id;
+	} else {
+	  print "wierd status $registration->statusId for family " . $person->home->id . "\n";
+	}
+      }
+    }
+
+    $html = "<p> The RSVP list for event number $eventId is as follows:</p>\n";
+    if (!empty($interest) ) {
+      self::EventRSVPTable($interest, $html, $lastUpdate, "Interested");
+    }
+    if (!empty($decline) ) {
+      self::EventRSVPTable($decline, $html, $lastUpdate, "Declined");
+    }
+    if (!empty($cancel) ) {
+      self::EventRSVPTable($cancel, $html, $lastupdate, "Cancelled");
+    }
+    return $html;
+  }
+
   public static function lcmatrix($year) {
     $language = array(); $culture=array();
     foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year) as $item) {

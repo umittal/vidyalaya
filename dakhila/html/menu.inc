@@ -61,6 +61,18 @@
 
     <div dojoType="dijit.PopupMenuBarItem">
         <span>
+            Misc
+        </span>
+        <div dojoType="dijit.Menu" id="miscMenu">
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=EventRSVP"'>
+                RSVP
+            </div>
+        </div>
+    </div>
+
+
+    <div dojoType="dijit.PopupMenuBarItem">
+        <span>
             Tools
         </span>
         <div dojoType="dijit.Menu" id="toolsMenu">

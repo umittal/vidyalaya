@@ -486,6 +486,27 @@ NAMAKOOL;
 
 
     // ************************************************************
+    case "EventRSVP":
+      $js = <<< NAMAKOOL
+<script type="text/javascript">
+$(document).ready( function() {
+    \$table = $("#Interested").tablesorter({widthFixed: true, widgets: ['zebra']
+	});
+    \$table = $("#Declined").tablesorter({widthFixed: true, widgets: ['zebra']
+	});
+
+});
+</script>
+NAMAKOOL;
+
+      $this->template->setCurrentBlock('RESULT');
+      $this->template->setVariable('RESULT', $js . Reports::EventRSVP(1));
+      $this->template->parseCurrentBlock();
+      print $this->template->get();
+      break;
+
+
+    // ************************************************************
     case "Teachers":
       $year=2011;
       $js = <<< NAMAKOOL
