@@ -1461,7 +1461,7 @@ Class Emails {
 	continue;
       }
       if (empty($email)) continue;
-      self::$objArray[strtolower($email)] = new self($email, $mfs, $mfsid);
+      self::$objArray[trim(strtolower($email))] = new self($email, $mfs, $mfsid);
     }
   }
 
@@ -1485,12 +1485,14 @@ Class Emails {
 
   public static function GetMFS($email) {
     self::firstTimeCall();
+    $email=trim(strtolower($email));
     if (!array_key_exists($email, self::$objArray)) return 0;
     return self::$objArray[$email]->MFS;
   }
 
   public static function Getmfsid($email) {
     self::firstTimeCall();
+    $email=trim(strtolower($email));
     if (!array_key_exists($email, self::$objArray)) return 0;
     return self::$objArray[$email]->mfsId;
   }
