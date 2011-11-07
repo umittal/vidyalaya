@@ -126,6 +126,7 @@ class VidDb {
   }
 
   public static function authenticateUser($username, $password) {
+    $username = trim(strtolower($username));
     if ($username != "umesh@vidyalaya.us") return false;
     return self::authenticateOrdinaryUser($username, $password);
   }
@@ -133,6 +134,7 @@ class VidDb {
 
   public static function authenticateOrdinaryUser($username, $password)
   {
+    $username = trim(strtolower($username));
     self::connect();
     VidSession::startSession();
     // Clean the data collected in the <form>
