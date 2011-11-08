@@ -812,9 +812,14 @@ class NewsletterHtml {
     fwrite($fh, "<div id='newsletter'>\n");
 
     // Step 1: publish dates
+<<<<<<< HEAD
     $expiration = "2011-10-30";
     fwrite ($fh, "<p class='newsgate'> Expiration Date: $expiration\n");
     fwrite ($fh, "<p class='newsgate'> Last Class: $date\n");
+=======
+    $expiration = "2011-11-20";
+    fwrite ($fh, "<p class='newsgate'> Week: 5 <br />Expiration Date: $expiration <br />Last Class: $date\n");
+>>>>>>> c39cb5806bd9a9bc32bf9907439f99145208bf49
     fwrite ($fh, "  <a name='top'>&nbsp;</a>\n");
     fwrite ($fh, "\n");
 
@@ -899,7 +904,115 @@ if (file_exists($classfile)) {
   }
 }
 
+<<<<<<< HEAD
 NewsletterHtml::Publish("2011-10-23"); exit();
+=======
+class EventManager {
+
+  private static function EventMail($family, $body) {
+    $footer="<p>Regards,<p>Vidyalaya Event Management<br />(sent by: Umesh Mittal)</p>";
+    $production=1;
+    $subject = "AVG Visit Event, Family- $family->id";
+    print "Trying to send email to id " . $family->id . "\n";
+    if ($production == 0) $subject = "[Test] $subject";
+    $mail = Mail::SetupMailSpa();
+    Mail::SetFamilyAddress(&$mail, $family, $production);
+    $mail->Subject = $subject;
+    $salutation = "<p>Dear " . $family->parentsName() . ",";
+    $mail->Body = $salutation . $body . $footer;
+    $mail->AltBody = "This is the body when user views in plain text format, opening day $family->id"; //Text Body
+
+    if(!$mail->Send()) {
+      echo "Mailer Error: Family: $family->id: " . $mail->ErrorInfo . "\n";
+    }  else {
+      echo "Message has been sent, Family: $family->id:\n";
+    }
+
+
+  }
+
+  // let us do some workflow here
+  private static function workflow($registration) {
+    $person = Person::PersonFromId($registration->MFS, $registration->mfsId);
+    if ($registration->statusId & ItemRegistrationStatus::Decline ) {
+      if ($registration->statusId & ItemRegistrationStatus::DeclineAcknowledged) return;
+      $body = file_get_contents("event1.decline.html");
+      self::EventMail($person->home, $body);
+      ItemRegistration::UpdateStatus($registration, ItemRegistrationStatus::DeclineAcknowledged);
+      return;
+    }
+
+    if ($registration->statusId & ItemRegistrationStatus::CancelRequest ) {
+      print "do not know how to handle cancel\n";
+      return;
+    }
+
+    if ($registration->statusId & ItemRegistrationStatus::Interested ) {
+      if ($registration->statusId & ItemRegistrationStatus::InterestAcknowledged) return;
+      $body = file_get_contents("event1.interested.html");
+      self::EventMail($person->home, $body);
+      ItemRegistration::UpdateStatus($registration, ItemRegistrationStatus::InterestAcknowledged);
+      return;
+    }
+  }
+
+  private static function UnknownReminder($status) {
+    // create unknown list
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, 2011) as $enrollment) { // registered students
+      $familyId = $enrollment->student->family->id;
+      if (!array_key_exists($familyId, $status)) {
+	$status[$familyId] = 0;
+	$body = file_get_contents("event1.announce.html");
+	self::EventMail($enrollment->student->family, $body);
+      }
+    }
+
+    foreach (Volunteers::GetAllYear(2011) as $item) { // volunteers
+      $familyId = $item->person->home->id;
+      if (!array_key_exists($familyId, $status)) {
+	$status[$familyId] = 0;
+	$body = file_get_contents("event1.announce.html");
+	self::EventMail($item->person->home, $body);
+      }
+    }
+  }
+
+  public static function PostPayment($eventId, $amount, $date, $familyId) {
+    $interest = array(); $cancel=array(); $decline=array(); $familyReg=array();
+    foreach(ItemRegistration::EventRegistration($eventId) as $registration) {
+      $person = Person::PersonFromId($registration->MFS, $registration->mfsId);
+      if (!array_key_exists($person->home->id, $familyReg)) {
+	$familyReg[$person->home->id] = $registration;
+      } else {
+	  print "wierd status $registration->statusId for family " . $person->home->id . "\n";
+      }
+    }
+
+
+    if (array_key_exists($familyId, $familyReg)) { // person paying money registered, update record
+      // set registered, paymentacknowledged,  clear cancelrequest,cancelled,declined,
+      $registration = $familyReg[$familyId];
+      $status = $registration->statusId;
+      $status = $status | ItemRegistrationStatus::Registered ;
+      $status = $status ^ ItemRegistrationStatus::CancelRequest ^ ItemRegistrationStatus::Cancelled ^ ItemRegistrationStatus::Decline;
+      $amount = $registration->amountPaid + $amount;
+      $sql = "update set statusId = $status, amountPaid = $amount where ";
+      // send an email about payment being received.
+      
+    } else { // preson paying money did not register, insert record
+      $status = ItemRegistrationStatus::Registered;
+      $amount = $amount;
+      $sql = "insert ";
+    }
+
+    $subject = "Payment Receipt for Vidyalaya Event : ";
+  }
+
+}
+
+//EventManager::ReportParticipation(1); exit();
+NewsletterHtml::Publish("2011-11-06");
+>>>>>>> c39cb5806bd9a9bc32bf9907439f99145208bf49
 //Publications::FamilyListForHandbookDistribution(2011); exit();
 //Publications::AttendanceSheet(2011); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();

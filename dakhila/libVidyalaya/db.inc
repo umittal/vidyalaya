@@ -76,7 +76,8 @@ class VidDb {
    	 
   private static function connect() {
     if (!empty(self::$connection)) return;
-    if (getenv('localvidyalaya') || $_SERVER['SERVER_NAME'] == "localhost") {
+    $server = $command=isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME']  : "";
+    if (getenv('localvidyalaya') || $server == "localhost") {
       self::showlocal( "\n\n\t*****Using local  database, may be out of sync");
       self::showlocal( "\t**********************************************");
       if (!self::$connection =  mysql_connect("localhost", self::$username, self::$password))
@@ -125,6 +126,7 @@ class VidDb {
   }
 
   public static function authenticateUser($username, $password) {
+    $username = trim(strtolower($username));
     if ($username != "umesh@vidyalaya.us") return false;
     return self::authenticateOrdinaryUser($username, $password);
   }
@@ -132,6 +134,7 @@ class VidDb {
 
   public static function authenticateOrdinaryUser($username, $password)
   {
+    $username = trim(strtolower($username));
     self::connect();
     VidSession::startSession();
     // Clean the data collected in the <form>

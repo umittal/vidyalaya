@@ -157,7 +157,7 @@ function PostOrientation($family) {
   
   $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Management/Admission/Volunteer2011.pdf"); // attachment
   $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Management/Admission/ParticipationAgreement.pdf"); // attachment
-  $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/Layouts/phhslayout2011-12.pdf"); // attachment
+  //  $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/Layouts/phhslayout2011-12.pdf"); // attachment
 
 
   print "Family id: $family->id, Name: " . $family->parentsName() . "\n";
@@ -753,7 +753,7 @@ TEACHEREMAIL;
       $subject="Welcome to Vidyalaya 2011";
       $production=1;
 
-      print "Trying to send email to id " . $person->id() . "\n";
+     print "Trying to send email to id " . $person->id() . "\n";
       if ($person->id() != "F227") continue;
       if ($production == 0) $subject = "[Test] $subject";
       $mail = Mail::SetupMailUmesh();
@@ -1419,7 +1419,7 @@ class TwoYearLayout {
 //Admission::PrintVolunteers(2011); exit();
 
 //Admission::admissionConfirmationEmail(2011);exit(); // has thing in there to decide which email to send
-Admission::FamilyClassAssignment(2011); exit(); //to resend class assignment email to parents
+//Admission::FamilyClassAssignment(2011); exit(); //to resend class assignment email to parents
 //Admission::itemDelivery(); exit();
 
 
@@ -1449,7 +1449,7 @@ if (array_key_exists("function", $out))
 //die("I have nothing to do\n");
 
 
-$students = GetAllData();
+//$students = GetAllData();
 
 // ExistingFamilies($students);
 //NewFamiliesOrientation();

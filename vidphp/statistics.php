@@ -471,7 +471,7 @@ function ConvertTeacherToObject() {
 
 
 //FamilyTracker::UpdateFamilyTracker(); exit();
-//FamilyTracker::loadPayments();exit();
+FamilyTracker::loadPayments();exit();
 //FamilyTracker::ReportPending();exit();
 //FamilyTracker::TrackerSummary();exit(); This has probably been removed
 //

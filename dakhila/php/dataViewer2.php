@@ -101,21 +101,9 @@ class DataViewer {
 
   // ************************************************************
   public function DoIt($command) {
-    VidSession::sessionAuthenticate();
-    $this->SetMenu();
-    switch ($command) {
 
-    // ************************************************************
-    case "home":
-      $html = file_get_contents("../html/dakhila.inc");
-      $this->template->setCurrentBlock('RESULT');
-      $this->template->setVariable("RESULT", $html);
-      $this->template->parseCurrentBlock();
-      print $this->template->get();
-      break;
-
-    // ************************************************************
-    case "logout":
+    if ($command == "logout") {
+      VidSession::startSession();
       $message = "<p>";
 
       // An authenticated user has logged out -- be polite and thank them for using your application.
@@ -136,6 +124,28 @@ class DataViewer {
       $this->template->parseCurrentBlock();
     print $this->template->get();
 
+    return;
+
+    }
+    VidSession::sessionAuthenticate();
+    if ($_SESSION["loginUsername"] != "umesh@vidyalaya.us") {
+      $html = "<p>Sorry, only administrators are permitted access to this page, please click the back button on your browser</p>";
+      $this->template->setCurrentBlock('RESULT');
+      $this->template->setVariable('RESULT', $html);
+      $this->template->parseCurrentBlock();
+      print $this->template->get();
+      return;
+    }
+    $this->SetMenu();
+    switch ($command) {
+
+    // ************************************************************
+    case "home":
+      $html = file_get_contents("../html/dakhila.inc");
+      $this->template->setCurrentBlock('RESULT');
+      $this->template->setVariable("RESULT", $html);
+      $this->template->parseCurrentBlock();
+      print $this->template->get();
       break;
 
     // ************************************************************
@@ -472,6 +482,27 @@ NAMAKOOL;
 
       $this->template->setCurrentBlock('RESULT');
       $this->template->setVariable('RESULT', $js . Reports::VolunteerListV2($year, true));
+      $this->template->parseCurrentBlock();
+      print $this->template->get();
+      break;
+
+
+    // ************************************************************
+    case "EventRSVP":
+      $js = <<< NAMAKOOL
+<script type="text/javascript">
+$(document).ready( function() {
+    \$table = $("#Interested").tablesorter({widthFixed: true, widgets: ['zebra']
+	});
+    \$table = $("#Declined").tablesorter({widthFixed: true, widgets: ['zebra']
+	});
+
+});
+</script>
+NAMAKOOL;
+
+      $this->template->setCurrentBlock('RESULT');
+      $this->template->setVariable('RESULT', $js . Reports::EventRSVP(1));
       $this->template->parseCurrentBlock();
       print $this->template->get();
       break;

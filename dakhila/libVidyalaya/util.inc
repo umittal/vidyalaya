@@ -290,7 +290,9 @@ class Mail {
     $mail = new PHPMailer(false);
     $mail->IsSMTP(); // send via SMTP
 
-    $server = $_SERVER['SERVER_NAME'];
+    
+    $server = $command=isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME']  : "";
+
     $sapi = php_sapi_name();
      if (preg_match('/^www.vidyalaya.us/',$server ) && $sapi != "cli")  {
       $mail->SMTPAuth = false; // turn on SMTP authentication
