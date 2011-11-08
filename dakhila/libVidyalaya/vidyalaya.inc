@@ -1172,8 +1172,9 @@ class ItemRegistrationStatus {
     , Cancelled = 8
     , Decline = 16
     , InterestAcknowledged = 256
-    , CancelAcknowledged = 512
     , DeclineAcknowledged = 512
+    , CancelAcknowledged = 1024
+    , PaymentAcknowledged = 2048
     ;
 
   public static function CodeFromId($id) {

@@ -812,9 +812,8 @@ class NewsletterHtml {
     fwrite($fh, "<div id='newsletter'>\n");
 
     // Step 1: publish dates
-    $expiration = "2011-10-23";
-    fwrite ($fh, "<p class='newsgate'> Expiration Date: $expiration\n");
-    fwrite ($fh, "<p class='newsgate'> Last Class: $date\n");
+    $expiration = "2011-11-20";
+    fwrite ($fh, "<p class='newsgate'> Week: 5 <br />Expiration Date: $expiration <br />Last Class: $date\n");
     fwrite ($fh, "  <a name='top'>&nbsp;</a>\n");
     fwrite ($fh, "\n");
 
@@ -963,30 +962,41 @@ class EventManager {
     }
   }
 
-  public static function ReportParticipation($eventId) {
-    $status = array();
+  public static function PostPayment($eventId, $amount, $date, $familyId) {
+    $interest = array(); $cancel=array(); $decline=array(); $familyReg=array();
     foreach(ItemRegistration::EventRegistration($eventId) as $registration) {
       $person = Person::PersonFromId($registration->MFS, $registration->mfsId);
-      if (array_key_exists($person->home->id, $status)) {
-	print "duplicate for family " . $person->home->id . ", ignored\n";
+      if (!array_key_exists($person->home->id, $familyReg)) {
+	$familyReg[$person->home->id] = $registration;
       } else {
-	$status[$person->home->id] = $registration->statusId;
-	self::workflow($registration);
+	  print "wierd status $registration->statusId for family " . $person->home->id . "\n";
       }
     }
 
 
-    // self::UnknownReminder($status);
-    foreach ($status as $familyId => $response) {
-      $family = Family::GetItemById($familyId);
-      //      print "$familyId, " . $family->parentsName() . ", " . ItemRegistrationStatus::CodeFromId($response) . "\n";
+    if (array_key_exists($familyId, $familyReg)) { // person paying money registered, update record
+      // set registered, paymentacknowledged,  clear cancelrequest,cancelled,declined,
+      $registration = $familyReg[$familyId];
+      $status = $registration->statusId;
+      $status = $status | ItemRegistrationStatus::Registered ;
+      $status = $status ^ ItemRegistrationStatus::CancelRequest ^ ItemRegistrationStatus::Cancelled ^ ItemRegistrationStatus::Decline;
+      $amount = $registration->amountPaid + $amount;
+      $sql = "update set statusId = $status, amountPaid = $amount where ";
+      // send an email about payment being received.
+      
+    } else { // preson paying money did not register, insert record
+      $status = ItemRegistrationStatus::Registered;
+      $amount = $amount;
+      $sql = "insert ";
     }
+
+    $subject = "Payment Receipt for Vidyalaya Event : ";
   }
+
 }
 
-
-EventManager::ReportParticipation(1); exit();
-//NewsletterHtml::Publish("2011-10-23");
+//EventManager::ReportParticipation(1); exit();
+NewsletterHtml::Publish("2011-11-06");
 //Publications::FamilyListForHandbookDistribution(2011); exit();
 //Publications::AttendanceSheet(2011); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
