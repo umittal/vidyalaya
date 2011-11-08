@@ -496,6 +496,8 @@ $(document).ready( function() {
 	});
     \$table = $("#Declined").tablesorter({widthFixed: true, widgets: ['zebra']
 	});
+    \$table = $("#Registered").tablesorter({widthFixed: true, widgets: ['zebra']
+	});
 
 });
 </script>

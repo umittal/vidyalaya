@@ -144,7 +144,8 @@ class Reports {
    return $html;
   }
 
-  private static function EventRSVPTable ($items, &$html, $lastUpdate, $heading) {
+  private static function EventRSVPTable ($items, &$html, $lastUpdate, $heading, $amount) {
+
     usort ($items, "Family::CompareFatherLast");
     $html .= "<h3>$heading</h3>\n";
     $html .= '<table id="' . $heading . '" cellspacing="0" class="tablesorter" width="600px">' . "\n";
@@ -152,18 +153,24 @@ class Reports {
     $i=1;
     foreach($items as $family) {
       $time = $lastUpdate[$family->id];
-      $html .= "<tr> <td align=right>$i</td><td align=right>$family->id</td><td>$time</td> <td>" .  $family->parentsName() . "</td><td></td></tr>";
+      $money = $amount[$family->id] == 0 ? "" : $amount[$family->id];
+      //      if ($family->id == 441) print "<p> time for 441 is " . $lastUpdate[441];
+      $html .= "<tr> <td align=right>$i</td><td align=right>$family->id</td><td>$time</td> <td>" .  $family->parentsName();
+      $html .= "</td><td>$money</td></tr>";
       $i++;
     }
     $html .= "</tbody></table>\n";
   }
 
   public static function EventRSVP($eventId) {
-    $interest = array(); $cancel=array(); $decline=array(); $lastUpdate=array();
+    $interest = array(); $registered = array(); 
+    $cancel=array(); $decline=array(); $lastUpdate=array(); $amount= array();
     foreach(ItemRegistration::EventRegistration($eventId) as $registration) {
       $person = Person::PersonFromId($registration->MFS, $registration->mfsId);
       if (!array_key_exists($person->home->id, $lastUpdate)) {
 	$lastUpdate[$person->home->id] = $registration->lastUpdate;
+	$amount[$person->home->id] = $registration->amountPaid;
+
 	if ($registration->statusId & ItemRegistrationStatus::Decline) {
 	  $decline[] = $person->home;
 	} else if ($registration->statusId & ItemRegistrationStatus::CancelRequest) {
@@ -171,21 +178,29 @@ class Reports {
 	} else if ($registration->statusId & ItemRegistrationStatus::Interested) {
 	  $interest[] = $person->home;
 	  //	  print "<p>I was here for " . $person->home->id;
+	} else if ($registration->statusId & ItemRegistrationStatus::Registered) {
+	  $registered[] = $person->home;
+	  //	  print "<p>$registration->lastUpdate, I was here for " . $person->home->id . ", " . $lastUpdate[$person->home->id];
 	} else {
-	  print "wierd status $registration->statusId for family " . $person->home->id . "\n";
+	  print "weird status $registration->statusId for family " . $person->home->id . "\n";
 	}
       }
+
     }
+
 
     $html = "<p> The RSVP list for event number $eventId is as follows:</p>\n";
     if (!empty($interest) ) {
-      self::EventRSVPTable($interest, $html, $lastUpdate, "Interested");
+      self::EventRSVPTable($interest, $html, $lastUpdate, "Interested", $amount);
+    }
+    if (!empty($registered) ) {
+      self::EventRSVPTable($registered, $html, $lastUpdate, "Registered", $amount);
     }
     if (!empty($decline) ) {
-      self::EventRSVPTable($decline, $html, $lastUpdate, "Declined");
+      self::EventRSVPTable($decline, $html, $lastUpdate, "Declined", $amount);
     }
     if (!empty($cancel) ) {
-      self::EventRSVPTable($cancel, $html, $lastupdate, "Cancelled");
+      self::EventRSVPTable($cancel, $html, $lastUpdate, "Cancelled", $amount);
     }
     return $html;
   }

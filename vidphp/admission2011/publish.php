@@ -812,14 +812,8 @@ class NewsletterHtml {
     fwrite($fh, "<div id='newsletter'>\n");
 
     // Step 1: publish dates
-<<<<<<< HEAD
-    $expiration = "2011-10-30";
-    fwrite ($fh, "<p class='newsgate'> Expiration Date: $expiration\n");
-    fwrite ($fh, "<p class='newsgate'> Last Class: $date\n");
-=======
     $expiration = "2011-11-20";
     fwrite ($fh, "<p class='newsgate'> Week: 5 <br />Expiration Date: $expiration <br />Last Class: $date\n");
->>>>>>> c39cb5806bd9a9bc32bf9907439f99145208bf49
     fwrite ($fh, "  <a name='top'>&nbsp;</a>\n");
     fwrite ($fh, "\n");
 
@@ -904,9 +898,6 @@ if (file_exists($classfile)) {
   }
 }
 
-<<<<<<< HEAD
-NewsletterHtml::Publish("2011-10-23"); exit();
-=======
 class EventManager {
 
   private static function EventMail($family, $body) {
@@ -978,6 +969,7 @@ class EventManager {
   }
 
   public static function PostPayment($eventId, $amount, $date, $familyId) {
+    $time=time();
     $interest = array(); $cancel=array(); $decline=array(); $familyReg=array();
     foreach(ItemRegistration::EventRegistration($eventId) as $registration) {
       $person = Person::PersonFromId($registration->MFS, $registration->mfsId);
@@ -993,26 +985,40 @@ class EventManager {
       // set registered, paymentacknowledged,  clear cancelrequest,cancelled,declined,
       $registration = $familyReg[$familyId];
       $status = $registration->statusId;
-      $status = $status | ItemRegistrationStatus::Registered ;
-      $status = $status ^ ItemRegistrationStatus::CancelRequest ^ ItemRegistrationStatus::Cancelled ^ ItemRegistrationStatus::Decline;
+      $status |=  ItemRegistrationStatus::Registered ;
+      $flagsToRemove = ItemRegistrationStatus::CancelRequest | ItemRegistrationStatus::Cancelled | ItemRegistrationStatus::Decline;
+      $status &= ~$flagsToRemove;
+
       $amount = $registration->amountPaid + $amount;
-      $sql = "update set statusId = $status, amountPaid = $amount where ";
+      $query = "
+	update itemRegistration set Status = $status, amountPaid = $amount 
+	where itemId = $registration->itemId and MFS = $registration->MFS and mfsId = $registration->mfsId 
+              and Status = $registration->statusId
+	";
       // send an email about payment being received.
       
     } else { // preson paying money did not register, insert record
       $status = ItemRegistrationStatus::Registered;
       $amount = $amount;
-      $sql = "insert ";
+      $query="insert into itemRegistration values ($eventId, 1, $familyId, 0, $amount, $status, $time)";
     }
+    $result = VidDb::query($query); 
+    echo "$query\n";
+  }
 
-    $subject = "Payment Receipt for Vidyalaya Event : ";
+  public static function PostPaymentFile() {
+    if (($handle = fopen("/tmp/nov6.csv", "r")) != FALSE) {
+      while (($data=fgetcsv($handle, 1000, ",")) != FALSE) {
+	self::PostPayment(1, $data[1], '2011-11-06', $data[0]);
+      }
+    }
   }
 
 }
 
 //EventManager::ReportParticipation(1); exit();
-NewsletterHtml::Publish("2011-11-06");
->>>>>>> c39cb5806bd9a9bc32bf9907439f99145208bf49
+EventManager::PostPaymentFile(); exit();
+//NewsletterHtml::Publish("2011-11-06");
 //Publications::FamilyListForHandbookDistribution(2011); exit();
 //Publications::AttendanceSheet(2011); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
