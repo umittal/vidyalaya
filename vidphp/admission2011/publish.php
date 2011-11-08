@@ -812,11 +812,17 @@ class NewsletterHtml {
     fwrite($fh, "<div id='newsletter'>\n");
 
     // Step 1: publish dates
-    $expiration = "2011-10-23";
+    $expiration = "2011-10-30";
     fwrite ($fh, "<p class='newsgate'> Expiration Date: $expiration\n");
     fwrite ($fh, "<p class='newsgate'> Last Class: $date\n");
     fwrite ($fh, "  <a name='top'>&nbsp;</a>\n");
     fwrite ($fh, "\n");
+
+    $classfile=$directory . "summary.html";
+    if (file_exists($classfile)) {
+      fwrite ($fh, "<h3>Summary</h3>" . "\n");
+      fwrite($fh, file_get_contents($classfile));
+    }
 
     // Step 2: availble table
     $available = array(); $unavailable = "";
@@ -893,13 +899,13 @@ if (file_exists($classfile)) {
   }
 }
 
-//NewsletterHtml::Publish("2011-10-23");
+NewsletterHtml::Publish("2011-10-23"); exit();
 //Publications::FamilyListForHandbookDistribution(2011); exit();
 //Publications::AttendanceSheet(2011); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
 //Publications::Roster(2011); exit();
 
-Publications::RosterSpa(2011); exit();
+//Publications::RosterSpa(2011); exit();
 
 //Publications::FullDumpFamilies();
 
