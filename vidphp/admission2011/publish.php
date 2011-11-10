@@ -817,6 +817,12 @@ class NewsletterHtml {
     fwrite ($fh, "  <a name='top'>&nbsp;</a>\n");
     fwrite ($fh, "\n");
 
+    $classfile=$directory . "summary.html";
+    if (file_exists($classfile)) {
+      fwrite ($fh, "<h3>Summary</h3>" . "\n");
+      fwrite($fh, file_get_contents($classfile));
+    }
+
     // Step 2: availble table
     $available = array(); $unavailable = "";
     foreach (AvailableClass::GetAllYear($year) as $class) {
