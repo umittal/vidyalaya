@@ -1011,8 +1011,8 @@ class EventManager {
 }
 
 //EventManager::ReportParticipation(1); exit();
-EventManager::PostPaymentFile(); exit();
-//NewsletterHtml::Publish("2011-11-06");
+//EventManager::PostPaymentFile(); exit();
+NewsletterHtml::Publish("2011-11-06");
 //Publications::FamilyListForHandbookDistribution(2011); exit();
 //Publications::AttendanceSheet(2011); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
