@@ -1247,7 +1247,19 @@ Class ItemRegistration {
     $mfsId = $item->mfsId;
     $oldstatus = $item->statusId;
     $status =  $oldstatus | $new;
+    //    print "new status is $status\n"; return;
     $query="update itemRegistration set Status = $status, lastUpdate = $time  where itemId=$eventId and MFS= $MFS and mfsId= $mfsId and Status = $oldstatus";
+    $result = VidDb::query($query); 
+  }
+
+  public static function UpdateStatusAdmin($item, $new) {
+    $eventId = $item->itemId;
+    $MFS =  $item->MFS;
+    $mfsId = $item->mfsId;
+    $oldstatus = $item->statusId;
+    $status =  $oldstatus | $new;
+    $query="update itemRegistration set Status = $status  
+            where itemId=$eventId and MFS= $MFS and mfsId= $mfsId and Status = $oldstatus";
     $result = VidDb::query($query); 
   }
 

@@ -901,6 +901,7 @@ if (file_exists($classfile)) {
 class EventManager {
 
   private static function EventMail($family, $body) {
+    if ($family->id != 273) return;
     $footer="<p>Regards,<p>Vidyalaya Event Management<br />(sent by: Umesh Mittal)</p>";
     $production=1;
     $subject = "AVG Visit Event, Family- $family->id";
@@ -912,6 +913,7 @@ class EventManager {
     $salutation = "<p>Dear " . $family->parentsName() . ",";
     $mail->Body = $salutation . $body . $footer;
     $mail->AltBody = "This is the body when user views in plain text format, opening day $family->id"; //Text Body
+    
 
     if(!$mail->Send()) {
       echo "Mailer Error: Family: $family->id: " . $mail->ErrorInfo . "\n";
@@ -919,19 +921,70 @@ class EventManager {
       echo "Message has been sent, Family: $family->id:\n";
     }
 
+    //die ("only one");
 
   }
 
   // let us do some workflow here
-  private static function workflow($registration) {
+  private static function PaymentConfirmation($registration, $familystudent, &$age, &$adult) {
     $person = Person::PersonFromId($registration->MFS, $registration->mfsId);
+
+    if ($registration->amountPaid == 0 ) return;
+    if ($registration->statusId & ItemRegistrationStatus::PaymentAcknowledged) return;
+    print "\nFamily: " . $person->home->id . "\n\n";
+
+    $body = <<<BODY
+<p>Thank you for registration for <a href="http://www.vidyalaya.us/shiksha/avg2011.html"
+target="_blank">AVG Visit</a> event on Sunday November 13, 2011. This email is your confirmation that we have received \$$registration->amountPaid from you.
+
+BODY;
+
+    if (array_key_exists($person->home->id, $familystudent))  {
+      $body .= "<p>For Enrolled families, the registration fee is $10 per family. For your family, we know following persons \n";
+      $family = Family::GetItemById($person->home->id);
+      $parents = $family->parentsName();
+      $adult +=2;
+      $body .= "<ul><li>Adults: $parents<li>Children: "; 
+      $kids = "";
+
+      foreach(explode(" ", $familystudent[$person->home->id]) as $id) {
+	$student = Student::GetItemById($id);
+	$ages = intval($student->Age());
+	$kids .= $student->fullName() . "(" . $ages  . ") " ;
+	
+	if (array_key_exists($ages, $age)) {$age[$ages]++;} else {$age[$ages]=1;}
+      }
+
+      $body .= "$kids </ul><p>Please bring a printout of this page with you for ease of on-site registration.\n";
+
+      if ($registration->amountPaid > 10) {
+	$count = intval(($registration->amountPaid - 10)/5);
+	$adult +=$count;
+	$body .= "<p>We are also expecting additional $count guests based on your fee. \n";
+      }
+
+    } else {
+      $count = intval($registration->amountPaid/5);
+	$adult +=$count;
+      $body .= "<p>For volunteer families, the registration cost is $5 per person. We expect to see $count adults. Please do let us know if there is any change\n";
+    }
+    
+    //    echo $body;
+  self::EventMail($person->home, $body);
+    ItemRegistration::UpdateStatusAdmin($registration, ItemRegistrationStatus::PaymentAcknowledged);
+    //    die ("only one");
+    return;
+  }
+
+  private static function workflow($registration) {
     if ($registration->statusId & ItemRegistrationStatus::Decline ) {
       if ($registration->statusId & ItemRegistrationStatus::DeclineAcknowledged) return;
       $body = file_get_contents("event1.decline.html");
       self::EventMail($person->home, $body);
-      ItemRegistration::UpdateStatus($registration, ItemRegistrationStatus::DeclineAcknowledged);
+      ItemRegistration::UpdateStatusAdmin($registration, ItemRegistrationStatus::DeclineAcknowledged);
       return;
     }
+
 
     if ($registration->statusId & ItemRegistrationStatus::CancelRequest ) {
       print "do not know how to handle cancel\n";
@@ -939,10 +992,11 @@ class EventManager {
     }
 
     if ($registration->statusId & ItemRegistrationStatus::Interested ) {
-      if ($registration->statusId & ItemRegistrationStatus::InterestAcknowledged) return;
+      if ($registration->amountPaid != 0 ) return;
+      if ($registration->statusId & ItemRegistrationStatus::Cancelled) return;
       $body = file_get_contents("event1.interested.html");
       self::EventMail($person->home, $body);
-      ItemRegistration::UpdateStatus($registration, ItemRegistrationStatus::InterestAcknowledged);
+      ItemRegistration::UpdateStatus($registration, ItemRegistrationStatus::Cancelled | ItemRegistrationStatus::CancelAcknowledged);
       return;
     }
   }
@@ -966,6 +1020,39 @@ class EventManager {
 	self::EventMail($item->person->home, $body);
       }
     }
+  }
+
+  public static function ReportParticipation($eventId) {
+
+    $familyReg=array();
+    foreach(ItemRegistration::EventRegistration($eventId) as $registration) {
+      $person = Person::PersonFromId($registration->MFS, $registration->mfsId);
+      if (!array_key_exists($person->home->id, $familyReg)) {
+	$familyReg[$person->home->id] = $registration;
+      }
+    }
+
+    // store enrollment data
+    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, 2011);
+    $done=array(); 
+    foreach($enrollment as $e) {
+      if (array_key_exists($e->student->family->id, $familyReg)) continue;
+      if (array_key_exists($e->student->family->id, $done)) continue;
+      $done[$e->student->family->id] = 1;
+      $body = file_get_contents("event1.announce.html");
+      self::EventMail($e->student->family, $body);
+    }
+
+    return;
+
+    print "Total Paid: $total\nAdults:  $adult\n";
+    $kids=0;
+    foreach ($age as $ages => $count) {
+      print "$ages     $count\n";
+      $kids += $count;
+    }
+
+    print "total kids $kids\n";
   }
 
   public static function PostPayment($eventId, $amount, $date, $familyId) {
@@ -1016,9 +1103,9 @@ class EventManager {
 
 }
 
-//EventManager::ReportParticipation(1); exit();
+EventManager::ReportParticipation(1); exit();
 //EventManager::PostPaymentFile(); exit();
-NewsletterHtml::Publish("2011-11-06");
+//NewsletterHtml::Publish("2011-11-06");
 //Publications::FamilyListForHandbookDistribution(2011); exit();
 //Publications::AttendanceSheet(2011); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();

@@ -173,7 +173,8 @@ class Reports {
 
 	if ($registration->statusId & ItemRegistrationStatus::Decline) {
 	  $decline[] = $person->home;
-	} else if ($registration->statusId & ItemRegistrationStatus::CancelRequest) {
+	} else if ($registration->statusId & ItemRegistrationStatus::CancelRequest 
+		   || $registration->statusId & ItemRegistrationStatus::Cancelled) {
 	  $cancel[] = $person->home;
 	} else if ($registration->statusId & ItemRegistrationStatus::Interested) {
 	  $interest[] = $person->home;
