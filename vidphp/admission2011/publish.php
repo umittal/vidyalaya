@@ -812,8 +812,8 @@ class NewsletterHtml {
     fwrite($fh, "<div id='newsletter'>\n");
 
     // Step 1: publish dates
-    $expiration = "2011-11-20";
-    fwrite ($fh, "<p class='newsgate'> Week: 5 <br />Expiration Date: $expiration <br />Last Class: $date\n");
+    $expiration = "2011-12-04";
+    fwrite ($fh, "<p class='newsgate'> Week: 6 <br />Expiration Date: $expiration <br />Last Class: $date\n");
     fwrite ($fh, "  <a name='top'>&nbsp;</a>\n");
     fwrite ($fh, "\n");
 
@@ -1105,7 +1105,7 @@ BODY;
 
 //EventManager::ReportParticipation(1); exit();
 //EventManager::PostPaymentFile(); exit();
-//NewsletterHtml::Publish("2011-11-06");
+NewsletterHtml::Publish("2011-11-20");
 //Publications::FamilyListForHandbookDistribution(2011); exit();
 //Publications::AttendanceSheet(2011); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
