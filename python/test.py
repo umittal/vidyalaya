@@ -1,3 +1,5 @@
+import sys
+sys.path.append('/home/umesh/lib/python')
 import gdata.apps.groups.service
 
 def parse_groupfeed(groupFeedObject):

@@ -1103,7 +1103,7 @@ BODY;
 
 }
 
-EventManager::ReportParticipation(1); exit();
+//EventManager::ReportParticipation(1); exit();
 //EventManager::PostPaymentFile(); exit();
 //NewsletterHtml::Publish("2011-11-06");
 //Publications::FamilyListForHandbookDistribution(2011); exit();

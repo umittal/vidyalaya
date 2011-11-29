@@ -1415,7 +1415,7 @@ class TwoYearLayout {
 
 
 
-//Admission::OpeningDay(2011); exit();
+Admission::OpeningDay(2011); exit();
 //Admission::PrintVolunteers(2011); exit();
 
 //Admission::admissionConfirmationEmail(2011);exit(); // has thing in there to decide which email to send
@@ -1429,7 +1429,7 @@ class TwoYearLayout {
 //FamilyTracker::loadPayments();exit();
 //FamilyTracker::UpdateFamilyTracker(); exit();
 //TwoYearLayout::assignClass(); exit();
-//TwoYearLayout::checkFeePaid(); exit();
+///TwoYearLayout::checkFeePaid(); exit();
 //TwoYearLayout::twoYearCsv(); exit();
 //Admission::Validation(2011); exit();
 
