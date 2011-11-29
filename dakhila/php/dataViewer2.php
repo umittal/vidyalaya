@@ -489,6 +489,21 @@ NAMAKOOL;
 
     // ************************************************************
     case "EventRSVP":
+      $url = htmlentities($_SERVER['PHP_SELF']) . "?command=EventRSVP";
+      $itemId = isset($_POST['ID']) ?  $_POST['ID'] : null;
+
+      $form = <<<EOT
+	<form method="post" action="$url">
+	Event ID: <input type="text" name="ID" value="$itemId"> 
+   <input type="submit" name="submit" value="GO"><br>
+</form>
+
+EOT;
+      $this->template->setCurrentBlock('QUERY');
+      $this->template->setVariable('QUERY', $form);
+      $this->template->parseCurrentBlock();
+
+
       $js = <<< NAMAKOOL
 <script type="text/javascript">
 $(document).ready( function() {
@@ -503,9 +518,11 @@ $(document).ready( function() {
 </script>
 NAMAKOOL;
 
-      $this->template->setCurrentBlock('RESULT');
-      $this->template->setVariable('RESULT', $js . Reports::EventRSVP(1));
-      $this->template->parseCurrentBlock();
+      if (isset($itemId)) {
+	$this->template->setCurrentBlock('RESULT');
+	$this->template->setVariable('RESULT', $js . Reports::EventRSVP($itemId));
+	$this->template->parseCurrentBlock();
+      }
       print $this->template->get();
       break;
 

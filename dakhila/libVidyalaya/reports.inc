@@ -165,6 +165,10 @@ class Reports {
   public static function EventRSVP($eventId) {
     $interest = array(); $registered = array(); 
     $cancel=array(); $decline=array(); $lastUpdate=array(); $amount= array();
+    $event=Items::GetItemById($eventId);
+    if (is_null($event)) return "<h3>No such event found</h3>";
+
+
     foreach(ItemRegistration::EventRegistration($eventId) as $registration) {
       $person = Person::PersonFromId($registration->MFS, $registration->mfsId);
       if (!array_key_exists($person->home->id, $lastUpdate)) {
@@ -188,9 +192,22 @@ class Reports {
       }
 
     }
+    
 
 
-    $html = "<p> The RSVP list for event number $eventId is as follows:</p>\n";
+    date_default_timezone_set ("America/New_York");
+    $html = "<h3>Event Description</h3>";
+
+    $html .= "<table class='tablesorter' cellspacing=0 >\n";
+    $html .= "<tr><td>Event ID:</td><td>$event->id</td></tr>\n";
+    $html .= "<tr><td>Description:</td><td><a href='$event->url'>$event->description</a></td></tr>\n";
+    $html .= "<tr><td>When:</td><td>$event->when</td></tr>\n";
+    $html .= "<tr><td>Type:</td><td>$event->itemType</td></tr>\n";
+    $html .= "<tr><td>Cost:</td><td>$event->cost</td></tr>\n";
+    $html .= "<tr><td>Curent Time:</td><td>" . strftime("%c", time()) . "</td></tr>\n";
+    $html .= "<tr><td>Registration:</td><td>" . strftime("%c",$event->start) . " - "  . strftime("%c",$event->end) . "</td></tr>\n";
+    $html .= " </table>\n";
+    $html .= "<h3>Event Registration</h3>";
     if (!empty($interest) ) {
       self::EventRSVPTable($interest, $html, $lastUpdate, "Interested", $amount);
     }

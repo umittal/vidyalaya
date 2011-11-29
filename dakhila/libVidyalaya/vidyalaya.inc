@@ -1148,6 +1148,15 @@ Class Items {
     return self::ArrayFromQuery($query);
   }
 
+  public static function GetItemById($id) {
+    $time = time();
+    $query = "select * from items where id = $id";
+    $eventlist= self::ArrayFromQuery($query);
+    if (count($eventlist) == 1) return $eventlist[0];
+    return null;
+  }
+
+
   public function __construct($row) {
     if ($row==null) return null;
     $this->id = $row["items.id"];
