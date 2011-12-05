@@ -670,7 +670,7 @@ CLOSING;
       //      print $family->id . ", " . $family->parentsName() . "\n";
       $body = <<<FAMILYUPDATE
 	<p>Attached please find confirmation of update in the enrollment of your family. Please let me know if there is any update to the family detail form.
- <p>Please print the student sheet and put it in the student's bag for easy reference.
+ <p>Please print the student sheet and put it in the student\'s bag for easy reference.
 <p>
 Regards,
 <p>
@@ -1087,6 +1087,56 @@ AGREEMENT;
 
     print "Total Families = " . count($familyarray) . ", Teaching families = " . count($teachers) . "\n";
   }
+
+  private static function AdultLanguageMail($family) {
+    //    if ($family->id != 43) return;
+    $footer="<p>Regards,<p>Language Curriculum Team<br />(sent on behalf of : Asmita Mistry)</p>";
+    $production=1;
+    $subject = "Survey: Language Class for Adults";
+    print "Trying to send email to id " . $family->id . "\n";
+    $body = file_get_contents("adult.inc");
+    if ($production == 0) $subject = "[Test] $subject";
+    $mail = Mail::SetupMailSpaReplyAsmita();
+    Mail::SetFamilyAddress(&$mail, $family, $production);
+    $mail->Subject = $subject;
+    $salutation = "<p>Dear " . $family->parentsName() . ",";
+    $mail->Body = $salutation . $body . $footer;
+    $mail->AltBody = "This is the body when user views in plain text format, opening day $family->id"; //Text Body
+    
+
+    if(!$mail->Send()) {
+      echo "Mailer Error: Family: $family->id: " . $mail->ErrorInfo . "\n";
+    }  else {
+      echo "Message has been sent, Family: $family->id:\n";
+    }
+
+    sleep(2);
+
+    //die ("only one");
+
+  }
+
+  public static function AdultLanguage() {
+    $status = array();
+    // registered families
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, 2011) as $enrollment) { 
+      $familyId = $enrollment->student->family->id;
+      if (!array_key_exists($familyId, $status)) {
+	$status[$familyId] = 0;
+	self::AdultLanguageMail($enrollment->student->family);
+      }
+    }
+
+    foreach (Volunteers::GetAllYear(2011) as $item) { // volunteers
+      $familyId = $item->person->home->id;
+      if (!array_key_exists($familyId, $status)) {
+	$status[$familyId] = 0;
+	self::AdultLanguageMail($item->person->home);
+      }
+    }
+  }
+
+
 }
 
 
@@ -1409,13 +1459,15 @@ class TwoYearLayout {
   }
 }
 
+Admission::AdultLanguage(); exit();
+
 //Teachers::AddTeacher(79, "hetalapurva@gmail.com", 0) ; exit();
 //Admission::VolunteerEmail(2011);exit();
 //Admission::TeacherEmail(2011);exit();
 
 
 
-Admission::OpeningDay(2011); exit();
+//Admission::OpeningDay(2011); exit();
 //Admission::PrintVolunteers(2011); exit();
 
 //Admission::admissionConfirmationEmail(2011);exit(); // has thing in there to decide which email to send

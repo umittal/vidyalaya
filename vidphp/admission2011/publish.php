@@ -526,7 +526,7 @@ class Publications {
   private static function RosterSpaStudents($year) {
     $fh = tmpfile();
     if (!$fh) die ("could not open temporary file for writing");
-    fwrite ($fh, "ID, First, Last, Language, , Culture, ,\n");
+    fwrite ($fh, "ID, First, Last, Language, , Culture, ,Parents,\n");
 
 
     $language = array(); $culture=array();
@@ -567,6 +567,8 @@ class Publications {
 	$csv[] = "";
 	$csv[] = "";
       }
+
+      $csv[] = $student->family->parentsName();
       
       fputcsv($fh, $csv);
       self::printOneStudent($student, $lc, $cc);
@@ -812,8 +814,8 @@ class NewsletterHtml {
     fwrite($fh, "<div id='newsletter'>\n");
 
     // Step 1: publish dates
-    $expiration = "2011-12-04";
-    fwrite ($fh, "<p class='newsgate'> Week: 6 <br />Expiration Date: $expiration <br />Last Class: $date\n");
+    $expiration = "2011-12-11";
+    fwrite ($fh, "<p class='newsgate'> Week: 7 <br />Expiration Date: $expiration <br />Last Class: $date\n");
     fwrite ($fh, "  <a name='top'>&nbsp;</a>\n");
     fwrite ($fh, "\n");
 
@@ -880,7 +882,11 @@ CLASSFOOTER;
 $classfile=$directory . $short . ".html";
 if (file_exists($classfile)) {
   fwrite ($fh, $classheader . "\n");
-  fwrite($fh, file_get_contents($classfile));
+  $content = file_get_contents($classfile);
+  $content = preg_replace('/__NEWLINE__/', '</td></tr><tr><td valign="top">&nbsp;</td><td>', $content); 
+
+
+  fwrite($fh, $content);
   fwrite ($fh, $classfooter . "\n");
 }
 
@@ -1105,7 +1111,7 @@ BODY;
 
 //EventManager::ReportParticipation(1); exit();
 //EventManager::PostPaymentFile(); exit();
-NewsletterHtml::Publish("2011-11-20");
+NewsletterHtml::Publish("2011-12-04");
 //Publications::FamilyListForHandbookDistribution(2011); exit();
 //Publications::AttendanceSheet(2011); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();

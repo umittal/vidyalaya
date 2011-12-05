@@ -1,4 +1,4 @@
-        <style type="text/css">
+﻿        <style type="text/css">
             td { padding-left:10px; }
             .ou { font-style:oblique;text-decoration:underline; }
         </style>
@@ -27,21 +27,35 @@ dojo.require("dijit.Tooltip");
 	formDlg.show();
     }
 
-			// When the DOM and reources are ready....
-			dojo.ready(function(){
-				// Add tooltip of his picture
-				new dijit.Tooltip({
-					connectId: ["tooltipField"],
-					label: "Click here to see details of Family"
-				});
-			});
+    function changeContact(emergency, primary, dentist, hospital, studentId) {
+        var formDlg = dijit.byId("formContact");
+	a = dijit.byId("emergency_phone_number");
+	a.set("value", emergency);
+	a = dijit.byId("primary_phone_number");
+	a.set("value", primary);
+	a = dijit.byId("dentist_phone_number");
+	a.set("value", dentist);
+	a = dijit.byId("hospital_phone_number");
+	a.set("value", hospital);
+	a = dijit.byId("studentid");
+	a.set("value", studentId);
+	formDlg.show();
+    }
+	 // When the DOM and reources are ready....
+	 dojo.ready(function(){
+	 // Add tooltip of his picture
+	 new dijit.Tooltip({
+	 connectId: ["tooltipField"],
+	 label: "Click here to see details of Family"
+	 });
+	 });
 
-	function showFamilyDetails(familyId) {
-	var form=dijit.byId("familyForm");
-	var idfield=dijit.byId("familyId");
-	idfield.attr("value", familyId);
-	if (form) {form.submit();} else {alert ("form not found");}
-      }
+	 function showFamilyDetails(familyId) {
+	 var form=dijit.byId("familyForm");
+	 var idfield=dijit.byId("familyId");
+	 idfield.attr("value", familyId);
+	 if (form) {form.submit();} else {alert ("form not found");}
+	 }
     </script>
 
 	<form method="post" action="/dakhila/php/dataViewer2.php?command=Family" style="display:none" id="familyForm"
@@ -81,7 +95,6 @@ dojo.require("dijit.Tooltip");
 	    
              var xhrArgs ={
                   url: '/dakhila/php/dataserver.php?command=ChangeClass',
-//                form: dojo.byId("ChgForm"),
 		  postData:queryString,
                 load: function(data, ioArgs) {
 		    r.set("value","Success ..." + data);		    
@@ -131,13 +144,87 @@ dojo.require("dijit.Tooltip");
     </form>
 </div>
 
+<div dojoType="dijit.Dialog" id="formContact" title="Change Contacts for a Student" style="display: none">
+    <form dojoType="dijit.form.Form" id="ChgContact" name="doineedit2">
+        <script type="dojo/event" event="onSubmit" args="e">
+            dojo.stopEvent(e); // prevent the default submit
+            if (!this.isValid()) {
+                window.alert('Please fix fields');
+                return;
+            }
+
+	a = dijit.byId("studentid");
+	studentId=a.value;
+	a = dijit.byId("emergency_phone_number");
+	emergency=a.value;
+	a = dijit.byId("primary_phone_number");
+	primary=a.value;
+	a = dijit.byId("dentist_phone_number");
+	dentist=a.value;
+	a = dijit.byId("hospital_phone_number");
+	hospital=a.value;
+
+
+	r = dijit.byId("response2");
+	r.set("value"," Form being sent...");
+	    
+	    qObject = new Object();
+	    qObject.studentId = studentId;
+	    qObject.emergency = emergency;
+	    qObject.primary = primary;
+	    qObject.dentist = dentist;
+	    qObject.hospital = hospital;
+	    qObject.owner = qObject;
+	    var queryString = dojo.objectToQuery(qObject);
+	    
+             var xhrArgs ={
+                  url: '/dakhila/php/dataserver.php?command=UpdateContacts',
+		  postData:queryString,
+                load: function(data, ioArgs) {
+		    r.set("value","Success ..." + data);		    
+                },
+                error: function(error, ioArgs) {
+                    //We'll 404 in the demo, but that's okay.  We don't have a 'postIt' service on the
+                    //docs server.
+		    r.set("value","Failed... " + error);		    
+                }
+            };
+
+            var deferred = dojo.xhrPost(xhrArgs);
+
+        </script>
+
+        <div class="dijitDialogPaneContentArea">
+	<label>Student ID:</label> 
+	<div dojoType="dijit.form.ValidationTextBox" id="studentid" disabled="disabled" style="width:50px" >nothing</div>
+	</div>
+        <div class="dijitDialogPaneContentArea">
+<!-- BEGIN FORMCONTENT -->
+	    {FORM}
+<!-- END FORMCONTENT -->
+	  </div> 
+
+
+          <div class="dijitDialogPaneContentArea">
+            <button dojoType="dijit.form.Button" type="submit">
+              Change
+            </button>
+            <button dojoType="dijit.form.Button" type="button" onClick="dijit.byId('formContact').hide();">
+              GO Back
+            </button>
+
+	    <div dojoType="dijit.form.ValidationTextBox" id="response2" disabled="disabled">nothing</div>
+	  </div>
+
+    </form>
+</div>
 
 <h3>Student Details</h3>
 <ol>
 
 <li class="section">Student</li>
 
-<table>
+<table class="tablesorter">
 <!-- BEGIN STUDENT -->
 
 <tr><td>ID</td><td>{ID}</td></tr>
@@ -155,7 +242,9 @@ dojo.require("dijit.Tooltip");
 <li class="section">Parents</li>
 
 
-<table>  	  	  
+
+<table class="tablesorter">
+
  <thead><tr><th>M/F<th>NAME<th>EMAIL<th>WORK<th>CELL<th>Directory</tr></thead>
 <!-- BEGIN FATHER -->
 <tr><td>Father </td><td>{NAME}</td><td> {EMAIL}</td><td>{WORK}</td><td>{CELL}</td><td>{ISCONTACTABLE}</td></tr>
@@ -168,7 +257,7 @@ dojo.require("dijit.Tooltip");
 
 
 <li class="section">Class Assignment</li>
-<table>
+<table class="tablesorter">
 <thead>
 <tr><th>Session</th><th>Language</th><th>Culture</th></tr>
 </thead>
@@ -183,7 +272,12 @@ dojo.require("dijit.Tooltip");
 </table>
 
 <li class="section">Contacts</li>
-<table>
+<!-- BEGIN CHANGEBUTTON -->
+{CHANGECONTACT}
+
+<!-- END CHANGEBUTTON -->
+
+<table class="tablesorter">
 <thead>
 <tr><th>Type</th><th>Phone</th><th>Name</th><th>Address</th><th>Email</th></tr>
 </thead>

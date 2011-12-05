@@ -378,6 +378,7 @@ function DisplayStudentTemplate (&$template, $student) {
 	$template->setVariable("ISCONTACTABLE", YesNoMap($family->father->IsContactable));
 	$template->parseCurrentBlock();
 
+
 	$templateName="OTHERCONTACT";
 	foreach ($student->contacts as $key => $phone) {
 	  $template->setCurrentBlock($templateName);
@@ -401,6 +402,32 @@ function DisplayStudentTemplate (&$template, $student) {
 	  $template->parseCurrentBlock();
 	}
 
+	$emergency = formatPhone($student->contacts["Emergency"]);
+	$primary = formatPhone($student->contacts["Primary"]);
+	$dentist = formatPhone($student->contacts["Dentist"]);
+	$hospital = formatPhone($student->contacts["Hospital"]);
+
+
+	$change =  <<< BUTTONHERE2
+	  <button data-dojo-type="dijit.form.Button" type="button">
+    <script type="dojo/method" event="onClick" args="evt">
+        // Do something:
+	  changeContact('$emergency', '$primary', '$dentist', '$hospital', $student->id);
+    </script>
+    Update
+</button>
+
+BUTTONHERE2;
+	$templateName="CHANGEBUTTON";
+	$template->setCurrentBlock($templateName);
+	$template->setVariable("CHANGECONTACT",  $change);
+	$template->parseCurrentBlock();
+	
+	$templateName="FORMCONTENT";
+	$template->setCurrentBlock($templateName);
+	$template->setVariable("FORM",  file_get_contents("../html/formContact.html"));
+	$template->parseCurrentBlock();
+	
 	$templateName="MOTHER";
 	$template->setCurrentBlock($templateName);
 	$template->setVariable("EMAIL", $family->mother->email);

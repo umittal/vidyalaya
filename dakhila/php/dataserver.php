@@ -23,6 +23,9 @@ case "CourseCatalog":
 case "ChangeClass":
   Dataserver::ChangeClass();
   break;
+case "UpdateContacts":
+  Dataserver::UpdateContacts();
+  break;
 case "RegisterEvent":
   Dataserver::RegisterEvent();
   $ref = $_SERVER['HTTP_REFERER'];
@@ -98,7 +101,50 @@ class Dataserver {
     header("HTTP/1.0 200 ");
     print "class changed";
   }
-}
+
+
+  public static function UpdateContacts() {
+    $studentId = $_POST["studentId"];
+    $emergency = preg_replace('/[^0-9]/', '', $_POST["emergency"]);
+    $primary = preg_replace('/[^0-9]/', '', $_POST["primary"]);
+    $dentist = preg_replace('/[^0-9]/', '', $_POST["dentist"]);
+    $hospital = preg_replace('/[^0-9]/', '', $_POST["hospital"]);
+    
+    $status = "";
+    $student = Student::GetItemById($studentId);
+    if (is_null($student)) {
+      self::error("Student for  id $studentId not found");
+    }
+
+    if (strlen($emergency) == 10 && $student->contacts["Emergency"] != $emergency) {
+      $status .= "emergency "; $phone=$emergency;
+      OtherContacts::CreatePhone($phone);
+      $student->UpdateStringField("EmergencyContact", $phone);
+    }
+
+    if (strlen($primary) == 10 && $student->contacts["Primary"] != $primary) {
+      $status .= "primary "; $phone=$primary;
+      OtherContacts::CreatePhone($phone);
+      $student->UpdateStringField("PrimaryDoctor", $phone);
+    }
+
+    if (strlen($dentist) == 10 && $student->contacts["Dentist"] != $dentist) {
+      $status .= "dentist "; $phone=$dentist;
+      OtherContacts::CreatePhone($phone);
+      $student->UpdateStringField("Dentist", $phone);
+    }
+
+    if (strlen($hospital) == 10 && $student->contacts["Hospital"] != $hospital) {
+      $status .= "hospital "; $phone=$hospital;
+      OtherContacts::CreatePhone($phone);
+      $student->UpdateStringField("Hospital", $phone);
+    }
+
+    header("HTTP/1.0 200 ");
+    print "$status";
+  }
+
+
+} // end of class
+
 ?>
-
-

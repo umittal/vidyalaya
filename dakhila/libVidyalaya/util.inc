@@ -286,7 +286,7 @@ class EnumFamilyTracker {
 }
 
 class Mail {
-  private static function SetupMailCommon($email, $name, $password) {
+  private static function SetupMailCommon($email, $name, $password, $replyEmail, $replyName) {
     $mail = new PHPMailer(false);
     $mail->IsSMTP(); // send via SMTP
 
@@ -310,7 +310,7 @@ class Mail {
     $mail->From = $email;
     $mail->FromName = $name;
     //		$mail->AddReplyTo($email,$name);
-    $mail->AddReplyTo("umesh@vidyalaya.us", "Umesh Mittal");
+    $mail->AddReplyTo($replyEmail, $replyName);
     $mail->IsHTML(true); // send as HTML
     $mail->WordWrap = 50; // set word wrap
 
@@ -318,19 +318,28 @@ class Mail {
   }
 
   public static function SetupMailAdmissions() {
-    return self::SetupMailCommon("Admission2011@vidyalaya.us", "Vidyalaya Admissions", "Praveen38");
+    return self::SetupMailCommon("Admission2011@vidyalaya.us", "Vidyalaya Admissions", "Praveen38", 
+				 "umesh@vidyalaya.us", "Umesh Mittal");
   }
 	
   public static function SetupMailSPA() {
-    return self::SetupMailCommon("spa@vidyalaya.us", "Student and Parent Affairs", "vasudha");
+    return self::SetupMailCommon("spa@vidyalaya.us", "Student and Parent Affairs", "vasudha", 
+				 "umesh@vidyalaya.us", "Umesh Mittal");
+  }
+
+  public static function SetupMailSPAReplyAsmita() {
+    return self::SetupMailCommon("spa@vidyalaya.us", "Student and Parent Affairs", "vasudha", 
+				 "asmita@vidyalaya.us", "Asmita Mistry");
   }
 
   public static function SetupMailInfo() {
-    return self::SetupMailCommon("info@vidyalaya.us", "Vidyalaya Information", "praveen");
+    return self::SetupMailCommon("info@vidyalaya.us", "Vidyalaya Information", "praveen", 
+				 "umesh@vidyalaya.us", "Umesh Mittal");
   }
 
   public static function SetupMailUmesh() {
-    return self::SetupMailCommon("umesh@vidyalaya.us", "Vidyalaya Information", "Praveen38");
+    return self::SetupMailCommon("umesh@vidyalaya.us", "Vidyalaya Information", "Praveen38", 
+				 "umesh@vidyalaya.us", "Umesh Mittal");
   }
 
 	

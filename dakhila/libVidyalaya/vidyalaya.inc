@@ -226,6 +226,10 @@ class Student {
 		       explode(";", $this->email));
   }
 
+  public function UpdateStringField($field, $value) {
+    $query = "Update Students2003 set $field = '$value' where id = $this->id";
+    $result = VidDb::query($query);
+  }
 
 
   public function __construct($row) {
@@ -1436,6 +1440,14 @@ Class OtherContacts {
     return new self(mysql_fetch_alias_array(VidDb::query($query)));
   }
 
+  public static function CreatePhone($phone) {
+    $foo = self::ObjectFromKey($phone);
+    if ($foo->phone != $phone) {
+      $query = "insert into  OtherContacts (phone) values ('$phone') ";
+      $result = VidDb::query($query);
+    }
+  }
+
   public function __construct($row) {
     if ($row==null) return;
     $this->phone = $row["OtherContacts.phone"];
@@ -1446,7 +1458,7 @@ Class OtherContacts {
     $this->email = $row["OtherContacts.email"];
   }
 
-}
+} // end Class OtherContacts
 
 Class Zipcodes {
   public $zipcodes = null;
