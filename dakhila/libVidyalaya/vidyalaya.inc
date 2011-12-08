@@ -886,6 +886,21 @@ class Enrollment{
 		return self::ArrayFromQuery($query);	
 	}
 
+	public static function GetEnrolledFamilesForFacilitySession($facility, $year) {
+		if ($year >= 2010) $year -= 2010;
+		$query = "select * 
+		from Enrollment
+			inner join AvailableClass on Enrollment.availableClass = AvailableClass.id
+			inner join Rooms on AvailableClass.room = Rooms.id
+		where AvailableClass.year = $year and Rooms.facility = $facility
+		";
+		$families = array();
+		foreach (self::ArrayFromQuery($query) as $item) {
+		  $families[$item->student->family->id] = $item->student->family;
+		}
+		return $families;
+	}
+
 	public static function GetAllEnrollmentForDeptSession($dept, $year) {
 		if ($year >= 2010) $year -= 2010;
 		
@@ -1097,6 +1112,19 @@ class MFS {
       return "F";
     case MFS::Student:
       return "S";
+    default: 
+      return "?";
+    }
+  }
+
+  public static function StringFromId($id) {
+    switch ($id) {
+    case MFS::Mother:
+      return "Mother";
+    case MFS::Father:
+      return "Father";
+    case MFS::Student:
+      return "Student";
     default: 
       return "?";
     }

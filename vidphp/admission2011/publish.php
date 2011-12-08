@@ -606,10 +606,50 @@ class Publications {
     }    
   }
 
+  private static function RosterAdults($year) {
+    $fh = tmpfile();
+    if (!$fh) die ("could not open temporary file for writing");
+
+    fwrite ($fh, "ID, MFS, First, Last, Description\n");
+    foreach (Enrollment::GetEnrolledFamilesForFacilitySession(Facility::PHHS, $year) as $item) {
+      $csv = array();
+      $csv[] = $item->id;
+      $csv[] = "Mother";
+      $csv[] = $item->mother->firstName;
+      $csv[] = $item->mother->lastName;
+      $csv[] = "Enrolled";
+      fputcsv($fh, $csv);
+
+      $csv=array();
+      $csv[] = $item->id;
+      $csv[] = "Father";
+      $csv[] = $item->father->firstName;
+      $csv[] = $item->father->lastName;
+      $csv[] = "Enrolled";
+      fputcsv($fh, $csv);
+    }
+
+    foreach (Volunteers::GetAllYear($year) as $item) { // volunteers
+      $csv = array();
+      $csv[] = $item->person->mfsId;
+      $csv[] = MFS::StringFromId($item->person->MFS);
+      $csv[] = $item->person->firstName;
+      $csv[] = $item->person->lastName;
+      $csv[] = "Volunteer";
+      fputcsv($fh, $csv);
+    }
+
+    $filename = self::rosterDir . "adults.csv";
+    fseek($fh, 0);
+    file_put_contents("$filename", stream_get_contents($fh));
+    fclose($fh);
+  }
+
 
   public static function RosterSpa($year) {
      self::RosterSpaStudents($year);
      self::RosterSpaTeachers($year);
+     self::RosterAdults($year);
   }
 
 
@@ -755,6 +795,8 @@ class Publications {
     $objPHPExcel->getActiveSheet()->getRowDimension("1")->setVisible(TRUE);
     $objPHPExcel->getActiveSheet()->getRowDimension("2")->setVisible(TRUE);
     $objPHPExcel->getActiveSheet()->getRowDimension("3")->setVisible(TRUE);
+
+    $count = 0;
     foreach(Enrollment::GetEnrollmentForClass ($class->id) as $item) {
       $cellValue=sprintf("B%d", $row);
       $objPHPExcel->getActiveSheet()->getCell($cellValue)->setValue($item->student->id);
@@ -766,6 +808,7 @@ class Publications {
       $objPHPExcel->getActiveSheet()->getCell($cellValue)->setValue($fullName);
       $objPHPExcel->getActiveSheet()->getRowDimension($row)->setVisible(TRUE);
       $row++;
+      $count++;
     }
     $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
     $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setVisible(true);
@@ -774,10 +817,14 @@ class Publications {
     $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setVisible(TRUE);
     $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setVisible(TRUE);
 
+    $objPHPExcel->getActiveSheet()->getHeaderFooter()->setOddFooter ("Teachers: " . Teachers::TeacherListClassCsv($class->id) . ", Count: " . $count);
+
+
     return $objPHPExcel;
   }
 	
   public static function AttendanceSheet($year) {
+
     foreach (AvailableClass::GetAllYear($year) as $class) {
       $excelDir = self::BaseDir . "/" . $class->session . "/attendance/" . 
 	Department::NameFromId($class->course->department) . "/excel/";
@@ -785,17 +832,13 @@ class Publications {
       if (!file_exists($excelDir) && !mkdir($excelDir, 0777, true)) die ("error creating directory $excelDir");
       if (!file_exists($pdfDir) && !mkdir($pdfDir, 0777, true)) die ("error creating directory $pdfDir");
       $excelFile=$excelDir . $class->short() . ".xlsx";
-      $pdfFile=$excelDir . $class->short() . ".pdf";
+      //      $pdfFile=$excelDir . $class->short() . ".pdf";
 
       $objPHPExcel = self::AttendanceSheetFill($class);
       
-      //PDF Writer is horrible, do not use it.
-      //      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'PDF');
-      //      $objWriter->save($pdfFile);
-
-      $objPHPExcel->getActiveSheet()->getHeaderFooter()->setOddFooter ("Teachers: " . Teachers::TeacherListClassCsv($class->id));
       $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
       $objWriter->save($excelFile);
+
       //      echo date('H:i:s') . " Peak memory usage: " . (memory_get_peak_usage(true) / 1024 / 1024) . " MBrn\no";
     }
   }
@@ -814,8 +857,8 @@ class NewsletterHtml {
     fwrite($fh, "<div id='newsletter'>\n");
 
     // Step 1: publish dates
-    $expiration = "2011-12-11";
-    fwrite ($fh, "<p class='newsgate'> Week: 7 <br />Expiration Date: $expiration <br />Last Class: $date\n");
+    $expiration = "2011-12-18";
+    fwrite ($fh, "<p class='newsgate'> Week: 8 <br />Expiration Date: $expiration <br />Last Class: $date\n");
     fwrite ($fh, "  <a name='top'>&nbsp;</a>\n");
     fwrite ($fh, "\n");
 
@@ -1111,7 +1154,7 @@ BODY;
 
 //EventManager::ReportParticipation(1); exit();
 //EventManager::PostPaymentFile(); exit();
-NewsletterHtml::Publish("2011-12-04");
+NewsletterHtml::Publish("2011-12-11");
 //Publications::FamilyListForHandbookDistribution(2011); exit();
 //Publications::AttendanceSheet(2011); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
