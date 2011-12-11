@@ -1461,6 +1461,7 @@ Class OtherContacts {
   public $addr2 = null;
   public $zip = null;
   public $email = null;
+  public $url = null;
 
   public static function ObjectFromKey($phone) {
     if ($phone == null) return null;
@@ -1484,9 +1485,186 @@ Class OtherContacts {
     $this->addr2 = $row["OtherContacts.addr2"];
     $this->zip = $row["OtherContacts.zip"];
     $this->email = $row["OtherContacts.email"];
+    $this->url = $row["OtherContacts.url"];
   }
 
 } // end Class OtherContacts
+
+Class EventCalendarType {
+  const SchoolDay = 1
+    , Yoga = 2
+    , Presentation = 4
+    , Meeting = 8
+    , Activity = 16
+    ;
+
+  public static function StringFromId($id) {
+    switch ($id) {
+    case EventCalendarType::SchoolDay:
+      return "School Day";
+    case EventCalendarType::Yoga:
+      return "Yoga";
+    case EventCalendarType::Presentation:
+      return "Presentation";
+    case EventCalendarType::Meeting:
+      return "Meeting";
+    case EventCalendarType::Activity:
+      return "Activity";
+    default: 
+      return "?";
+    }
+  }
+} //Class EventCalendarTypes
+
+Class EventCalendar {
+  public $id=null;
+  public $eventType=null;
+  public $date=null;
+  public $weekNumber=null;
+  public $portalId=null;
+  public $startTime=null;
+  public $endTime=null;
+  public $class=null;
+  public $description=null;
+
+  public static function PreviousSchoolDay() {
+    $type=EventCalendarType::SchoolDay;
+    $query="select * from EventCalendar where date < now() and eventtype = $type order by date desc limit 1";
+    return new self(mysql_fetch_alias_array(VidDb::query($query)));
+
+  }
+
+  public static function NextSchoolDay() {
+    $type=EventCalendarType::SchoolDay;
+    $query="select * from EventCalendar where date > now() and eventtype = $type order by date asc limit 1";
+    return new self(mysql_fetch_alias_array(VidDb::query($query)));
+  }
+
+  public function __construct($row) {
+    if ($row==null) return;
+    $this->id = $row["EventCalendar.id"];
+    $this->eventType = $row["EventCalendar.eventtype"];
+    $this->date = $row["EventCalendar.date"];
+    $this->weekNumber = $row["EventCalendar.weeknumber"];
+    $this->portalId = $row["EventCalendar.portalid"];
+    $this->startTime = $row["EventCalendar.starttime"];
+    $this->endTime = $row["EventCalendar.endtime"];
+    $this->class = is_null($row["EventCalendar.class"]) ? null : AvailableClass::GetItemById($row["EventCalendar.class"]);
+    $this->description = $row["EventCalendar.description"];
+  }
+} // Class EventCalendar
+
+// ************** 
+Class CodesStatus {
+  const Active = 1
+    , Volunteer = 2
+    , Medical = 4
+    , Teacher = 8
+    , YesNo = 16
+    ;
+
+  public static function CodeFromId($id) {
+    $csv = array();
+    if ($id & self::Active) $csv[] = "Active";
+    if ($id & self::Volunteer) $csv[] =  "Volunteer";
+    if ($id & self::Medical) $csv[] = "Medical";
+    if ($id & self::Teacher) $csv[] = "Teacher";
+    if ($id & self::YesNo) $csv[] = "Yes/No";
+    if (count($csv) == 0 ) return "unknown";
+    return implode(", ", $csv);
+  }
+} // Class CodesStatus
+
+Class Codes { // various codes used in the business
+  public $code = null;
+  public $status = null;
+  public $department = null;
+  public $role = null;
+  public $description = null;
+  public $hours = null;
+  public $requirement = null;
+
+  public static function VolunteerCodeHtml() {
+    
+    $html = "<div class='vidyalaya'>\n";
+    $html .= "<h3>Teaching Roles</h3>\n<table border=1>\n";
+    $html .= "<thead><tr><th>Code</th><th>Department</th><th>Role</th><th>Hours</th>";
+    $html .= "<th>Requirement</th><th>?</th></thead>\n";
+    foreach (self::GetTeacherCodes() as $item) {
+      $html .=  "<tr><td rowspan=2 valign=top>$item->code</td><td>$item->department</td><td>$item->role</td><td>$item->hours</td>";
+      $html .= "<td align='right'>$item->requirement</td></tr>\n";
+      $html .= "<tr><td colspan=4>$item->description</td></tr>\n";
+    }
+    $html .= "</table>\n";
+    print $html;
+
+    $html = "<h3>Non-teaching Volunteer Roles</h3>\n<table border=1>\n";
+    $html .= "<thead><tr><th>Code</th><th>Department</th><th>Role</th><th>Hours</th>";
+    $html .= "<th>Requirement</th><th>?</th></thead>\n";
+    foreach (self::GetNonTeacherVolunteerCodes() as $item) {
+      $html .=  "<tr><td rowspan=2 valign=top>$item->code</td><td>$item->department</td><td>$item->role</td><td>$item->hours</td>";
+      $html .= "<td align='right'>$item->requirement</td></tr>\n";
+      $html .= "<tr><td colspan=4>$item->description</td></tr>\n";
+    }
+    $html .= "</table>\n";
+    $html .= "</div>\n";
+    return $html;
+  }
+
+  public static $objArray = Array ();
+
+  private static function firstTimeCall() {
+    if (!empty(self::$objArray)) return;
+    $query = "select * from Codes";
+    $result = VidDb::query($query);
+    while ($row = mysql_fetch_alias_array($result)) {
+      $key = $row["Codes.code"];
+      if (!array_key_exists($key, self::$objArray)) 
+	self::$objArray[$key] = new self($row);
+    }
+  }
+  
+  public static function GetAll() {
+    self::firstTimeCall();
+    return self::$objArray;
+  }
+
+  public static function GetTeacherCodes() {
+    return self::ArrayForCode(CodesStatus::Volunteer | CodesStatus::Active | CodesStatus::Teacher);
+  }
+  public static function GetNonTeacherVolunteerCodes() {
+    return self::ArrayForCode(CodesStatus::Volunteer | CodesStatus::Active );
+  }
+
+  private static function ArrayForCode($code) {
+    $list = Array();
+    foreach(self::GetAll() as $item) {
+      if (!($item->status ^ $code ))
+	$list[] = $item;
+    }
+    return $list;
+  }
+  
+  public static function GetItemById($key) {
+    self::firstTimeCall();
+    if (isset(self::$objArray[$key])) return self::$objArray[$key];
+    return null;
+  }
+
+
+  public function __construct($row) {
+    if ($row==null) return;
+    $this->code = $row["Codes.code"];
+    $this->status = $row["Codes.status"];
+    $this->department = $row["Codes.Department"];
+    $this->role = $row["Codes.Role"];
+    $this->description = $row["Codes.Description"];
+    $this->hours = $row["Codes.hours"];
+    $this->requirement = $row["Codes.requirement"];
+  }
+} // Class Codes
+
+
 
 Class Zipcodes {
   public $zipcodes = null;

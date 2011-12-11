@@ -279,10 +279,10 @@ dojo.require("dijit.Tooltip");
 
 <table class="tablesorter">
 <thead>
-<tr><th>Type</th><th>Phone</th><th>Name</th><th>Address</th><th>Email</th></tr>
+<tr><th>Type</th><th>Phone</th><th>Name</th><th>Address</th><th>Email</th><th>URL</th></tr>
 </thead>
 <!-- BEGIN OTHERCONTACT -->
-<tr><td>{TYPE}</td><td>{PHONE}</td><td>{NAME}</td><td>{ADDR}</td><td>{EMAIL}</td></tr>
+<tr><td>{TYPE}</td><td>{PHONE}</td><td>{NAME}</td><td>{ADDR}</td><td>{EMAIL}</td><td>{URL}</td></tr>
 <!-- END OTHERCONTACT -->
 </table>
 

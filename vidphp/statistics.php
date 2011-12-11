@@ -469,9 +469,25 @@ function ConvertTeacherToObject() {
   }
 }
 
+Class Sandbox {
+
+
+  public static function loadCodes() {
+    $filename = "/home/umesh/Dropbox/Vidyalaya-Management/Admission/codes.csv";
+    if (($handle = fopen($filename, "r")) !== FALSE) {
+      while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {    
+	$sql = "insert into Codes values ( $data[0], '$data[1]', $data[2], ";
+	$sql .= " '$data[3]', '$data[4]', '$data[5]', '$data[6]', '$data[7]' ); \n";
+	$result = VidDb::query($sql);
+	print $sql;
+      }
+    }
+  }
+} // Class Sandbox
+
 
 //FamilyTracker::UpdateFamilyTracker(); exit();
-FamilyTracker::loadPayments();exit();
+//FamilyTracker::loadPayments();exit();
 //FamilyTracker::ReportPending();exit();
 //FamilyTracker::TrackerSummary();exit(); This has probably been removed
 //

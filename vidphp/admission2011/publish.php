@@ -1,5 +1,6 @@
+#!/usr/bin/php -q
 <?php
-
+@ob_end_clean();
 $libDir="../../dakhila/libVidyalaya/";
 require_once "$libDir/db.inc";
 require_once "$libDir/vidyalaya.inc";
@@ -847,18 +848,25 @@ class Publications {
 }	
 
 class NewsletterHtml {
-  public static function Publish($date) {
+  public static function Publish() {
     $year="2011"; // todo: get year from date
     $fh = tmpfile();
     if (!$fh) die ("could not open temporary file for writing");
+
+    $previous = EventCalendar::PreviousSchoolDay();
+    $next =  EventCalendar::NextSchoolDay();
+
+    $date = $previous->date;
+    $expiration = $next->date;
+    $week = $previous->weekNumber;
+
 
     $directory= "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/Newsletter/$date/";
 
     fwrite($fh, "<div id='newsletter'>\n");
 
     // Step 1: publish dates
-    $expiration = "2011-12-18";
-    fwrite ($fh, "<p class='newsgate'> Week: 8 <br />Expiration Date: $expiration <br />Last Class: $date\n");
+    fwrite ($fh, "<p class='newsgate'> Week: $week <br />Expiration Date: $expiration <br />Last Class: $date\n");
     fwrite ($fh, "  <a name='top'>&nbsp;</a>\n");
     fwrite ($fh, "\n");
 
@@ -1152,9 +1160,10 @@ BODY;
 
 }
 
+//print Codes::VolunteerCodeHtml();  exit(); // print volunteer codes for shiksha portal
 //EventManager::ReportParticipation(1); exit();
 //EventManager::PostPaymentFile(); exit();
-NewsletterHtml::Publish("2011-12-11");
+NewsletterHtml::Publish();
 //Publications::FamilyListForHandbookDistribution(2011); exit();
 //Publications::AttendanceSheet(2011); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
@@ -1174,7 +1183,6 @@ NewsletterHtml::Publish("2011-12-11");
 //Publications::TeacherDirectory(2011); exit (); // Directory of all Teachers
 //Publications::VolunteerDirectory(2011); exit (); // Directory of all Volunteers
 //Publications::ClassDirectory(2011); exit (); // Directory of all classes, with and without email
-
 
 
 ?>

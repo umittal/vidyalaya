@@ -398,6 +398,10 @@ function DisplayStudentTemplate (&$template, $student) {
 	    $template->setVariable("ADDR",  $address);
 
 	    $template->setVariable("EMAIL",  $contact->email);
+	    if (!empty($contact->url)) {
+	      $url = "<a href='$contact->url' target='_blank'>url</a>";
+	      $template->setVariable("URL",  $url);
+	    }
 	  }
 	  $template->parseCurrentBlock();
 	}
