@@ -1589,7 +1589,7 @@ Class Codes { // various codes used in the business
     $html = "<div class='vidyalaya'>\n";
     $html .= "<h3>Teaching Roles</h3>\n<table border=1>\n";
     $html .= "<thead><tr><th>Code</th><th>Department</th><th>Role</th><th>Hours</th>";
-    $html .= "<th>Requirement</th><th>?</th></thead>\n";
+    $html .= "<th>Requirement</th></thead>\n";
     foreach (self::GetTeacherCodes() as $item) {
       $html .=  "<tr><td rowspan=2 valign=top>$item->code</td><td>$item->department</td><td>$item->role</td><td>$item->hours</td>";
       $html .= "<td align='right'>$item->requirement</td></tr>\n";

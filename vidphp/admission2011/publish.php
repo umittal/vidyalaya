@@ -947,7 +947,7 @@ if (file_exists($classfile)) {
     fwrite($fh, "</div>\n");
     fseek($fh, 0);
 
-    $filename = "/tmp/foo";
+    $filename=$directory . "final.html";
     file_put_contents("$filename", stream_get_contents($fh));
     print "check $filename\n";
     fclose($fh);
