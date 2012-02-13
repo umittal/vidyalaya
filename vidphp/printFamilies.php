@@ -176,6 +176,7 @@ function printMedicalForms($students) {
 }
 
 function printOneFamily($family) {
+  print "** Trying to print for $family->id ****\n";
 	$printDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission";
 	$html = GetPdfForFamilyV2($family);
 	// Convert to PDF
@@ -188,9 +189,9 @@ function printOneFamily($family) {
 
 	$fileName = $printDir . "/pdf/Family-" . $family->id . ".pdf";
 	file_put_contents("$fileName", $pdf);
-	$fileName = $printDir . "/html/Family-" . $family->id . ".html";
-	file_put_contents("$fileName", $html);
 	echo "printed $fileName\n";
+	$fileName = $printDir . "/html/Family-" . $family->id . ".html";
+	//	file_put_contents("$fileName", $html);
 }
 
 function printOneFamilyDetail($family) {
