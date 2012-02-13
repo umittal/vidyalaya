@@ -844,6 +844,78 @@ class Publications {
     }
   }
 
+  private static function LanguageAssessmentFill($class) {
+    $templateDirectory = "/home/umesh/Dropbox/Vidyalaya-Management/templates/LanguageAssessment";
+    $filename = $class->course->department == Department::Kindergarten ? "KG" :  $class->course->level;
+    $inputFileName = "$templateDirectory/". $filename . ".xlsx";
+
+    $activeSheetIndex=0;
+    $row =3;
+
+    $objPHPExcel = PHPExcel_IOFactory::load($inputFileName);
+    $objPHPExcel->setActiveSheetIndex($activeSheetIndex);
+    $objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
+    $objPHPExcel->getActiveSheet()->setShowGridlines(false);
+    $objPHPExcel->getActiveSheet()->setRightToLeft(FALSE);
+
+
+    $objPHPExcel->getActiveSheet()->setTitle($class->short());
+    //    $shortValue = $class->course->department == Department::Culture ? $class->short() . " Language Asessment" : $class->short();
+    //    $objPHPExcel->getActiveSheet()->getCell("B2")->setValue($shortValue);
+    $objPHPExcel->getActiveSheet()->getCell("B1")->setValue($class->course->short . " " . $class->section);
+    //    $objPHPExcel->getActiveSheet()->getCell("B3")->setValue("Room: " . $class->room->roomNumber);
+			
+    $objPHPExcel->getActiveSheet()->getRowDimension("1")->setVisible(TRUE);
+    $objPHPExcel->getActiveSheet()->getRowDimension("2")->setVisible(TRUE);
+    $objPHPExcel->getActiveSheet()->getRowDimension("3")->setVisible(TRUE);
+
+    $count = 0;
+    foreach(Enrollment::GetEnrollmentForClass ($class->id) as $item) {
+      $cellValue=sprintf("B%d", $row);
+      $objPHPExcel->getActiveSheet()->getCell($cellValue)->setValue($item->student->id);
+      $cellValue=sprintf("C%d", $row);
+      $fullName=$item->student->fullName();
+      if ($class->course->department == Department::Kindergarten) {
+	$fullName = substr(Department::NameFromId($item->student->languagePreference), 0, 1) . " " . $fullName;
+      }
+      $objPHPExcel->getActiveSheet()->getCell($cellValue)->setValue($fullName);
+      $objPHPExcel->getActiveSheet()->getRowDimension($row)->setVisible(TRUE);
+      $row++;
+      $count++;
+    }
+    $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
+    $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setVisible(true);
+    $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setVisible(TRUE);
+    $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setVisible(TRUE);
+    $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setVisible(TRUE);
+    $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setVisible(TRUE);
+
+    $objPHPExcel->getActiveSheet()->getHeaderFooter()->setOddFooter ("Teachers: " . Teachers::TeacherListClassCsv($class->id) . ", Count: " . $count);
+
+
+    return $objPHPExcel;
+
+
+  }
+
+  public static function LanguageAssessment($year) {
+    foreach (AvailableClass::GetAllYear($year) as $class) {
+      if ($class->course->department == Department::Culture) continue;
+      $excelDir = self::BaseDir . "/" . $class->session . "/assessment/" . 
+	"/excel/";
+      $pdfDir=str_replace("excel", "pdf", $excelDir);
+      if (!file_exists($excelDir) && !mkdir($excelDir, 0777, true)) die ("error creating directory $excelDir");
+      if (!file_exists($pdfDir) && !mkdir($pdfDir, 0777, true)) die ("error creating directory $pdfDir");
+      $excelFile=$excelDir . $class->short() . ".xlsx";
+      //      $pdfFile=$excelDir . $class->short() . ".pdf";
+
+      $objPHPExcel = self::LanguageAssessmentFill($class);
+      
+      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+      $objWriter->save($excelFile);
+    }
+  }
+
 
 }	
 
@@ -1163,9 +1235,10 @@ BODY;
 //print Codes::VolunteerCodeHtml();  exit(); // print volunteer codes for shiksha portal
 //EventManager::ReportParticipation(1); exit();
 //EventManager::PostPaymentFile(); exit();
-NewsletterHtml::Publish();
+//NewsletterHtml::Publish();
 //Publications::FamilyListForHandbookDistribution(2011); exit();
-//Publications::AttendanceSheet(2011); exit();
+Publications::AttendanceSheet(2011); exit();
+//Publications::LanguageAssessment(2011); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
 //Publications::Roster(2011); exit();
 

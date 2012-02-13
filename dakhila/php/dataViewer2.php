@@ -231,7 +231,7 @@ EOT;
 	case "RegistrationSummary":
 		$sql = <<< SQLREGISTRATIONSUMMAY
 		  select previousYear, currentYear, count(*) 
-		  from FamilyTracker where year = 1 
+		  from FamilyTracker where year = 2 
 		  group by previousYear, currentYear 
 		  order by previousYear, currentYear
 

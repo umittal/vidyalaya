@@ -99,7 +99,7 @@
 	  <tr><td></td></tr>
 	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=Registration&familyId=47">Registration Form</tr>
 	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=MedicalForm&studentId=1446">Medical Form</tr>
-	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=RegistrationSummary">2011 Registration Summary</tr>
+	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=RegistrationSummary">2012 Registration Summary</tr>
 	  <tr><td><a href="/dakhila/php/dataViewer2.php?command=FamilyTracker">Family Tracker</tr>
 	</table>
       </div>

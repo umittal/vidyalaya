@@ -1,7 +1,7 @@
 <?php
 
 require_once "vidyalaya.inc";
-$dompdfDir = realpath(dirname(__FILE__)."/../../dompdf2");
+$dompdfDir = realpath(dirname(__FILE__)."/../../dompdf");
 require_once("$dompdfDir/dompdf_config.inc.php");
 $phpMailerDir = realpath(dirname(__FILE__)."/../../Classes/PHPMailer_v5.1");
 require_once("$phpMailerDir/class.phpmailer.php");

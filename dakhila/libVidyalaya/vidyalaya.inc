@@ -2174,7 +2174,7 @@ class FamilyTracker {
 
 	private static function firstTimeCall() {
 		if (!empty(self::$objArray)) return;
-		$query = "select * from FamilyTracker";
+		$query = "select * from FamilyTracker where year=2";
 		$result  = VidDb::query($query);
 		while ($row = mysql_fetch_alias_array($result)) {
 			$key = $row["FamilyTracker.family"];

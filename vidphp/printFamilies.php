@@ -61,7 +61,6 @@ function GetPdfForRoster($classId) {
 }
 
 function GetPdfForFamilyV2($family) {
-	$dompdf = new DOMPDF();
 	$students = Student::AllStudents();
 
 	// Header 
@@ -145,11 +144,7 @@ function GetPdfForFamilyV2($family) {
 	$template->touchBlock('F_BOTTOM');
 	$html = $html . $template->get();
 
-	// Convert to PDF
-	$html = str_replace('&nbsp;', '<span style="color:#fff;">x</span>',$html);
-	$dompdf->load_html($html);
-	$dompdf->render();	
-	return $dompdf->output();
+	return $html;
 }
 
 
@@ -181,10 +176,20 @@ function printMedicalForms($students) {
 }
 
 function printOneFamily($family) {
-	$printDir = "/home/umesh/package2011";
-	$pdf = GetPdfForFamilyV2($family);
-	$fileName = $printDir . "/Family-" . $family->id . ".pdf";
+	$printDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission";
+	$html = GetPdfForFamilyV2($family);
+	// Convert to PDF
+	$html = str_replace('&nbsp;', '<span style="color:#fff;">x</span>',$html);
+
+	$dompdf = new DOMPDF();
+	$dompdf->load_html($html);
+	$dompdf->render();	
+	$pdf= $dompdf->output();
+
+	$fileName = $printDir . "/pdf/Family-" . $family->id . ".pdf";
 	file_put_contents("$fileName", $pdf);
+	$fileName = $printDir . "/html/Family-" . $family->id . ".html";
+	file_put_contents("$fileName", $html);
 	echo "printed $fileName\n";
 }
 
@@ -221,13 +226,20 @@ function printRosterYear () {
 	}
 }
 
-function printAllFamilies($students) {
+function printAllFamilies() {
+  foreach (FamilyTracker::GetAll()  as $tracker) {
+    printOneFamily(Family::GetItemById($tracker->family));
+  }
+}
+
+function printAllFamiliesOld($students) {
 	foreach (Family::$objArray as $family) {
 		$count = GetEnrolledStudentCountForFamily($family->id, $students);
 		if ($count > 0 || $family->category->id == FamilyCategory::Waiting) 		printOneFamily($family);
 	}
 }
 //printRosterYear (); exit();
+//printAllFamilies(); exit();
 $entry = GetSingleIntArgument();
 print "printing  $entry\n";
 printOneFamily (Family::GetItemById($entry));

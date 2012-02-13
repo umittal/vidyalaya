@@ -1,6 +1,4 @@
         <style type="text/css">
-            td { padding-left:10px; }
-            th { padding-left:10px; }
             .ou { font-style:oblique;text-decoration:underline; }
         </style>
     <script>
@@ -32,21 +30,17 @@ dojo.require("dijit.Tooltip");
 	</form>
 
 
-<h3>Family Details</h3>
-
-<ol>
-
-<li class="section">Home</li>
+<div class="heading1">Family Details </div>
 
 <table>
 <!-- BEGIN HOME -->
-
-<tr><td>ID</td><td>{ID} (Home: {HOMEPHONE})</td></tr>
-<tr><td rowspan=2>Address</td><td>{LINE1} {LINE2}</td></tr>
+<tr><td>ID</td><td>{ID} (Home Phone: {HOMEPHONE})</td></tr>
+<tr><td rowspan=2>Home Address</td><td>{LINE1} {LINE2}</td></tr>
 <tr><td>{CITY}, {STATE} {ZIP}</td></tr>
 <!-- END HOME -->
 </table>
 
+<ol>
 
 <li class="section">Parents</li>
 
@@ -57,7 +51,6 @@ dojo.require("dijit.Tooltip");
 <tr><td>{MF} </td><td>{NAME}</td><td> {EMAIL}</td><td>{WORK}</td><td>{CELL}</td><td>{ISCONTACTABLE}</td></tr>
 <!-- END PARENTS -->  	  	  
 </table>
-<p>
 
 <li class="section">Children</li>
 <table>
@@ -102,3 +95,8 @@ dojo.require("dijit.Tooltip");
 </table>
 
 </ol>
+
+<p></p>
+<div class="explanation">
+Note: Please email any changes to admission2012@vidyalaya.us and we will send you an updated package. 
+</div>

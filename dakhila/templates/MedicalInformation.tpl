@@ -1,19 +1,15 @@
-<body>
+<div class="heading1">Student Medical Information Form </div>
+<div class=explanation>This form needs to be completed separately for each registered student</div>
 
-<h3>Medical Information Form </h3>
-<p><i>This form needs to be completed separately for each registered student</i>
-
-<ol>
-<li class="section">Student</li>
 <table style="width:400px;">
 <thead>
-<tr><th>ID</th><th>Session</th><th>First</th><th>Last	</th></tr>
+<tr><th style="text-align:left;">Student ID</th><th style="text-align:left;">Session</th><th style="text-align:left;">First</th><th style="text-align:left;">Last</th></tr>
 </thead>
 <tbody>
 <!-- BEGIN STUDENT -->
 <tr>
 <td>{ID}</td>
-<td>2011-12</td>
+<td>2012-13</td>
 <td>{FIRST}</td>
 <td>{LAST}</td>
 </tr>
@@ -21,6 +17,7 @@
 </tbody>
 </table>
 
+<ol>
 <li class="section">Emergency Contact (Other than Parents)</li>
 <table>
 <thead>
@@ -34,10 +31,10 @@
 <li class="section">Providers</li>
 <table>
 <thead>
-<tr><th class="category">Type</th><th class="name">Name</th><th class="phone">Phone (10 digit)</th></tr>
+<tr><th>Type</th><th>Name</th><th>Phone (10 digit)</th></tr>
 </thead>
 <tbody>
-<tr><td>Hospital</td><td class=input>&nbsp;</td><td class=input>&nbsp;</td></tr>
+<tr><td>Hospital</td><td class=input width=250px>&nbsp;</td><td class=input>&nbsp;</td></tr>
 <tr><td>Primary Doctor</td><td class=input>&nbsp;</td><td class=input>&nbsp;</td></tr>
 <tr><td>Dentist</td><td class=input>&nbsp;</td><td class=input>&nbsp;</td></tr>
 </tbody>
@@ -56,7 +53,6 @@
 </tbody>
 </table>
 
-<p> If yes, please provide additional explanation on a separate page
 
 <table>
 <thead>
@@ -73,16 +69,18 @@
 </tbody>
 </table>
 
+<br>* If yes, please provide additional explanation on a separate page
+
 <li class="section">Consent</li>
-<p>As the parent of the above named Student,  I hereby 
+<div class="nomargin">As the parent of the above named Student,  I hereby </div>
 <ol class="smallFont">
-<li>Confirm that above information is correct and complete
-<li>Confirm that I have provided all the relevant medical information
-<li>Understand that there is no Nurse/Medical professional on staff during school session
-<li>Understand that volunteers at Vidyalaya are not equipped to handle allergies or other Medical situations
-<li>Give consent for emergency medical care prescribed by a duly licensed Doctor of Medicine or Doctor of Dentistry. The care may be given under whatever conditions are necessary to preserve life, limb or well-being of my child/dependant.
+<li>Confirm that above information is correct and complete</li>
+<li>Confirm that I have provided all the relevant medical information</li>
+<li>Understand that there is no Nurse/Medical professional on staff during school session</li>
+<li>Understand that volunteers at Vidyalaya are not equipped to handle allergies or other Medical situations</li>
+<li>Give consent for emergency medical care prescribed by a duly licensed Doctor of Medicine or Doctor of Dentistry. The care may be given under whatever conditions are necessary to preserve life, limb or well-being of my child/dependant.</li>
 </ol>
-</p>
+
 
 <li class="section">Signature</li>
 <table>
@@ -91,7 +89,7 @@
 </thead>
 <tbody>
 <!-- BEGIN PARENTS -->
-<tr><td>{PARENTSNAME}</td><td style="text-align: right;" class=input>&nbsp;/2011</td><td class=input>&nbsp;</td></tr>
+<tr><td>{PARENTSNAME}</td><td style="text-align: right;" class=input>&nbsp;/2012</td><td class=input>&nbsp;</td></tr>
 <!-- END PARENTS -->
 </tbody>
 </table>
