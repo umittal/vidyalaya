@@ -1235,9 +1235,9 @@ BODY;
 //print Codes::VolunteerCodeHtml();  exit(); // print volunteer codes for shiksha portal
 //EventManager::ReportParticipation(1); exit();
 //EventManager::PostPaymentFile(); exit();
-//NewsletterHtml::Publish();
+NewsletterHtml::Publish();
 //Publications::FamilyListForHandbookDistribution(2011); exit();
-Publications::AttendanceSheet(2011); exit();
+//Publications::AttendanceSheet(2011); exit();
 //Publications::LanguageAssessment(2011); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
 //Publications::Roster(2011); exit();
