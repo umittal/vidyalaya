@@ -338,8 +338,8 @@ class Mail {
   }
 
   public static function SetupMailUmesh() {
-    return self::SetupMailCommon("umesh@vidyalaya.us", "Vidyalaya Information", "Praveen38", 
-				 "umesh@vidyalaya.us", "Umesh Mittal");
+    return self::SetupMailCommon("umesh@vidyalaya.us", "Vidyalaya Administration", "Praveen38", 
+				 "asmita@vidyalaya.us", "Language Curriculum Team");
   }
 
 	

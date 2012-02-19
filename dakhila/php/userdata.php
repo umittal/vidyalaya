@@ -39,7 +39,6 @@ class UserData {
   }
 
   public function formhelp() {
-    VidSession::sessionAuthenticate();
     $this->SetMenu();
     $html = "";
 
@@ -238,6 +237,17 @@ RESETFORM;
     $this->template->parseCurrentBlock();
     print $this->template->get();
     
+  }
+
+  public function newFamily() {
+    $this->template->setCurrentBlock('RESULT');
+    $html = file_get_contents("../html/formNewFamily.inc");
+    $this->template->setVariable("RESULT", $html);
+    $this->template->parseCurrentBlock();
+    $this->template->addBlockFile('BOTTOM', 'F_BOTTOM', 'LayoutBottom.tpl');
+    $this->template->touchBlock('F_BOTTOM');
+
+    print $this->template->get();
   }
 
   // ************************************************************

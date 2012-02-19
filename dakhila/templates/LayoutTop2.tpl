@@ -10,25 +10,34 @@
 	<title>Vidyalaya - Dakhila</title>
 
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
-	<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dojo/dojo.xd.js" djConfig="parseOnLoad: true"></script>
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>	
+<script src="https://ajax.googleapis.com/ajax/libs/dojo/1.7/dojo/dojo.js" type="text/javascript" djConfig="parseOnLoad:true"></script>
 
 	<script type="text/javascript" src="/dakhila/js/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="/dakhila/js/jquery.uitablefilter.js"></script>
 
         <script type="text/javascript">
+dojo.require('dojox.validate');
+dojo.require('dojox.validate.us');
+dojo.require('dojox.validate.web');
             dojo.require("dijit.MenuBar");
             dojo.require("dijit.PopupMenuBarItem");
             dojo.require("dijit.Menu");
             dojo.require("dijit.MenuItem");
             dojo.require("dijit.PopupMenuItem");
+	    dojo.require('dijit.form.ValidationTextBox');
+	    dojo.require('dijit.form.FilteringSelect');
+	    dojo.require('dijit.form.Form');
+
         </script>
 
     <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/ui-lightness/jquery-ui.css" />
-    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dojox/grid/enhanced/resources/claro/EnhancedGrid.css" />
-    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7/dojox/grid/enhanced/resources/claro/EnhancedGrid.css" />
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7/dijit/themes/claro/claro.css">
+
       <style type="text/css">
-       @import "http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/resources/dojo.css"; 
+
+       @import "http://ajax.googleapis.com/ajax/libs/dojo/1.7/dojo/resources/dojo.css"; 
        </style>
 
 
