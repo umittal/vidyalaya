@@ -39,8 +39,6 @@ class UserData {
   }
 
   public function formhelp() {
-    VidSession::sessionAuthenticate();
-    $this->SetMenu();
     $html = "";
 
     $html .= "<h3>Form Parameters are </h3>";
