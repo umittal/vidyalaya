@@ -12,7 +12,7 @@ require_once "../../MPDF53/mpdf.php";
 
 function SetupMail() {
 
-  $email = "Admission2011@vidyalaya.us";
+  $email = "Admission2012@vidyalaya.us";
   $name = "Vidyalaya Admissions";
 
   $mail = new PHPMailer(false); 
@@ -51,34 +51,6 @@ function SetFamilyAddress(&$mail, $family) {
 	
 }
 
-function AnnounceExisting($family) {
-  $mail = SetupMail();
-  SetFamilyAddress($mail, $family);
-
-  $mail->Subject = "Vidyalaya Admission 2011-12";
-  
-  // attachments
-  $attachDir = "/home/umesh/admissions";
-  $mail->AddAttachment("$attachDir/Volunteer2011.pdf"); // attachment
-  $mail->AddAttachment("$attachDir/ParticipationAgreement.pdf"); // attachment
-  
-  $customizedPdf = "/home/umesh/package2011/Family-". $family->id . ".pdf";
-  $mail->AddAttachment("$customizedPdf"); // attachment
-  
-//  $draft = "<p>This is a <u>draft</u> message being sent for review. Please send all comments, trivial/substantial. The real mail will come later.";
-	$draft="";
-  $salutation = "<p>Dear " . $family->parentsName() . ",";
-  $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/announce-existing.html");
-  $mail->AltBody = "This is the body when user views in plain text format"; //Text Body
-
-//  if ($family->id != 43) return;
-
-  if(!$mail->Send()) {
-    echo "Mailer Error: " . $mail->ErrorInfo . "\n";
-  }  else {
-    echo "Message has been sent\n";
-  }
-}
 
 function GetEnrolledStudentCountForFamily($id, $students) {
 	$count=0;
@@ -91,7 +63,7 @@ function GetEnrolledStudentCountForFamily($id, $students) {
 return $count;
 }
 
-function ExistingFamilies($students) {
+function ExistingFamiliesOld($students) {
   foreach (Family::$objArray as $family) {
     $count = GetEnrolledStudentCountForFamily($family->id, $students);
     if ($count > 0) {
@@ -728,15 +700,15 @@ Please print out a copy of this template for yourselves and use it to collect th
 
 <p>
 Please feel free to ask questions or make comments at any time (asmita@vidyalaya.us or reply to this email).  It is best if you do not wait until the last minute to ask questions. 
- 
-																     <p>Regards,
 
-																     <p>Language and Curriculum Team<br />(Sent By: umesh@vidyalaya.us)
+ <p>Regards,
+
+ <p>Asmita<br />Language and Curriculum Team<br />Vidyalya Inc.
 
 TEACHEREMAILATTENDANCEASSESSMENT;
       $footer = "";
       $subject="Attendance/Assessment Sheet";
-      $production=0;
+      $production=1;
 
      //      if ($person->id() != "F227") continue;
       if ($production == 0) $subject = "[Test] $subject";
@@ -763,7 +735,7 @@ TEACHEREMAILATTENDANCEASSESSMENT;
 	echo "Message has been sent, Person: " .$person->id() . ":\n";
       }
 
-      die ("I die\n");
+      // die ("I die\n");
     }
   }
 
@@ -1188,6 +1160,49 @@ AGREEMENT;
     }
   }
 
+  private static function AnnounceExisting($family) {
+    $production=1;
+    $mail =   Mail::SetupMailAdmissions();
+    Mail::SetFamilyAddress(&$mail, $family, $production);
+
+    $subject = "Vidyalaya Admission 2012-13, Family $family->id";
+    if ($production == 0) $subject = "[Test] $subject";
+    $mail->Subject = $subject;
+  
+
+    // attachments
+    $customizedPdf = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission/pdf/Family-". $family->id . ".pdf";
+    $mail->AddAttachment("$customizedPdf"); // attachment
+    $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Management/Admission/Volunteer2011.pdf"); // attachment
+    $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Management/Admission/ParticipationAgreement.pdf"); // attachment
+  
+    print "Family id: $family->id, Name: " . $family->parentsName() . "\n";
+
+    $salutation = "<p>Dear " . $family->parentsName() . ",";
+    $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/announce-existing2012.html");
+    $mail->AltBody = "Family: $family->id"; //Text Body
+
+    //    if ($family->id != 47) return;
+
+    if(!$mail->Send()) {
+      echo "Mailer Error: " . $mail->ErrorInfo . "\n";
+    }  else {
+      echo "Message has been sent\n";
+    }
+  }
+
+  public static function ExistingFamilies() {
+    $i=1;
+    foreach (FamilyTracker::GetAll() as $tracker) {
+      if ($tracker->previousYear != EnumFamilyTracker::registered) continue;
+      $family = Family::GetItemById($tracker->family);
+      print "$i. Family id: $family->id, Name: " . $family->parentsName() . "\n";
+      $i++;
+      self::AnnounceExisting($family);
+      
+    }
+    return;
+  }
 
 }
 
@@ -1511,6 +1526,7 @@ class TwoYearLayout {
   }
 }
 
+Admission::ExistingFamilies(); exit();
 
 //Admission::AdultLanguage(); exit();
 
@@ -1556,7 +1572,6 @@ if (array_key_exists("function", $out))
 
 //$students = GetAllData();
 
-// ExistingFamilies($students);
 //NewFamiliesOrientation();
 $entry = GetSingleIntArgument();
 PostOrientation(Family::GetItemById($entry));

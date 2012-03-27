@@ -1,7 +1,7 @@
 <div class="heading1">Student Medical Information Form </div>
 <div class="heading1">2012-13 </div>
 
-<div class=explanation>This form needs to be completed separately for each registered student</div>
+<div class=explanation>This form needs to be completed separately for each registered student.</div>
 
 <table style="width:400px;">
 <thead>
@@ -46,7 +46,7 @@
 </table>
 
 <div class="section">Medical Information </div>
-<div class=explanation>Place a check  mark  in Yes/No boxes as appropriate. For items marked * provide additional explation below.</div>
+<div class=explanation>Place a check  mark  in Yes/No boxes as appropriate. For items marked * provide additional explanation below.</div>
 
 <table>
 <thead>

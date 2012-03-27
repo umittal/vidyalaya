@@ -2154,8 +2154,8 @@ class Parents {
 // ******** Family Tracker
 class FamilyTracker {
 	const facility = 2;
-	const prevYear = 0;
-	const currYear = 1;
+	const prevYear = 1;
+	const currYear = 2;
 
 	public $year=null;
 	public $family = null;

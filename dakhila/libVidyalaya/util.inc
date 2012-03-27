@@ -318,8 +318,8 @@ class Mail {
   }
 
   public static function SetupMailAdmissions() {
-    return self::SetupMailCommon("Admission2011@vidyalaya.us", "Vidyalaya Admissions", "Praveen38", 
-				 "umesh@vidyalaya.us", "Umesh Mittal");
+    return self::SetupMailCommon("Admission2012@vidyalaya.us", "Vidyalaya Admissions", "Praveen38", 
+				 "Admission2012@vidyalaya.us", "Vidyalaya Admissions");
   }
 	
   public static function SetupMailSPA() {
