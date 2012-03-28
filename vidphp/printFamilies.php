@@ -191,7 +191,8 @@ function printOneFamily($family) {
 	file_put_contents("$fileName", $pdf);
 	echo "printed $fileName\n";
 	$fileName = $printDir . "/html/Family-" . $family->id . ".html";
-	//	file_put_contents("$fileName", $html);
+	file_put_contents("$fileName", $html);
+	echo "printed $fileName\n";
 }
 
 function printOneFamilyDetail($family) {
