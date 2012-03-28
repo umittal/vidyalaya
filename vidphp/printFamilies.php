@@ -47,7 +47,7 @@ function GetCommonTemplate ($template) {
 }
 
 function GetPdfForRoster($classId) {
-  $template = new HTML_Template_ITX("/var/www/dakhila/templates");
+  $template = new HTML_Template_ITX("../dakhila/templates");
   GetCommonTemplate( $template);
   print "Trying for class id $classId\n";
   DisplayClassRoster($template, $classId);
@@ -64,14 +64,14 @@ function GetPdfForFamilyV2($family) {
 	$students = Student::AllStudents();
 
 	// Header 
-	$template = new HTML_Template_ITX("/var/www/dakhila/templates");
+	$template = new HTML_Template_ITX("../dakhila/templates");
 	$template->loadTemplatefile("Layout.tpl", true, true);
 	$template->addBlockFile('TOP', 'F_TOP', 'LayoutTop.tpl');
 	$template->touchBlock('F_TOP');
 	$html = $template->get();
 
 	// Family Detail Form - one per family
-	$template = new HTML_Template_ITX("/var/www/dakhila/templates");
+	$template = new HTML_Template_ITX("../dakhila/templates");
 	$template->loadTemplatefile("Layout.tpl", true, true);
 	$template->addBlockFile('CONTENT', 'F_CONTENT', 'LayoutContent.tpl');
 	$template->touchBlock('F_CONTENT');
@@ -91,7 +91,7 @@ function GetPdfForFamilyV2($family) {
 	$html = $html . '<DIV style="page-break-after:always"></DIV>';
 	
 	// Registration Form - one per family
-	$template = new HTML_Template_ITX("/var/www/dakhila/templates");
+	$template = new HTML_Template_ITX("../dakhila/templates");
 	$template->loadTemplatefile("Layout.tpl", true, true);
 	$template->addBlockFile('CONTENT', 'F_CONTENT', 'LayoutContent.tpl');
 	$template->touchBlock('F_CONTENT');
@@ -117,7 +117,7 @@ function GetPdfForFamilyV2($family) {
 ) {
 				$html = $html . '<DIV style="page-break-after:always"></DIV>';
 				
-				$template = new HTML_Template_ITX("/var/www/dakhila/templates");
+				$template = new HTML_Template_ITX("../dakhila/templates");
 				$template->loadTemplatefile("Layout.tpl", true, true);
 				$template->addBlockFile('CONTENT', 'F_CONTENT', 'LayoutContent.tpl');
 				$template->touchBlock('F_CONTENT');
@@ -138,7 +138,7 @@ function GetPdfForFamilyV2($family) {
 	}
 	
 	// Footer
-	$template = new HTML_Template_ITX("/var/www/dakhila/templates");
+	$template = new HTML_Template_ITX("../dakhila/templates");
 	$template->loadTemplatefile("Layout.tpl", true, true);
 	$template->addBlockFile('BOTTOM', 'F_BOTTOM', 'LayoutBottom.tpl');
 	$template->touchBlock('F_BOTTOM');
@@ -150,7 +150,7 @@ function GetPdfForFamilyV2($family) {
 
 function GetPdfForMedical($student) {
 	$dompdf = new DOMPDF();
-	$template = new HTML_Template_ITX("/var/www/dakhila/templates");
+	$template = new HTML_Template_ITX("../dakhila/templates");
 	DisplayStudentMedicalInformationV2($template, $student);
 	$html = $template->get();
 	$html = str_replace('&nbsp;', '<span style="color:#fff;">x</span>',$html);
@@ -195,16 +195,6 @@ function printOneFamily($family) {
 	echo "printed $fileName\n";
 }
 
-function printOneFamilyDetail($family) {
-	$printDir = "/home/umesh/student2011";
-	$pdf = PrintFactory::HtmlToPdf(PrintFactory::GetHtmlForFamilyDetail($family));
-	$fileName = $printDir . "/Family-" . $family->id . ".pdf";
-	file_put_contents("$fileName", $pdf);
-	echo "printed $fileName\n";
-}
-
-
-
 
 function printRosterClass($class) {
 	$printDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/roster/tabular/";
@@ -245,7 +235,6 @@ function printAllFamiliesOld($students) {
 $entry = GetSingleIntArgument();
 print "printing  $entry\n";
 printOneFamily (Family::GetItemById($entry));
-//printOneFamilyDetail (Family::GetItemById($entry));
 
 echo "\n";
 echo "Thank you for using my print program...\n";
