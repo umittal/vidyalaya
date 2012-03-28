@@ -1527,16 +1527,25 @@ Class EventCalendar {
   public $class=null;
   public $description=null;
 
+  private static function today() {
+    $today = getenv("TODAY");
+    if ($today==null) $today =  date("Y-m-d");
+    //    die( "Returning today as $today\n");
+    return $today;
+  }
+
   public static function PreviousSchoolDay() {
     $type=EventCalendarType::SchoolDay;
-    $query="select * from EventCalendar where date < now() and eventtype = $type order by date desc limit 1";
+    $today = self::today();
+    $query="select * from EventCalendar where date < '$today' and eventtype = $type order by date desc limit 1";
     return new self(mysql_fetch_alias_array(VidDb::query($query)));
 
   }
 
   public static function NextSchoolDay() {
     $type=EventCalendarType::SchoolDay;
-    $query="select * from EventCalendar where date > now() and eventtype = $type order by date asc limit 1";
+    $today = self::today();
+    $query="select * from EventCalendar where date > '$today' and eventtype = $type order by date asc limit 1";
     return new self(mysql_fetch_alias_array(VidDb::query($query)));
   }
 
