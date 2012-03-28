@@ -39,6 +39,10 @@ class UserData {
   }
 
   public function formhelp() {
+<<<<<<< HEAD
+=======
+    $this->SetMenu();
+>>>>>>> ae14ff537a908ee1d091bf849c8c47de72204542
     $html = "";
 
     $html .= "<h3>Form Parameters are </h3>";
@@ -236,6 +240,17 @@ RESETFORM;
     $this->template->parseCurrentBlock();
     print $this->template->get();
     
+  }
+
+  public function newFamily() {
+    $this->template->setCurrentBlock('RESULT');
+    $html = file_get_contents("../html/formNewFamily.inc");
+    $this->template->setVariable("RESULT", $html);
+    $this->template->parseCurrentBlock();
+    $this->template->addBlockFile('BOTTOM', 'F_BOTTOM', 'LayoutBottom.tpl');
+    $this->template->touchBlock('F_BOTTOM');
+
+    print $this->template->get();
   }
 
   // ************************************************************

@@ -144,6 +144,78 @@ class Dataserver {
     print "$status";
   }
 
+  public static function InsertFamily() {
+    $values = array();
+    foreach ($_POST as $key => $value) {
+      if (empty($value)) continue;
+      switch($key) {
+      case "homePhone":
+	$values[] = "MH_PHONE = $value";
+	break;
+      case "addr1":
+	$values[] = "M_ADDRESS = $value";
+	break;
+      case "city":
+	$values[] = "M_CITY = $value";
+	break;
+      case "state":
+	$values[] = "M_STATE = $value";
+	break;
+      case "zip":
+	$values[] = "M_ZIP_CODE = $value";
+	break;
+      case "mfirst":
+	$values[] = "MFIRST_NAME = $value";
+	break;
+      case "ffirst":
+	$values[] = "FFIRST_NAME = $value";
+	break;
+      case "mLast":
+	$values[] = "MLAST_NAME = $value";
+	break;
+      case "fLast":
+	$values[] = "FLAST_NAME = $value";
+	break;
+      case "mEmail":
+	$values[] = "M_EMAIL = $value";
+	break;
+      case "fEmail":
+	$values[] = "F_EMAIL = $value";
+	break;
+      case "mWork":
+	$values[] = "MW_PHONE = $value";
+	break;
+      case "fWork":
+	$values[] = "FW_PHONE = $value";
+	break;
+      case "mCell":
+	$values[] = "MC_PHONE = $value";
+	break;
+      case "fCell":
+	$values[] = "FC_PHONE = $value";
+	break;
+      default:
+	self::error("Did not expect Key $key");
+      }
+
+    }
+
+    if (empty($values)) {
+      self::error("No Values Found");
+    }
+
+    $sql = "insert into Parents2003 Set " . implode(",", $values);
+    $result = VidDb::query($sql);
+    if ($result == FALSE) {
+      header("HTTP/1.0 200 ");
+      print "Error insert failed, " . mysql_error();
+      return;
+    }
+    $id = mysql_insert_id();
+    header("HTTP/1.0 200 ");
+    print "Family id $id created sucessfully";
+  }
+
 
 } // end of class
 
