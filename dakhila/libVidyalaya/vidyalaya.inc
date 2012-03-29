@@ -1531,7 +1531,7 @@ Class EventCalendar {
     $today = getenv("TODAY");
     if ($today==null) $today =  date("Y-m-d");
     //    die( "Returning today as $today\n");
-    return $today;
+    return "$today 01:01:01";
   }
 
   public static function PreviousSchoolDay() {
