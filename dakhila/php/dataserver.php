@@ -145,6 +145,7 @@ class Dataserver {
   }
 
   public static function InsertFamily() {
+      self::error("I am loser");
     $values = array();
     foreach ($_POST as $key => $value) {
       if (empty($value)) continue;

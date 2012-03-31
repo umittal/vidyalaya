@@ -1994,6 +1994,7 @@ class Family {
 	}
 
 	public static function GetItemById($key) {
+	  if (is_null($key)) return null;
 	  self::firstTimeCall();
 	  if (!array_key_exists($key, self::$objArray)) return null;
 	  return self::$objArray[$key];

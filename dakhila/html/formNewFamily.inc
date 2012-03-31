@@ -7,11 +7,104 @@
   dojo.require("dijit.form.Button"); 
   dojo.require("dijit.form.Form");
   dojo.require("dijit.form.ValidationTextBox");    
+  dojo.require("dijit.form.DateTextBox");
 </script>
 
-<div class="formContainer">
+<div class="formContainer"  style="width:800px">
 
-<form method="POST" action="/dakhila/php/userdata.php?command=formhelp" dojoType="dijit.form.Form">
+<form  dojoType="dijit.form.Form" id="newFamily" name="newFamily">
+    <script type="dojo/event" event="onSubmit" args="e">
+    dojo.stopEvent(e); // prevent the default submit
+if (!this.isValid()) {
+  window.alert('Please fix fields');
+  return;
+}
+
+
+qObject = new Object();
+
+a = dijit.byId("homePhone");
+b=a.value;
+qObject.homePhone =b;
+
+a = dijit.byId("addr1");
+b=a.value;
+qObject.addr1 =b;
+
+a = dijit.byId("city");
+b=a.value;
+qObject.city =b;
+
+a = dijit.byId("state");
+b=a.value;
+qObject.state =b;
+
+a = dijit.byId("zip");
+b=a.value;
+qObject.zip =b;
+
+a = dijit.byId("mFirst");
+b=a.value;
+qObject.mFirst =b;
+
+a = dijit.byId("fFirst");
+b=a.value;
+qObject.fFirst =b;
+
+a = dijit.byId("mLast");
+b=a.value;
+qObject.mLast =b;
+
+a = dijit.byId("fLast");
+b=a.value;
+qObject.fLast =b;
+
+
+a = dijit.byId("mEmail");
+b=a.value;
+qObject.mEmail =b;
+a = dijit.byId("fEmail");
+b=a.value;
+qObject.fEmail =b;
+
+a = dijit.byId("mWork");
+b=a.value;
+qObject.mWork =b;
+
+a = dijit.byId("fWork");
+b=a.value;
+qObject.fWork =b;
+
+a = dijit.byId("mCell");
+b=a.value;
+qObject.mCell =b;
+
+a = dijit.byId("fCell");
+b=a.value;
+qObject.fCell =b;
+
+var queryString = dojo.objectToQuery(qObject);
+
+
+r = dijit.byId("response");
+r.set("value"," Form being sent...");
+var xhrArgs ={
+url: '/dakhila/php/datainsert.php?command=InsertFamily',
+postData:queryString,
+load: function(data, ioArgs) {
+    r.set("value","Success ..." + data);		    
+  },
+error: function(error, ioArgs) {
+    //We'll 404 in the demo, but that's okay.  We don't have a 'postIt' service on the
+    //docs server.
+    r.set("value","Failed... " + error);		    
+  }
+};
+
+var deferred = dojo.xhrPost(xhrArgs);
+
+</script>
+
 
 <div class="formTitle">New Family Registration</div>
 
@@ -38,18 +131,18 @@
 	
 	<tr>
 	  <td>Street</td>
-	  <td><input  type="text" name="addr1" /></td>
+	  <td><input  type="text" data-dojo-type="dijit.form.TextBox" id="addr1" name="addr1" /></td>
 	</tr>
 	
 	<tr>
 	  <td>City</td>
-	  <td><input  type="text" name="city" /></td>
+	  <td><input  data-dojo-type="dijit.form.TextBox" id="city" name="city" /></td>
 	</tr>
 	
 	<tr>
     <td>State</td>
     <td>
-    <select name="state" dojoType="dijit.form.FilteringSelect">
+  <select name="state" dojoType="dijit.form.FilteringSelect" id="state">
     <option value="NY">New York</option>
     <option value="NJ" selected="selected">New Jersey</option>
     <option value="PA">Pennsylvania</option>
@@ -60,7 +153,7 @@
 	<tr>
 	  <td><label for="zip">Zipcode</label></td>
 	  <td>
-<input type="text" name="zip" required="true" size="5"
+<input type="text" name="zip" required="true" size="5" id="zip"
     dojoType="dijit.form.ValidationTextBox"
     maxLength="5"
     promptMessage="Enter zip code"
@@ -71,6 +164,14 @@
  />
 </td>
 	</tr>
+
+  <tr><td>Priority Date</td>
+  <td><input type="text" name="priority" id="priority" value=""
+    data-dojo-type="dijit.form.DateTextBox"
+    required="true" />
+  </td>
+  </tr>
+
       </table>
 
     </td>
@@ -86,14 +187,14 @@
 	
 	<tr>
 	  <td>First Name</td>
-	  <td><input  type="text" name="mFirst" /></td>
-	  <td><input  type="text" name="fFirst" /></td>
+	  <td><input data-dojo-type="dijit.form.TextBox" id="mFirst" name="mFirst" /></td>
+	  <td><input data-dojo-type="dijit.form.TextBox" id="fFirst" name="fFirst" /></td>
 	</tr>
 	
 	<tr>
 	  <td>Last Name</td>
-	  <td><input  type="text" name="mLast" /></td>
-	  <td><input  type="text" name="fLast" /></td>
+	  <td><input data-dojo-type="dijit.form.TextBox" id="mLast" name="mLast" /></td>
+	  <td><input data-dojo-type="dijit.form.TextBox" id="fLast" name="fLast" /></td>
 	</tr>
 	
 	<tr>
@@ -180,6 +281,12 @@
 </table>
 
 <button dojoType="dijit.form.Button" type="submit" >Register</button>
+<button dojoType="dijit.form.Button" type="reset" >Reset</button>
+
+        <div class="dijitDialogPaneContentArea">
+	<div dojoType="dijit.form.ValidationTextBox" id="response" disabled="disabled">nothing</div>
+	</div>
+
 </form>
 </div>
 
