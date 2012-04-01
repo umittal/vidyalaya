@@ -79,9 +79,9 @@ a = dijit.byId("mCell");
 b=a.value;
 qObject.mCell =b;
 
-a = dijit.byId("fCell");
-b=a.value;
-qObject.fCell =b;
+qObject.fCell =dijit.byId("fCell").value;
+qObject.priority=dojo.date.locale.format(dijit.byId('priority').value, 
+{datePattern: "yyyy-MM-dd", selector: "date"})
 
 var queryString = dojo.objectToQuery(qObject);
 
