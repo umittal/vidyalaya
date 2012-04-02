@@ -929,7 +929,6 @@ class NewsletterHtml {
     $next =  EventCalendar::NextSchoolDay();
 
     print "previous is $previous->date, next is $next->date\n";
-    die();
 
     $date = $previous->date;
     $expiration = $next->date;
