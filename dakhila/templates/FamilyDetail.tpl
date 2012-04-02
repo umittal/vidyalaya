@@ -52,7 +52,7 @@ dojo.require("dijit.Tooltip");
 <!-- END PARENTS -->  	  	  
 </table>
 
-<li class="section">Children</li>
+<li class="section">Children</li> 
 <table>
 <thead><tr><th scope="col">ID<th>Gender<th>NAME<th>DOB</th><th>LANGUAGE</th><th>EMAIL<th width=30px>CELL</th></tr></thead>
 <!-- BEGIN CHILDREN -->
@@ -67,7 +67,12 @@ dojo.require("dijit.Tooltip");
 <!-- END CHILDREN -->
 </table>
 
-
+<!-- BEGIN ADDCHILD -->
+<form method="post" action="/dakhila/php/userdata.php?command=addChild">
+<input type="text" style="display:none;"  name="familyId" id="familyId" value={ID} /> 
+<input type="submit" value="Add Child" />
+</form>
+<!-- END ADDCHILD -->
 
 <li class="section">Class Assignment (2011-12)</li>
 <table>

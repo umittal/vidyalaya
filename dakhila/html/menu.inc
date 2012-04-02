@@ -35,6 +35,9 @@
             <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=Family"'>
                 Family
             </div>
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/userdata.php?command=newFamily"'>
+                New
+            </div>
             <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=Student"'>
                 Student
             </div>

@@ -39,10 +39,7 @@ class UserData {
   }
 
   public function formhelp() {
-<<<<<<< HEAD
-=======
     $this->SetMenu();
->>>>>>> ae14ff537a908ee1d091bf849c8c47de72204542
     $html = "";
 
     $html .= "<h3>Form Parameters are </h3>";
@@ -243,6 +240,7 @@ RESETFORM;
   }
 
   public function newFamily() {
+
     $this->template->setCurrentBlock('RESULT');
     $html = file_get_contents("../html/formNewFamily.inc");
     $this->template->setVariable("RESULT", $html);
@@ -251,6 +249,32 @@ RESETFORM;
     $this->template->touchBlock('F_BOTTOM');
 
     print $this->template->get();
+  }
+
+  // ************************************************************
+  public function addChild() {
+    VidSession::sessionAuthenticate();
+    $this->SetMenu();
+    $this->template->setCurrentBlock('RESULT');
+
+
+    $familyId = isset($_POST['familyId']) ?  $_POST['familyId'] : null;
+    $family=Family::GetItemById($familyId);
+    if (is_null($family)) {
+      $html ="<p>Cannot find any Family in the database</p>\n";
+    } else {
+      $html="<p>" . $family->parentsName() . "<br />\n";
+      $addr = $family->address;
+      $html.="$addr->addr1, $addr->city, $addr->state, $addr->zipcode ($family->phone)<br />\n";
+      $html.="</p>\n";
+
+      $html .= str_replace("==FAMILYID==", $family->id, file_get_contents("../html/formAddChild.inc"));
+}
+    $this->template->setVariable("RESULT", $html);
+    $this->template->parseCurrentBlock();
+    print $this->template->get();
+    return;
+    
   }
 
   // ************************************************************

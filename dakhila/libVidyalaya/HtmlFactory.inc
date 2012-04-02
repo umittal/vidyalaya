@@ -268,6 +268,12 @@ function DisplayFamilyTemplateV3 (&$template, $family) {
 	  DisplayChildren($template, $student);
 	}
 
+	$templateName="ADDCHILD";
+	$template->setCurrentBlock($templateName);
+	$template->setVariable("ID", $family->id);
+	$template->parseCurrentBlock();
+
+
 	$templateName="HOME";
 	$template->setCurrentBlock($templateName);
 	$line2 = $family->address->addr2;
