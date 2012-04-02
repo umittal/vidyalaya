@@ -155,9 +155,9 @@ function GetPdfForMedical($student) {
 	$html = $template->get();
 	$html = str_replace('&nbsp;', '<span style="color:#fff;">x</span>',$html);
 	$dompdf->load_html($html);
+	return $dompdf->output();
 	file_put_contents("/tmp/whatiswrong.html", $html);
 	$dompdf->render();	
-	return $dompdf->output();
 }
 
 
