@@ -77,7 +77,7 @@ class VidDb {
   private static function connect() {
     if (!empty(self::$connection)) return;
     $server = $command=isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME']  : "";
-    if (getenv('localvidyalaya') || $server == "localhost") {
+    if (getenv('localvidyalaya') || $server == "localhost" || strcasecmp($server, "ubuntudesk.home") == 0) {
       self::showlocal( "\n\n\t*****Using local  database, may be out of sync");
       self::showlocal( "\t**********************************************");
       if (!self::$connection =  mysql_connect("localhost", self::$username, self::$password))

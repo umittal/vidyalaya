@@ -87,12 +87,14 @@ var queryString = dojo.objectToQuery(qObject);
 
 
 r = dijit.byId("response");
+f = dijit.byId("familyId");
 r.set("value"," Form being sent...");
 var xhrArgs ={
 url: '/dakhila/php/datainsert.php?command=InsertFamily',
 postData:queryString,
 load: function(data, ioArgs) {
     r.set("value","Success ..." + data);		    
+    f.set("value", data);
   },
 error: function(error, ioArgs) {
     //We'll 404 in the demo, but that's okay.  We don't have a 'postIt' service on the
@@ -288,5 +290,11 @@ var deferred = dojo.xhrPost(xhrArgs);
 	</div>
 
 </form>
+
+<form method="post" action="/dakhila/php/userdata.php?command=addChild">
+<input type="text" data-dojo-type="dijit.form.TextBox" style="display:none;"  name="familyId" id="familyId" /> 
+<input type="submit" value="Add Child" />
+</form>
+
 </div>
 
