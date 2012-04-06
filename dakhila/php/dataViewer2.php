@@ -161,6 +161,7 @@ class DataViewer {
     case "Family":
       $url = htmlentities($_SERVER['PHP_SELF']) . "?command=Family";
       $familyId = isset($_POST['ID']) ?  $_POST['ID'] : null;
+      //      if (is_null($familyId) $familyId = isset($_POST['familyId']) ?  $_POST['familyId'] : null;
 
       $form = <<<EOT
 	<form method="post" action="$url">

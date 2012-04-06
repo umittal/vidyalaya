@@ -88,7 +88,7 @@ class DataInsert {
     }
     $id = mysql_insert_id();
     header("HTTP/1.0 200 ");
-    print "Student id $id created sucessfully";
+    print "$id";
 
 
 }
@@ -169,7 +169,7 @@ class DataInsert {
     }
     $id = mysql_insert_id();
     header("HTTP/1.0 200 ");
-    print "Family id $id created sucessfully";
+    print "$id";
   }
 
 

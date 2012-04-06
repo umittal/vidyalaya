@@ -93,8 +93,13 @@ var xhrArgs ={
 url: '/dakhila/php/datainsert.php?command=InsertFamily',
 postData:queryString,
 load: function(data, ioArgs) {
-    r.set("value","Success ..." + data);		    
+    r.set("value","Success ..." + data + " Created");		    
     f.set("value", data);
+    f2 = dijit.byId("ID");
+    f2.set("value", data);
+    b =     dijit.byId("addChildButton");
+    b.set("disabled", false);
+    b.disabled=false;
   },
 error: function(error, ioArgs) {
     //We'll 404 in the demo, but that's okay.  We don't have a 'postIt' service on the
@@ -291,9 +296,14 @@ var deferred = dojo.xhrPost(xhrArgs);
 
 </form>
 
-<form method="post" action="/dakhila/php/userdata.php?command=addChild">
+<form target="_blank" dojoType="dijit.form.Form" method="post" action="/dakhila/php/userdata.php?command=addChild">
 <input type="text" data-dojo-type="dijit.form.TextBox" style="display:none;"  name="familyId" id="familyId" /> 
-<input type="submit" value="Add Child" />
+<button dojoType="dijit.form.Button" type="submit" id="addChildButton"  disabled="true" >add child</button>
+</form>
+
+<form target="_blank" dojoType="dijit.form.Form" method="post" action="/dakhila/php/dataViewer2.php?command=Family">
+<input type="text" data-dojo-type="dijit.form.TextBox" style="display:none;"  name="ID" id="ID" /> 
+<button dojoType="dijit.form.Button" type="submit" id="showFamily"  >View Family</button>
 </form>
 
 </div>
