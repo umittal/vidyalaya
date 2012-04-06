@@ -62,7 +62,7 @@ Select up to 4 volunteering options from the attached sheet and write the corres
 
 <table>
 <thead>
-<tr><th colspan=2>Parents</th><th>Option 1</th><th>Option 2</th><th>Option 3</th><th>Option 4</th></tr>
+<tr><th colspan=2>Parents</th><th width="50px">Option 1</th><th width="50px">Option 2</th><th width="50px">Option 3</th><th width="50px">Option 4</th></tr>
 </thead>
 
 <tbody>

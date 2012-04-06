@@ -247,7 +247,6 @@ function DisplayFamilyTemplate (&$template, $family, $students) {
 function DisplayFamilyTemplateV3 (&$template, $family) {
 	$templateName="PARENTS";
 	$template->setCurrentBlock($templateName);
-
 	$template->setVariable("MF", "Father");
 	$template->setVariable("NAME", $family->father->fullName());
 	$template->setVariable("EMAIL", $family->father->email);
@@ -300,8 +299,8 @@ function DisplayFamilyTemplateV3 (&$template, $family) {
 	  $template->setVariable("PREVIOUS", $previous);
 	  $template->setVariable("CURRENT", EnumFamilyTracker::NameFromId($item->currentYear));
 	  $template->setVariable("TUITION", $item->tuition);
+	  $template->parseCurrentBlock();
 	}
-	$template->parseCurrentBlock();
 
 }
 

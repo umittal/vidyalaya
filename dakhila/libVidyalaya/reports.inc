@@ -1,5 +1,6 @@
 <?php
 require_once "vidyalaya.inc";
+require_once "HtmlFactory.inc";
 /** Error reporting */
 error_reporting(E_ALL);
 
@@ -48,6 +49,106 @@ class VidBook {
 }
 
 class Reports {
+
+  private  static function RegistrationPacketHtml($family) {  
+	$students = Student::AllStudents();
+	$templateDir = realpath(dirname(__FILE__)."/../templates");
+	$pageheader = '<a href=""><img src="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/images/Vheader2.jpg" width="700" height="70" alt="php5 logo"/></a>';
+	$timestamp = date('d M Y h:i A');
+	$footer = '<div id="footer"> <table><tr><td>Copyright &#169; 2011 Vidyalya Inc., Printed at: .' 
+	  . $timestamp 
+	  . '</td><td style="text-align:right;"><div class="page-number"></div></td></tr></table></div>';
+
+	// Header 
+	$template = new HTML_Template_ITX($templateDir);
+	$template->loadTemplatefile("Layout.tpl", true, true);
+	$template->addBlockFile('TOP', 'F_TOP', 'LayoutTop.tpl');
+	$template->touchBlock('F_TOP');
+	$html = $template->get();
+
+	// Family Detail Form - one per family
+	$template = new HTML_Template_ITX($templateDir);
+	$template->loadTemplatefile("Layout.tpl", true, true);
+
+	$template->addBlockFile('CONTENT', 'F_CONTENT', 'LayoutContent.tpl');
+	$template->touchBlock('F_CONTENT');
+	$template->setCurrentBlock('HEADER');
+	$template->setVariable("HEADER", $pageheader);
+	$template->parseCurrentBlock();
+
+	$template->addBlockFile('RESULT', 'F_RESULT', 'FamilyDetail.tpl');
+	$template->touchBlock('F_RESULT');
+	DisplayFamilyTemplateV3(&$template, $family);
+
+	$html = $html . $template->get();	
+
+	$html = $html . $footer . '<DIV style="page-break-after:always"></DIV>';
+
+	// Registration Form - one per family
+	$template = new HTML_Template_ITX($templateDir);
+	$template->loadTemplatefile("Layout.tpl", true, true);
+
+	$template->addBlockFile('CONTENT', 'F_CONTENT', 'LayoutContent.tpl');
+	$template->touchBlock('F_CONTENT');
+
+	$template->setCurrentBlock('HEADER');
+	$template->setVariable("HEADER", $pageheader);
+	$template->parseCurrentBlock();
+
+	$template->addBlockFile('RESULT', 'F_RESULT', 'Registration.tpl');
+	$template->touchBlock('F_RESULT');
+	DisplayRegistrationTemplate($template, $family, $students);
+
+	$html = $html . $template->get();	
+	
+	// Medical Information Form - one per student
+	foreach ($family->Children() as $student) {
+	  $html = $html . $footer . '<DIV style="page-break-after:always"></DIV>';
+	  	  
+	  $template = new HTML_Template_ITX($templateDir);
+	  $template->loadTemplatefile("Layout.tpl", true, true);
+	  $template->addBlockFile('CONTENT', 'F_CONTENT', 'LayoutContent.tpl');
+	  $template->touchBlock('F_CONTENT');
+	  $template->setCurrentBlock('HEADER');
+	  $template->setVariable("HEADER", $pageheader);
+	  $template->parseCurrentBlock();
+	  
+	  $template->addBlockFile('RESULT', 'F_RESULT', 'MedicalInformation.tpl');
+	  $template->touchBlock('F_RESULT');
+	  DisplayStudentMedicatlInformationTemplate($template, $student);	
+	  $html = $html . $template->get();			
+	}
+	
+	// Footer
+	$template = new HTML_Template_ITX($templateDir);
+	$template->loadTemplatefile("Layout.tpl", true, true);
+	$template->addBlockFile('BOTTOM', 'F_BOTTOM', 'LayoutBottom.tpl');
+	$template->setCurrentBlock('FOOTER');
+	$template->setVariable("FOOTER", $footer);
+	$template->parseCurrentBlock();
+	$template->touchBlock('F_BOTTOM');
+	$html = $html . $template->get();
+
+	return $html;
+  }
+
+  public static function RegistrationPacketFamily($family) {
+    if (is_null($family)) return;
+    $html = Reports::RegistrationPacketHtml($family);
+    $pdf = PrintFactory::HtmlToPdf($html);
+    
+    $printDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission";
+    $fileName = $printDir . "/pdf/Family-" . $family->id . ".pdf";
+    file_put_contents("$fileName", $pdf);
+    echo "printed $fileName\n";
+    return;
+    
+    $fileName = $printDir . "/html/Family-" . $family->id . ".html";
+    file_put_contents("$fileName", $html);
+    echo "printed $fileName\n";
+    return;
+  }
+
   public static function VolunteerListV2($year, $carryLinks) {
     $html = "<p>Vidyalaya appreciates the following volunteers for their service.\n";
     $html .= '<table id="maintable" cellspacing="0" class="tablesorter" width="600px">' . "\n";

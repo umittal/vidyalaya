@@ -5,6 +5,7 @@ require_once "$libDir/db.inc";
 require_once "$libDir/vidyalaya.inc";
 require_once "HTML/Template/ITX.php";
 require_once "$libDir/HtmlFactory.inc";
+require_once "$libDir/reports.inc";
 require_once "../../MPDF53/mpdf.php";
 
 //require("../../Classes/PHPMailer_v5.1/class.phpmailer.php");
@@ -1204,6 +1205,55 @@ AGREEMENT;
     return;
   }
 
+  private static function AnnounceOrientation($family) {
+    $production=1;
+    $mail =   Mail::SetupMailAdmissions();
+    Mail::SetFamilyAddress(&$mail, $family, $production);
+
+    $subject = "Vidyalaya Admission 2012-13, Family $family->id";
+    if ($production == 0) $subject = "[Test] $subject";
+    $mail->Subject = $subject;
+  
+
+    // attachments
+    $customizedPdf = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission/pdf/Family-". $family->id . ".pdf";
+    $mail->AddAttachment("$customizedPdf"); // attachment
+    $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Management/Admission/Volunteer2011.pdf"); // attachment
+    $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Management/Admission/ParticipationAgreement.pdf"); // attachment
+  
+    print "Family id: $family->id, $subject; Name: " . $family->parentsName() . "\n";
+
+    $salutation = "<p>Dear " . $family->parentsName() . ",";
+    $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/orientation2012.html");
+    $mail->AltBody = "Family: $family->id"; //Text Body
+
+    if(!$mail->Send()) {
+      echo "Mailer Error: " . $mail->ErrorInfo . "\n";
+    }  else {
+      echo "Message has been sent\n";
+    }
+
+  }
+
+  public static function InviteNew() {
+    $i=1;
+    foreach (FamilyTracker::GetAll() as $tracker) {
+      $family = Family::GetItemById($tracker->family);
+      if ($tracker->currentYear != EnumFamilyTracker::pendingInvitation) continue;
+      if ($tracker->previousYear == EnumFamilyTracker::registered) continue;
+      if ($tracker->previousYear != EnumFamilyTracker::waitlist) die("famiy $family->id is neither registered nor waitlist");
+      print "$i. Family id: $family->id, Name: " . $family->parentsName() . "\n";
+      $i++;
+
+      $customizedPdf = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission/pdf/Family-". $family->id . ".pdf";
+      if (!file_exists($customizedPdf)) Reports::RegistrationPacketFamily($family);
+      //      self::AnnounceOrientation($family);
+    }
+    return;
+  }
+
+
+
 }
 
 
@@ -1526,14 +1576,15 @@ class TwoYearLayout {
   }
 }
 
-Admission::ExistingFamilies(); exit();
+Admission::InviteNew(); exit();
+//Admission::ExistingFamilies(); exit();
 
 //Admission::AdultLanguage(); exit();
 
 //Teachers::AddTeacher(79, "hetalapurva@gmail.com", 0) ; exit();
 //Admission::VolunteerEmail(2011);exit();
 //Admission::TeacherEmail(2011);exit();
-Admission::TeacherEmailAttendanceAssessment(2011);exit();
+//Admission::TeacherEmailAttendanceAssessment(2011);exit();
 
 
 //Admission::OpeningDay(2011); exit();

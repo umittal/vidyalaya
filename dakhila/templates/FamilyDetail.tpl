@@ -77,7 +77,7 @@ dojo.require("dijit.Tooltip");
 <li class="section">Class Assignment (2011-12)</li>
 <table>
 <thead>
-<tr><th scope="col">Name<th>Class<th>Room<th width='400px'>Teachers</tr>
+<tr><th scope="col">Name<th>Class<th>Room<th width='400px' align="left">Teachers</tr>
 </thead>
 <tbody>
 <!-- BEGIN REGISTRATION -->
