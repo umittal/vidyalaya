@@ -19,6 +19,9 @@ switch ($command) {
 case "InsertFamily":
   DataInsert::InsertFamily();
   break;
+case "InsertClass":
+  DataInsert::InsertClass();
+  break;
 case "InsertChild":
   DataInsert::InsertChild();
   break;
@@ -92,11 +95,55 @@ class DataInsert {
 
 
 }
+  public static function InsertClass() {
+    $values = array();
+    foreach ($_POST as $key => $value) {
+      if (empty($value)) continue;
+      $value = trim($value);
+      switch($key) {
+      case "course":
+	$values[] = "course = $value";
+	break;
+      case "section":
+	$values[] = "section = '$value'";
+	break;
+      case "startTime":
+	$values[] = "startTime = '$value'";
+	break;
+      case "endTime":
+	$values[] = "endTime = '$value'";
+	break;
+      default:
+	self::error("Did not expect Key $key");
+      }
+    }
+    if (empty($values)) {
+      self::error("No Values Found");
+    }
+
+    // Obviously we can do better than that
+    $values[] = "year = 2";
+    $values[] = "room = 19";
+
+    $sql = "insert into AvailableClass Set " . implode(",", $values);
+    //self::error($sql);
+    $result = VidDb::query($sql);
+    if ($result == FALSE) {
+      header("HTTP/1.0 200 ");
+      print "Error insert failed, " . mysql_error();
+      return;
+    }
+    $id = mysql_insert_id();
+    header("HTTP/1.0 200 ");
+    print "$id";
+
+  }
 
   public static function InsertFamily() {
     $values = array();
     foreach ($_POST as $key => $value) {
       if (empty($value)) continue;
+      $value = trim($value);
       switch($key) {
       case "homePhone":
 	$values[] = "MH_PHONE = '$value'";

@@ -158,6 +158,30 @@ class DataViewer {
       break;
 
     // ************************************************************
+    case "newFamily":
+      $this->template->setCurrentBlock('RESULT');
+      $html = file_get_contents("../html/formNewFamily.inc");
+      $this->template->setVariable("RESULT", $html);
+      $this->template->parseCurrentBlock();
+      $this->template->addBlockFile('BOTTOM', 'F_BOTTOM', 'LayoutBottom.tpl');
+      $this->template->touchBlock('F_BOTTOM');
+      
+      print $this->template->get();
+      break;
+
+    // ************************************************************
+    case "newClass":
+      $this->template->setCurrentBlock('RESULT');
+      $html = file_get_contents("../html/formNewClass.inc");
+      $this->template->setVariable("RESULT", $html);
+      $this->template->parseCurrentBlock();
+      $this->template->addBlockFile('BOTTOM', 'F_BOTTOM', 'LayoutBottom.tpl');
+      $this->template->touchBlock('F_BOTTOM');
+      
+      print $this->template->get();
+      break;
+
+    // ************************************************************
     case "Family":
       $url = htmlentities($_SERVER['PHP_SELF']) . "?command=Family";
       $familyId = isset($_POST['ID']) ?  $_POST['ID'] : null;

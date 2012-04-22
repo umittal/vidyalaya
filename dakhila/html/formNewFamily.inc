@@ -299,6 +299,7 @@ var deferred = dojo.xhrPost(xhrArgs);
 <form target="_blank" dojoType="dijit.form.Form" method="post" action="/dakhila/php/userdata.php?command=addChild">
 <input type="text" data-dojo-type="dijit.form.TextBox" style="display:none;"  name="familyId" id="familyId" /> 
 <button dojoType="dijit.form.Button" type="submit" id="addChildButton"  disabled="true" >add child</button>
+<button dojoType="dijit.form.Button" type="submit" id="waitlist"  disabled="true" >WaitList</button>
 </form>
 
 <form target="_blank" dojoType="dijit.form.Form" method="post" action="/dakhila/php/dataViewer2.php?command=Family">

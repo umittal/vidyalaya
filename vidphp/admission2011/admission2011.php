@@ -1173,29 +1173,34 @@ AGREEMENT;
 
     // attachments
     $customizedPdf = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission/pdf/Family-". $family->id . ".pdf";
-    $mail->AddAttachment("$customizedPdf"); // attachment
-    $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Management/Admission/Volunteer2011.pdf"); // attachment
-    $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Management/Admission/ParticipationAgreement.pdf"); // attachment
+    //    $mail->AddAttachment("$customizedPdf"); // attachment
+    //   $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Management/Admission/Volunteer2011.pdf"); // attachment
+    //   $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Management/Admission/ParticipationAgreement.pdf"); // attachment
   
     print "Family id: $family->id, Name: " . $family->parentsName() . "\n";
 
     $salutation = "<p>Dear " . $family->parentsName() . ",";
-    $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/announce-existing2012.html");
+    $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/reminder-existing-1.html");
     $mail->AltBody = "Family: $family->id"; //Text Body
 
-    //    if ($family->id != 47) return;
+    return;
 
     if(!$mail->Send()) {
       echo "Mailer Error: " . $mail->ErrorInfo . "\n";
     }  else {
       echo "Message has been sent\n";
     }
+
   }
 
   public static function ExistingFamilies() {
     $i=1;
     foreach (FamilyTracker::GetAll() as $tracker) {
       if ($tracker->previousYear != EnumFamilyTracker::registered) continue;
+      if ($tracker->currentYear != EnumFamilyTracker::pendingRegistration) continue;
+      if ($tracker->family < 471) continue;
+      print $tracker->family . ", previous: " . EnumFamilyTracker::NameFromId($tracker->previousYear) . ", current: " 
+	. EnumFamilyTracker::NameFromId($tracker->currentYear) . "\n";
       $family = Family::GetItemById($tracker->family);
       print "$i. Family id: $family->id, Name: " . $family->parentsName() . "\n";
       $i++;
@@ -1223,6 +1228,7 @@ AGREEMENT;
   
     print "Family id: $family->id, $subject; Name: " . $family->parentsName() . "\n";
 
+    //    return;
     $salutation = "<p>Dear " . $family->parentsName() . ",";
     $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/orientation2012.html");
     $mail->AltBody = "Family: $family->id"; //Text Body
@@ -1247,7 +1253,7 @@ AGREEMENT;
 
       $customizedPdf = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission/pdf/Family-". $family->id . ".pdf";
       if (!file_exists($customizedPdf)) Reports::RegistrationPacketFamily($family);
-      //      self::AnnounceOrientation($family);
+      self::AnnounceOrientation($family);
     }
     return;
   }
@@ -1576,8 +1582,8 @@ class TwoYearLayout {
   }
 }
 
-Admission::InviteNew(); exit();
-//Admission::ExistingFamilies(); exit();
+//Admission::InviteNew(); exit();
+Admission::ExistingFamilies(); exit();
 
 //Admission::AdultLanguage(); exit();
 
