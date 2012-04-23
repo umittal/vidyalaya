@@ -19,6 +19,9 @@ switch ($command) {
 case "InsertFamily":
   DataInsert::InsertFamily();
   break;
+case "waitlistme":
+  DataInsert::waitlistme();
+  break;
 case "InsertClass":
   DataInsert::InsertClass();
   break;
@@ -94,7 +97,43 @@ class DataInsert {
     print "$id";
 
 
-}
+  }
+  public static function waitlistme() {
+    $values = array();
+    foreach ($_POST as $key => $value) {
+      if (empty($value)) continue;
+      $value = trim($value);
+      switch($key) {
+      case "familyId":
+	$values[] = "family = $value";
+	break;
+      default:
+	self::error("Did not expect Key $key");
+      }
+    }
+    if (empty($values)) {
+      self::error("No Values Found");
+    }
+    $thisyear=Calendar::RegistrationYear() - 2010;
+    $values[] = "year = $thisyear"  ;
+    $values[] = "previousYear = " . EnumFamilyTracker::waitlist;
+    $values[] = "currentYear = " . EnumFamilyTracker::pendingInvitation;
+    $values[] = "tuition = 0 ";
+
+    $sql = "insert into FamilyTracker Set " . implode(",", $values);
+    //self::error($sql);
+    $result = VidDb::query($sql);
+    if ($result == FALSE) {
+      header("HTTP/1.0 200 ");
+      print "Error insert failed, " . mysql_error();
+      return;
+    }
+    $id = mysql_insert_id();
+    header("HTTP/1.0 200 ");
+    print "$id";
+  }
+
+
   public static function InsertClass() {
     $values = array();
     foreach ($_POST as $key => $value) {
@@ -122,7 +161,7 @@ class DataInsert {
     }
 
     // Obviously we can do better than that
-    $values[] = "year = 2";
+    $values[] = "year = " . Calendar::RegistrationYear();
     $values[] = "room = 19";
 
     $sql = "insert into AvailableClass Set " . implode(",", $values);

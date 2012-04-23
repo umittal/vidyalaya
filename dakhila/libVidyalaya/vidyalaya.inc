@@ -2181,6 +2181,11 @@ class FamilyTracker {
 	  return ($a->family < $b->family) ? -1 : 1;
 	}
 
+	public static function CompareYear($a, $b) {
+	  if ($a->year == $b->year) return 0;
+	  return ($a->year < $b->year) ? -1 : 1;
+	}
+
 
 	private static function firstTimeCall() {
 		if (!empty(self::$objArray)) return;
@@ -2192,14 +2197,14 @@ class FamilyTracker {
 		}
 	}
 
-	private static function ArrayFromQuery($query) {
+	private static function ArrayFromQuery($query, $sortFunc = "FamilyTracker::CompareFamilyId") {
 	  $localarray = Array();
 		
 	  $result = VidDb::query($query);
 	  while ($row = mysql_fetch_alias_array($result)) {
 	    $localarray[] = new self($row);
 	  }
-	  usort ($localarray, "FamilyTracker::CompareFamilyId");
+	  usort ($localarray, $sortFunc);
 	  return $localarray;
 	}
 
@@ -2235,7 +2240,7 @@ class FamilyTracker {
 
 	public static function FamilyHistory($familyId)  {
 	  $query = "Select * from FamilyTracker where family = $familyId order by year";
-	  return self::ArrayFromQuery($query);
+	  return self::ArrayFromQuery($query, "FamilyTracker::CompareYear");
 	}
 
 	public function __construct($row) {

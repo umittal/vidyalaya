@@ -302,6 +302,31 @@ function DisplayFamilyTemplateV3 (&$template, $family) {
 	  $template->parseCurrentBlock();
 	}
 
+	$sapi = php_sapi_name();
+	if ($sapi == "cli") return;
+
+	if ($item->year != (Calendar::RegistrationYear() - 2010)) {
+	$trackerchange =  <<< WAITLISTME
+	  <button data-dojo-type="dijit.form.Button" type="button">
+    <script type="dojo/method" event="onClick" args="evt">
+        // Do something:
+	  waitlistme( $item->family);
+    </script>
+    Waitlist Me!
+</button>
+
+WAITLISTME;
+	} else {
+	  $trackerchange = file_get_contents("../html/TrackerChange.inc");
+	  $trackerchange = str_replace("FAMILYID", $item->family, $trackerchange);
+	}
+
+
+	$templateName="CHANGEBLOCK";
+	$template->setCurrentBlock($templateName);
+	$template->setVariable("CHANGE", $trackerchange);
+	$template->parseCurrentBlock();
+
 }
 
 

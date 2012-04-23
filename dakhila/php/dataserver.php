@@ -26,6 +26,9 @@ case "ChangeClass":
 case "UpdateContacts":
   Dataserver::UpdateContacts();
   break;
+case "TrackerChange":
+  Dataserver::TrackerChange();
+  break;
 case "RegisterEvent":
   Dataserver::RegisterEvent();
   $ref = $_SERVER['HTTP_REFERER'];
@@ -102,6 +105,24 @@ class Dataserver {
     print "class changed";
   }
 
+  public static function TrackerChange() {
+    $familyId = $_POST["familyId"];
+    $currentYear = $_POST["status"];
+    $tuition = $_POST["tuition"];
+    $thisyear=Calendar::RegistrationYear() - 2010;
+
+    $sql = "update FamilyTracker Set currentYear=$currentYear, tuition = $tuition where family=$familyId and year=$thisyear";
+    //self::error($sql);
+    $result = VidDb::query($sql);
+    if ($result == FALSE) {
+      header("HTTP/1.0 200 ");
+      print "Error insert failed, " . mysql_error();
+      return;
+    }
+    $rowcount = mysql_affected_rows ( );
+    header("HTTP/1.0 200 ");
+    print "$rowcount row  updated";
+  }
 
   public static function UpdateContacts() {
     $studentId = $_POST["studentId"];

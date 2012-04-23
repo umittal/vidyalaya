@@ -5,6 +5,7 @@
          dojo.require("dijit.form.TextBox");    
 dojo.require("dijit.form.Form");
 dojo.require("dijit.Tooltip");
+dojo.require("dijit.form.Button");
 			// When the DOM and reources are ready....
 			dojo.ready(function(){
 				// Add tooltip of his picture
@@ -20,6 +21,24 @@ dojo.require("dijit.Tooltip");
 	idfield.attr("value", studentId);
 	if (form) {form.submit();} else {alert ("form not found");}
       }
+
+      function waitlistme(familyId) {
+      	    qObject = new Object();
+	    qObject.familyId = familyId;
+	    var queryString = dojo.objectToQuery(qObject);
+	    
+             var xhrArgs ={
+                  url: '/dakhila/php/datainsert.php?command=waitlistme',
+		  postData:queryString,
+                load: function(data, ioArgs) {
+		  window.alert('success ' + data);
+                },
+                error: function(error, ioArgs) {
+		  window.alert('fail ' + error);
+		}
+	   } //xhrargs
+	   var deferred = dojo.xhrPost(xhrArgs);
+	} //function waitlistme
     </script>
 
 	<form method="post" action="/dakhila/php/dataViewer2.php?command=Student" style="display:none" id="studentForm"
@@ -88,6 +107,7 @@ dojo.require("dijit.Tooltip");
 </table>
 
 <li class="section">Registration History</li>
+<table><tr><td>
 <table>
 <thead>
 <tr><th scope="col">Year<th>Previous<th>Current<th>Tuition</tr>
@@ -98,7 +118,14 @@ dojo.require("dijit.Tooltip");
 <!-- END TRACKER -->
 </tbody>
 </table>
-
+</td>
+<td>
+<!-- BEGIN CHANGEBLOCK -->
+{CHANGE}
+<!-- END CHANGEBLOCK -->
+</td>
+</tr>
+</table>
 </ol>
 
 <p></p>
