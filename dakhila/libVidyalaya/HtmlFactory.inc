@@ -292,6 +292,7 @@ function DisplayFamilyTemplateV3 (&$template, $family) {
 
 	$templateName="TRACKER";
 	$template->setCurrentBlock($templateName);
+	$item=null;
 	foreach (FamilyTracker::FamilyHistory($family->id) as $item) {
 	  $template->setVariable("YEAR", $item->year+2010);
 	  $previous = EnumFamilyTracker::NameFromId($item->previousYear);
@@ -305,12 +306,12 @@ function DisplayFamilyTemplateV3 (&$template, $family) {
 	$sapi = php_sapi_name();
 	if ($sapi == "cli") return;
 
-	if ($item->year != (Calendar::RegistrationYear() - 2010)) {
+	if (is_null($item) || $item->year != (Calendar::RegistrationYear() - 2010)) {
 	$trackerchange =  <<< WAITLISTME
 	  <button data-dojo-type="dijit.form.Button" type="button">
     <script type="dojo/method" event="onClick" args="evt">
         // Do something:
-	  waitlistme( $item->family);
+	  waitlistme( $family->id);
     </script>
     Waitlist Me!
 </button>
