@@ -1228,7 +1228,7 @@ AGREEMENT;
   
     print "Family id: $family->id, $subject; Name: " . $family->parentsName() . "\n";
 
-    //    return;
+    // return;
     $salutation = "<p>Dear " . $family->parentsName() . ",";
     $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/orientation2012.html");
     $mail->AltBody = "Family: $family->id"; //Text Body
@@ -1582,8 +1582,8 @@ class TwoYearLayout {
   }
 }
 
-//Admission::InviteNew(); exit();
-Admission::ExistingFamilies(); exit();
+Admission::InviteNew(); exit();
+//Admission::ExistingFamilies(); exit();
 
 //Admission::AdultLanguage(); exit();
 

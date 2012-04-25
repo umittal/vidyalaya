@@ -254,47 +254,62 @@ EOT;
       break;
 		
 	case "RegistrationSummary":
-		$sql = <<< SQLREGISTRATIONSUMMAY
-		  select previousYear, currentYear, count(*) 
-		  from FamilyTracker where year = 2 
-		  group by previousYear, currentYear 
-		  order by previousYear, currentYear
+	  $sql = <<< SQLREGISTRATIONSUMMAY
+	    select previousYear, currentYear, count(*) 
+	    from FamilyTracker where year = 2 
+	    group by previousYear, currentYear 
+	    order by previousYear, currentYear
 
 SQLREGISTRATIONSUMMAY;
-		$result = VidDb::query($sql);
-		$subTotal = 0; $total = 0; $current = null;
-		$html =  "<html><body><table width='400'>\n";
-		$html .= "<tr><th>Current Year</th><th>Next Year</th><th>Count</th></tr>\n";
-		while ($row = mysql_fetch_array($result)) {
-		  $currentYear = $row[0];
-		  if ($current == null) $current = $currentYear;
-		  if ($current !=  $currentYear) {
-		    //show subtotal
-			$html .=  "<tr><td colspan=2>";
-			$html .=  "Subtotal </td><td align=right> " . $subTotal;
-			$html .=  "</td></tr>\n<tr><td>&nbsp;</td></tr>\n";
-			$current = $currentYear;
-			$subTotal = 0;
-		  }
-			$html .=  "<tr><td>";
-			$html .=  EnumFamilyTracker::NameFromId($row[0]) . "</td><td> " . EnumFamilyTracker::NameFromId($row[1]) .
-			"</td><td align=right> " . $row[2] ;
-			$html .=  "</td></tr>\n";
-			$subTotal += $row[2];
-			$total += $row[2];
-		}
-			$html .=  "<tr><td colspan=2>";
-			$html .=  "Subtotal </td><td align=right> " . $subTotal;
-			$html .=  "</td></tr>\n<tr><td>&nbsp;</td></tr>\n";
-			$html .=  "<tr><td colspan=2>";
-			$html .=  "Total </td><td align=right> " . $total;
-			$html .=  "</td></tr>\n";
-		$html .=  "\n</table></body></html>";
-      $this->template->setCurrentBlock('RESULT');
-      $this->template->setVariable("RESULT", $html);
-      $this->template->parseCurrentBlock();
-    print $this->template->get();
-		break;
+	  $result = VidDb::query($sql);
+	  $subTotal = 0; $total = 0; $current = null; $subTotal1 = 0; $subTotal2 = 0; $subTotal3 = 0;
+	  $html =  "<html><body><h4>Registration Status (2012-13)</h4><table width='400'  class='tablesorter'>\n";
+	  $html .= "<thead><tr><th>2011-12</th><th>2012-13</th><th>Yes</th><th>No</th><th>Maybe</th></tr></thead><tbody>\n";
+	  while ($row = mysql_fetch_array($result)) {
+	    $currentYear = $row[0];
+	    if ($current == null) $current = $currentYear;
+	    if ($current !=  $currentYear) {
+	      //show subtotal
+	      $html .=  "<tr><td>";
+	      $html .=  "Subtotal </td><td style='font-weight:bold;'> " . $subTotal . "</td>";
+	      $html .=  "<td align=right> " . $subTotal1 . "</td><td align=right>" . $subTotal2 . "</td><td align=right>" . $subTotal3 . "</td></tr>\n";
+	      $html .= "<tr><td colspan=5>&nbsp;</td></tr>\n";
+	      $current = $currentYear;
+	      $subTotal = 0;  $subTotal1 = 0; $subTotal2 = 0; $subTotal3 = 0;
+	    }
+	    $html .=  "<tr><td>";
+	    $html .=  EnumFamilyTracker::NameFromId($row[0]) . "</td><td> " . EnumFamilyTracker::NameFromId($row[1]) ."</td>";
+
+	    switch ($row[1]) {
+	    case EnumFamilyTracker::registered:
+	      $html .= "<td align=right> " . $row[2] . "</td><td>&nbsp;</td><td>&nbsp;</td></tr>\n";
+	      $subTotal1 += $row[2];
+	      break;
+	    case EnumFamilyTracker::pendingInvitation:
+	    case EnumFamilyTracker::pendingRegistration:
+	      $html .= "<td>&nbsp;</td><td>&nbsp;</td><td align=right> " . $row[2] . "</td></tr>\n";
+	      $subTotal3 += $row[2];
+	      break;
+	    default:
+	      $html .= "<td>&nbsp;</td><td align=right> " . $row[2] . "</td><td>&nbsp;</td></tr>\n";
+	      $subTotal2 += $row[2];
+	      break;
+	
+	    }
+	    $subTotal += $row[2];
+	    $total += $row[2];
+	  }
+	  $html .=  "</tbody><tfooter>";
+	  $html .=  "<tr><td>Subtotal </td><td style='font-weight:bold;'> " . $subTotal . "</td>";
+	  $html .=  "<td align=right> " . $subTotal1 . "</td><td align=right>" . $subTotal2 . "</td><td align=right>" . $subTotal3 . "</td></tr>\n";
+	  $html .=  "<tr><td colspan=5>&nbsp;</td></tr>\n";
+	  $html .=  "<tr><td>Total </td><td style='font-weight:bold;'> " . $total."</td><td colspan=3>&nbsp;</td></tr></tfooter>\n";
+	  $html .=  "</table></body></html>";
+	  $this->template->setCurrentBlock('RESULT');
+	  $this->template->setVariable("RESULT", $html);
+	  $this->template->parseCurrentBlock();
+	  print $this->template->get();
+	  break;
 
     // ************************************************************
     case "CourseCatalog":
