@@ -270,6 +270,7 @@ SQLREGISTRATIONSUMMAY;
 	    if ($current == null) $current = $currentYear;
 	    if ($current !=  $currentYear) {
 	      //show subtotal
+
 	      $html .=  "<tr><td>";
 	      $html .=  "Subtotal </td><td style='font-weight:bold;'> " . $subTotal . "</td>";
 	      $html .=  "<td align=right> " . $subTotal1 . "</td><td align=right>" . $subTotal2 . "</td><td align=right>" . $subTotal3 . "</td></tr>\n";

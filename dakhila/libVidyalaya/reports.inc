@@ -102,7 +102,7 @@ class Reports {
 	$html = $html . $template->get();	
 	
 	// Medical Information Form - one per student
-	foreach ($family->Children() as $student) {
+	foreach ($family->EligibleChildren() as $student) {
 	  $html = $html . $footer . '<DIV style="page-break-after:always"></DIV>';
 	  	  
 	  $template = new HTML_Template_ITX($templateDir);

@@ -2050,6 +2050,16 @@ class Family {
 		return $children;
 	}
 
+	public function EligibleChildren() {
+	  $children = array();
+	  foreach (Student::$objArray as $student) {
+	    if ($student->family->id != $this->id) continue;
+	    $grade = $student->GradeAt(Calendar::RegistrationSession);
+	    if ($grade < 0 || $grade == "College" || $grade == "Unknown" ) continue;
+	    $children[] = $student;
+	  }
+	  return $children;
+	}
 
 
   public function setVariables($row) {

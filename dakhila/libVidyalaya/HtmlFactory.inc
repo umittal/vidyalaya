@@ -555,9 +555,8 @@ function DisplayRegistrationTemplate (&$template, $family) {
 	$template->setVariable("MOTHER", $family->mother->fullName());
 	$template->parseCurrentBlock();
 
-	$children = $family->Children();
+	$children = $family->EligibleChildren();
 	foreach ($children as $student) {
-	  //		if ($student->studentStatus->id != StudentStatus::Inactive)	
 		  DisplayRegistrationChildren($template, $student);
 	}
 
@@ -570,6 +569,7 @@ function DisplayRegistrationTemplate (&$template, $family) {
 
 
 function DisplayRegistrationChildren(&$template, $student) {
+
 	$templateName="STUDENTS";
 	$template->setCurrentBlock($templateName);
 	$template->setVariable("ID", $student->id);
