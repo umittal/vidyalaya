@@ -263,7 +263,30 @@ EOT;
 SQLREGISTRATIONSUMMAY;
 	  $result = VidDb::query($sql);
 	  $subTotal = 0; $total = 0; $current = null; $subTotal1 = 0; $subTotal2 = 0; $subTotal3 = 0;
-	  $html =  "<html><body><h4>Registration Status (2012-13)</h4><table width='400'  class='tablesorter'>\n";
+	  $html =  "<html> ";
+	  $html .= "<head><style type=\"text/css\">
+.ou { font-style:oblique;text-decoration:underline; }
+</style>
+<script>
+  function showTrackerDetails(year, previous, current) {
+  var form=dijit.byId(\"trackerForm\");
+  var idfield=dijit.byId(\"YEAR\"); idfield.attr(\"value\", year);
+  var idfield=dijit.byId(\"PREVIOUS\"); idfield.attr(\"value\", previous);
+  var idfield=dijit.byId(\"CURRENT\"); idfield.attr(\"value\", current);
+  if (form) {form.submit();} else {alert (\"form not found\");}
+  }
+</script>
+
+</head><body>
+<form method=\"post\" action=\"/dakhila/php/dataViewer2.php?command=FamilyTracker\" style=\"display:none\" id=\"trackerForm\" dojoType=\"dijit.form.Form\">
+Year: <input type=\"text\" dojoType=\"dijit.form.TextBox\" name=\"YEAR\" id=\"YEAR\"> 
+Previous: <input type=\"text\" dojoType=\"dijit.form.TextBox\" name=\"PREVIOUS\"  id=\"PREVIOUS\"> 
+Current: <input type=\"text\" dojoType=\"dijit.form.TextBox\" name=\"CURRENT\" id=\"CURRENT\"> 
+<input type=\"submit\" name=\"go\" value=\"GO\"><br>
+</form>
+
+";
+	  $html .= "<h4>Registration Status (2012-13)</h4><table width='400'  class='tablesorter'>\n";
 	  $html .= "<thead><tr><th>2011-12</th><th>2012-13</th><th>Yes</th><th>No</th><th>Maybe</th></tr></thead><tbody>\n";
 	  while ($row = mysql_fetch_array($result)) {
 	    $currentYear = $row[0];
@@ -281,18 +304,21 @@ SQLREGISTRATIONSUMMAY;
 	    $html .=  "<tr><td>";
 	    $html .=  EnumFamilyTracker::NameFromId($row[0]) . "</td><td> " . EnumFamilyTracker::NameFromId($row[1]) ."</td>";
 
+	    $number = "<td class=\"ou\" onclick=\"showTrackerDetails(2, $row[0], $row[1])\" align=\"right\" onmouseover=\"this.style.cursor='pointer'\">$row[2]</td>";
+
 	    switch ($row[1]) {
 	    case EnumFamilyTracker::registered:
-	      $html .= "<td align=right> " . $row[2] . "</td><td>&nbsp;</td><td>&nbsp;</td></tr>\n";
+	      //	      $html .= "<td align=right> " . $row[2] . "</td><td>&nbsp;</td><td>&nbsp;</td></tr>\n";
+	      $html .= "$number<td>&nbsp;</td><td>&nbsp;</td></tr>\n";
 	      $subTotal1 += $row[2];
 	      break;
 	    case EnumFamilyTracker::pendingInvitation:
 	    case EnumFamilyTracker::pendingRegistration:
-	      $html .= "<td>&nbsp;</td><td>&nbsp;</td><td align=right> " . $row[2] . "</td></tr>\n";
+	      $html .= "<td>&nbsp;</td><td>&nbsp;</td>$number</tr>\n";
 	      $subTotal3 += $row[2];
 	      break;
 	    default:
-	      $html .= "<td>&nbsp;</td><td align=right> " . $row[2] . "</td><td>&nbsp;</td></tr>\n";
+	      $html .= "<td>&nbsp;</td>$number<td>&nbsp;</td></tr>\n";
 	      $subTotal2 += $row[2];
 	      break;
 	
@@ -332,7 +358,12 @@ SQLREGISTRATIONSUMMAY;
 	dojo.require("dijit.form.Select");
         </script>
 	<form method="post" action="$url">
-	Year: <input type="text" name="YEAR" value="$year"> 
+	Year: 
+	<select id="YEAR" dojoType="dijit.form.Select" name="YEAR">
+	<option value=0>2010</option>
+	<option value=1>2011</option>
+	<option value=2 selected="selected">2012</option>
+	</select>
 	Previous: 
 	<select id="previous" dojoType="dijit.form.Select" name="PREVIOUS">
 	$previousChoices
@@ -350,7 +381,7 @@ EOT;
       $this->template->setVariable('QUERY', $form);
       $this->template->parseCurrentBlock();
       
-      $sql = "select * from FamilyTracker inner join Students2003 on FamilyTracker.family = Students2003.PARENT_ID where ";
+      $sql = "select * from FamilyTracker  where ";
       $csv = array();
       if (isset($_POST['YEAR']) && $_POST['YEAR'] != "") {
 	$year = $_POST['YEAR'];
@@ -362,9 +393,7 @@ EOT;
 
       if (count($csv) != 0) {
 	$sql .= implode (" and  ", $csv);
-	$html = "";
 	$result = VidDb::query($sql);
-	$html .= "<table>\n";
 
 	$this->template->addBlockFile('RESULT', 'F_RESULT', 'FamilyTrackerDetails.tpl');
 	$this->template->touchBlock('F_RESULT');
@@ -372,28 +401,20 @@ EOT;
 	while ($row = mysql_fetch_alias_array($result)) {
 	  $ryear=$row["FamilyTracker.year"];
 	  $family = Family::GetItemById($row["FamilyTracker.family"]);
-	  $student = Student::GetItemById($row["Students2003.ID"]);
 
 	  $this->template->setCurrentBlock("TRACKER");
 	  $this->template->setVariable("FAMILYID",$family->id);
 	  $this->template->setVariable("STUDENTID",$student->id);
 	  $this->template->setVariable("PARENT",$family->parentsName());
-	  $this->template->setVariable("STUDENT",$student->fullName());
-	  $this->template->setVariable("AGE",intval($student->Age()));
-	  $this->template->setVariable("GRADE",$student->Grade());
-	  $this->template->setVariable("LANGUAGE",$student->LanguageInterest());
+	  //	  $this->template->setVariable("STUDENT",$student->fullName());
+	  //	  $this->template->setVariable("AGE",intval($student->Age()));
+	  //	  $this->template->setVariable("GRADE",$student->Grade());
+	  //	  $this->template->setVariable("LANGUAGE",$student->LanguageInterest());
 	  $this->template->setVariable("PREVIOUS",EnumFamilyTracker::NameFromId($row["FamilyTracker.previousYear"]));
 	  $this->template->setVariable("CURRENT",EnumFamilyTracker::NameFromId($row["FamilyTracker.currentYear"]));
 	  $this->template->setVariable("YEAR",$ryear+2010);
 	  $this->template->parseCurrentBlock();
-
-
-	  $html .= "<tr><td>" . $family->parentsName() . "</td><td>" . $student->fullName() . "</td><td>" . intval($student->Age()) . "</td><td>" . $student->Grade(). "</td><td>". $student->LanguageInterest() . "</td></tr>\n";
 	}
-	$html .= "</table>\n";
-
-	//	$this->template->setCurrentBlock('RESULT');
-	//	$this->template->setVariable("RESULT", $html);
 	$this->template->parseCurrentBlock();
       }
       print $this->template->get();

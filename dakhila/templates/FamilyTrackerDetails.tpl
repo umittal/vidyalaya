@@ -53,12 +53,18 @@ Family ID: <input type="text" dojoType="dijit.form.TextBox" name="ID" id="family
 <h3>Family Tracker Lookup </h3>
 
 <table id="maintable" cellspacing="0" class="tablesorter" width="800px">
- <thead><tr><th>Parents<th>Student<th>Age<th>Grade<th>Language</th><th>Previous</th><th>Current</th><th>Year</th></tr></thead>
+ <thead><tr><th>Parents</th>
+<!--
+<th>Student<th>Age<th>Grade<th>Language</th>
+-->
+<th>Previous</th><th>Current</th><th>Year</th></tr></thead>
 <!-- BEGIN TRACKER -->
 <tr>
   <td class="ou" onclick="showFamilyDetails({FAMILYID})" onmouseover="this.style.cursor='pointer'">{PARENT} </td>
+<!--
   <td class="ou" onclick="showStudentDetails({STUDENTID})" onmouseover="this.style.cursor='pointer'">{STUDENT}</td>
   <td align="right"> {AGE}</td><td align="right">{GRADE}</td><td align="right">{LANGUAGE}</td>
+-->
   <td>{PREVIOUS}</td>
   <td>{CURRENT}</td>
   <td>{YEAR}</td>
