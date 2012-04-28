@@ -1162,6 +1162,7 @@ AGREEMENT;
   }
 
   private static function AnnounceExisting($family) {
+
     $production=1;
     $mail =   Mail::SetupMailAdmissions();
     Mail::SetFamilyAddress(&$mail, $family, $production);
@@ -1169,7 +1170,6 @@ AGREEMENT;
     $subject = "Vidyalaya Admission 2012-13, Family $family->id";
     if ($production == 0) $subject = "[Test] $subject";
     $mail->Subject = $subject;
-  
 
     // attachments
     $customizedPdf = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission/pdf/Family-". $family->id . ".pdf";
@@ -1180,10 +1180,8 @@ AGREEMENT;
     print "Family id: $family->id, Name: " . $family->parentsName() . "\n";
 
     $salutation = "<p>Dear " . $family->parentsName() . ",";
-    $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/reminder-existing-1.html");
+    $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/reminder-existing-2.html");
     $mail->AltBody = "Family: $family->id"; //Text Body
-
-    return;
 
     if(!$mail->Send()) {
       echo "Mailer Error: " . $mail->ErrorInfo . "\n";
@@ -1196,9 +1194,9 @@ AGREEMENT;
   public static function ExistingFamilies() {
     $i=1;
     foreach (FamilyTracker::GetAll() as $tracker) {
+      if ($tracker->family != 482) continue;
       if ($tracker->previousYear != EnumFamilyTracker::registered) continue;
       if ($tracker->currentYear != EnumFamilyTracker::pendingRegistration) continue;
-      if ($tracker->family < 471) continue;
       print $tracker->family . ", previous: " . EnumFamilyTracker::NameFromId($tracker->previousYear) . ", current: " 
 	. EnumFamilyTracker::NameFromId($tracker->currentYear) . "\n";
       $family = Family::GetItemById($tracker->family);
@@ -1235,10 +1233,15 @@ AGREEMENT;
 
     if(!$mail->Send()) {
       echo "Mailer Error: " . $mail->ErrorInfo . "\n";
-    }  else {
-      echo "Message has been sent\n";
+      return;
+    }  
+    print  "Message has been sent  ";
+    $count = FamilyTracker::UpdateStatus($family->id, EnumFamilyTracker::pendingRegistration, 0);
+    if ($count != 1 ) {
+      print "problem updating database, count = $count\n";
+      return;
     }
-
+    print "Databse updated successfully\n";
   }
 
   public static function InviteNew() {
@@ -1582,8 +1585,8 @@ class TwoYearLayout {
   }
 }
 
-Admission::InviteNew(); exit();
-//Admission::ExistingFamilies(); exit();
+//Admission::InviteNew(); exit();
+Admission::ExistingFamilies(); exit();
 
 //Admission::AdultLanguage(); exit();
 

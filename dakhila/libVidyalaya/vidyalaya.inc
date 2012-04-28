@@ -126,6 +126,33 @@ class Student {
   public $contacts = array();
 
   public static $objArray = Array ();
+
+  public static $currentlyEnrolled = Array ();
+
+  private static function firstTimeEnrolled() {
+    if (!empty(self::$currentlyEnrolled)) return;
+    $thisyear=Calendar::RegistrationYear() - 2011;
+
+    $query = "select distinct student from Enrollment 
+              left join AvailableClass on Enrollment.availableClass = AvailableClass.id
+               where AvailableClass.year = $thisyear 
+              ";
+    $result = VidDb::query($query);
+    while ($row = mysql_fetch_array($result)) {
+      self::$currentlyEnrolled[$row[0]] = 1;
+    }
+  }
+
+  public static function IsCurrentlyEnrolledId($id) {
+    self::firstTimeEnrolled();
+    $result = array_key_exists ($id, self::$currentlyEnrolled);
+    return $result;
+  }
+
+  public function IsCurrentlyEnrolled() {
+    return self::IsCurrentlyEnrolledId($this->id);
+  }
+
   
   public static function GetStudent($row) {
   	$key = $row["Students2003.ID"];
@@ -2264,6 +2291,17 @@ class FamilyTracker {
 
 	private static function createInsertString($familyID, $prevStatus, $currStatus) {
 		return " (" . self::currYear . ", $familyID, $prevStatus, $currStatus, 0)";
+	}
+
+	public static function UpdateStatus($familyId, $newStatus, $tuition) {
+	  $thisyear=Calendar::RegistrationYear() - 2010;
+	  $sql = "update FamilyTracker Set currentYear=$newStatus, tuition = $tuition where family=$familyId and year=$thisyear";
+	  $result = VidDb::query($sql);
+	  if ($result == FALSE) {
+	    return 0;
+	  }
+	  return  mysql_affected_rows ();
+
 	}
 
 	public static function UpdateFamilyTracker() {

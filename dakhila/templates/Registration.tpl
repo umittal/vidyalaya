@@ -46,10 +46,10 @@ Please fill all boxes, sign, date and bring completed package to School or mail 
 <div class=explanation>Place a check  mark  for each student to be enrolled</div>
 
 <table>
-<tr><th>ID</th><th>Name</th><th>Language</th><th>Age<th>Grade</th><th>Enroll</th></tr>
+<tr><th>ID</th><th>Name</th><th>Language</th><th>Age<th>Grade</th><th>Enroll</th><th>NEW</th></tr>
 
 <!-- BEGIN STUDENTS -->
-<tr><td>{ID}</td><td>{NAME}</td><td>{LANGUAGE}</td><td>{AGE}<td>{GRADE}</td><td class=input></td></tr>
+<tr><td>{ID}</td><td>{NAME}</td><td>{LANGUAGE}</td><td>{AGE}<td>{GRADE}</td><td class=input></td><td>{NEW}</td></tr>
 <!-- END STUDENTS -->
 
 </table>

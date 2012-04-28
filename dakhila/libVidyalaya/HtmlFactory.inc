@@ -583,6 +583,7 @@ function DisplayRegistrationChildren(&$template, $student) {
 	 $template->setVariable("AGE", intval($age));
        }
 	$template->setVariable("GRADE", $student->GradeAt(Calendar::RegistrationSession));
+	if (!$student->IsCurrentlyEnrolled()) $template->setVariable("NEW", "NEW");
 	
 	
 	$template->parseCurrentBlock();
