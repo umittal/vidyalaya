@@ -2304,6 +2304,13 @@ class FamilyTracker {
 
 	}
 
+	public static function TuitionCollected() {
+	  $sql="select sum(tuition) from FamilyTracker where year= " . FamilyTracker::currYear;
+	  $result = VidDb::query($sql);
+	  $row = mysql_fetch_array($result);
+	 return $row[0];
+	}
+
 	public static function UpdateFamilyTracker() {
 		self::firstTimeCall();
 
@@ -2345,7 +2352,7 @@ class FamilyTracker {
 		}
 	}
 
-	public static function loadPayments () {
+	public static function loadPayments2011 () {
 		//FamilyTracker::firstTimeCall();
 		$filename = "/home/umesh/Dropbox/Vidyalaya-Management/Administration/2011.csv";
 		if (($handle = fopen($filename, "r")) !== FALSE) {

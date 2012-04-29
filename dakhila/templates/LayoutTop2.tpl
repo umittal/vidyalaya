@@ -11,7 +11,7 @@
 
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>	
-<script src="https://ajax.googleapis.com/ajax/libs/dojo/1.7/dojo/dojo.js" type="text/javascript" djConfig="parseOnLoad:true"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dojo/dojo.js" type="text/javascript" djConfig="parseOnLoad:true"></script>
 
 	<script type="text/javascript" src="/dakhila/js/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="/dakhila/js/jquery.uitablefilter.js"></script>
@@ -32,12 +32,12 @@ dojo.require('dojox.validate.web');
         </script>
 
     <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/ui-lightness/jquery-ui.css" />
-    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7/dojox/grid/enhanced/resources/claro/EnhancedGrid.css" />
-    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dojox/grid/enhanced/resources/claro/EnhancedGrid.css" />
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dijit/themes/claro/claro.css">
 
       <style type="text/css">
 
-       @import "http://ajax.googleapis.com/ajax/libs/dojo/1.7/dojo/resources/dojo.css"; 
+       @import "http://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dojo/resources/dojo.css"; 
        </style>
 
 

@@ -253,7 +253,7 @@ EOT;
       print $this->template->get();
       break;
 		
-	case "RegistrationSummary":
+    case "RegistrationSummary":
 	  $sql = <<< SQLREGISTRATIONSUMMAY
 	    select previousYear, currentYear, count(*) 
 	    from FamilyTracker where year = 2 
@@ -262,7 +262,9 @@ EOT;
 
 SQLREGISTRATIONSUMMAY;
 	  $result = VidDb::query($sql);
-	  $subTotal = 0; $total = 0; $current = null; $subTotal1 = 0; $subTotal2 = 0; $subTotal3 = 0;
+	  $current = null; 
+	  $subTotal = 0; $subTotal1 = 0; $subTotal2 = 0; $subTotal3 = 0;
+	  $total = 0; $total1 = 0; $total2 = 0; $total3 = 0;
 	  $html =  "<html> ";
 	  $html .= "<head><style type=\"text/css\">
 .ou { font-style:oblique;text-decoration:underline; }
@@ -311,15 +313,18 @@ Current: <input type=\"text\" dojoType=\"dijit.form.TextBox\" name=\"CURRENT\" i
 	      //	      $html .= "<td align=right> " . $row[2] . "</td><td>&nbsp;</td><td>&nbsp;</td></tr>\n";
 	      $html .= "$number<td>&nbsp;</td><td>&nbsp;</td></tr>\n";
 	      $subTotal1 += $row[2];
+	      $total1 += $row[2];
 	      break;
 	    case EnumFamilyTracker::pendingInvitation:
 	    case EnumFamilyTracker::pendingRegistration:
 	      $html .= "<td>&nbsp;</td><td>&nbsp;</td>$number</tr>\n";
 	      $subTotal3 += $row[2];
+	      $total3 += $row[2];
 	      break;
 	    default:
 	      $html .= "<td>&nbsp;</td>$number<td>&nbsp;</td></tr>\n";
 	      $subTotal2 += $row[2];
+	      $total2 += $row[2];
 	      break;
 	
 	    }
@@ -330,8 +335,13 @@ Current: <input type=\"text\" dojoType=\"dijit.form.TextBox\" name=\"CURRENT\" i
 	  $html .=  "<tr><td>Subtotal </td><td style='font-weight:bold;'> " . $subTotal . "</td>";
 	  $html .=  "<td align=right> " . $subTotal1 . "</td><td align=right>" . $subTotal2 . "</td><td align=right>" . $subTotal3 . "</td></tr>\n";
 	  $html .=  "<tr><td colspan=5>&nbsp;</td></tr>\n";
-	  $html .=  "<tr><td>Total </td><td style='font-weight:bold;'> " . $total."</td><td colspan=3>&nbsp;</td></tr></tfooter>\n";
-	  $html .=  "</table></body></html>";
+	  $html .=  "<tr><td>Total </td><td style='font-weight:bold;'> " . $total."</td>\n";
+	  $html .=  "<td align=right> " . $total1 . "</td><td align=right>" . $total2 . "</td><td align=right>" . $total3 . "</td></tr>\n";
+
+	  $html .=  "</tfooter></table>\n";
+
+	  $html .= "<p>Total Tuition Collected: " . FamilyTracker::TuitionCollected() . "</p>\n";
+	  $html .= "</body></html>";
 	  $this->template->setCurrentBlock('RESULT');
 	  $this->template->setVariable("RESULT", $html);
 	  $this->template->parseCurrentBlock();
@@ -398,23 +408,23 @@ EOT;
 	$this->template->addBlockFile('RESULT', 'F_RESULT', 'FamilyTrackerDetails.tpl');
 	$this->template->touchBlock('F_RESULT');
 
+	$count=0;
 	while ($row = mysql_fetch_alias_array($result)) {
 	  $ryear=$row["FamilyTracker.year"];
 	  $family = Family::GetItemById($row["FamilyTracker.family"]);
 
 	  $this->template->setCurrentBlock("TRACKER");
 	  $this->template->setVariable("FAMILYID",$family->id);
-	  $this->template->setVariable("STUDENTID",$student->id);
 	  $this->template->setVariable("PARENT",$family->parentsName());
-	  //	  $this->template->setVariable("STUDENT",$student->fullName());
-	  //	  $this->template->setVariable("AGE",intval($student->Age()));
-	  //	  $this->template->setVariable("GRADE",$student->Grade());
-	  //	  $this->template->setVariable("LANGUAGE",$student->LanguageInterest());
 	  $this->template->setVariable("PREVIOUS",EnumFamilyTracker::NameFromId($row["FamilyTracker.previousYear"]));
 	  $this->template->setVariable("CURRENT",EnumFamilyTracker::NameFromId($row["FamilyTracker.currentYear"]));
 	  $this->template->setVariable("YEAR",$ryear+2010);
 	  $this->template->parseCurrentBlock();
+	  $count++;
 	}
+	$this->template->parseCurrentBlock();
+	$this->template->setCurrentBlock("COUNT");
+	$this->template->setVariable("COUNT",$count);
 	$this->template->parseCurrentBlock();
       }
       print $this->template->get();

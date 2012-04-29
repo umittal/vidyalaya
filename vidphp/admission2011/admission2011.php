@@ -418,10 +418,12 @@ EOT;
 }
 
 class Admission {
-  const DataFile = "/home/umesh/Dropbox/Vidyalaya-Management/Administration/2011.csv";
+  //  const DataFile = "/home/umesh/Dropbox/Vidyalaya-Management/Administration/2011.csv";
+  const DataFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission/Admission.csv";
   const OrientationFile = "/home/umesh/workspace/vidphp/admission2011/orientation1.txt";
   const assesssmentFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/data/assessment.csv";
   const rosterDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/roster/";
+  public static $students = Array ();
 
   private static function sendItemEmail($familyId, $cd, $pb, $bag) {
 		
@@ -447,7 +449,123 @@ ITEMEMAIL;
     Mail::mailFamilyFromAdmission($family, $subject, $body . $table, 1);
   }
 
-  public static function itemDelivery() {
+  private static function EnrollStudent($familyId, $studentId) {
+    $student = Student::GetItemById($studentId);
+    if (is_null($student)) {
+      print "invalid student id $studentId\n";
+      return;
+    }
+    if ($student->family->id != $familyId) {
+      print "parent error: family $family, child $child, family should be " . $student->family->id . "\n";
+      return;
+    } 
+    self::$students[$studentId] = $student;
+  }
+
+  public static function Payment2012() {
+    $totalCD = array();
+    $totalPB = array();
+    $totalBag = array();
+    $totalFamily = array();
+
+    if (($handle = fopen(self::DataFile, "r")) !== FALSE) {
+      $header = fgetcsv($handle, 0, ",");
+      $header = fgetcsv($handle, 0, ",");
+      $i=1;
+      $totalTuition=0;
+      $done=array();
+      $familyTuition = array();
+      while ((list($familyId,$Check , $base, $new , $adj , $CD , $PB , $Bag , $date , $total ,$foo, $ch1 , $ch2 , $ch3 )
+	      = fgetcsv($handle, 0, ",")) !== FALSE) {
+	if (!empty($familyId)) {
+	  $base = str_replace('$', "",$base);
+	  $new = str_replace('$', "",$new);
+	  $adj = str_replace('$', "",$adj);
+
+	  $CD = str_replace('$', "",$CD);
+	  $PB = str_replace('$', "",$PB);
+	  $Bag = str_replace('$', "",$Bag);
+	  $total = str_replace('$', "",$total);
+	  if ($total != $base+$new+$adj+$CD+$PB+$Bag) die ("error with total for family $familyId, check $Check\n");
+	  
+	  $tuition = $base+$new+$adj;
+	  $familyTuition [$familyId] += $tuition;
+	  $totalTuition += $tuition;
+
+	  if (empty($totalFamily[$familyId])) {
+	    $totalFamily[$familyId] =0;
+	    $totalCD[$familyId] = 0;
+	    $totalPB[$familyId] = 0;
+	    $totalBag[$familyId] = 0;
+	  }
+	  $totalFamily[$familyId] +=$CD+$PB+$Bag;
+	  $totalCD[$familyId] += $CD;
+	  $totalPB[$familyId] += $PB;
+	  $totalBag[$familyId] += $Bag;
+	  
+	  if (!empty($ch1)) self::EnrollStudent($familyId, $ch1);
+	  if (!empty($ch2)) self::EnrollStudent($familyId, $ch2);
+	  if (!empty($ch3)) self::EnrollStudent($familyId, $ch3);
+	  //	  print "$familyId, $check, $base, $new, $adj, $cd, $pb, $bag, date = $date, $total, $ch1, $ch2, $ch3\n";
+	} // if (!empty($family))
+      } // while (list)
+    } // if handle
+	  
+    $i=1;
+    foreach ($familyTuition as $familyId => $tuition) {
+      $tracker = FamilyTracker::GetItemById($familyId);
+      if (empty($tracker)) throw new Exception("family $familyId not found in tracker, weird");
+      if ($tuition != 0 &&  ($tracker->tuition != $tuition || $tracker->currentYear != EnumFamilyTracker::registered) ) {
+	print "Error: family $familyId, File=$tuition, Tracker tuition=$tracker->tuition, status = " . $tracker->currentYear . "\n";
+	// FamilyTracker::UpdateStatus($familyId, EnumFamilyTracker::registered , $tuition);
+	//	      $sql = "update FamilyTracker set tuition = $tuition, currentYear = " .  EnumFamilyTracker::enum('registered');
+	//	      $sql .= " where family = $family and year= " . FamilyTracker::currYear . ";\n";
+	//	      $result = VidDb::query($sql);
+	//	      print $i++ . "$sql \n";
+					
+      } elseif ($tuition == 0 && $tracker->currentYear == EnumFamilyTracker::registered) {
+	print "check tracker for $familyId, it should not be marked registered\n";
+      } else {
+	//	print $i++ . " Family $familyId looks ok\n";
+      }
+      $done[$familyId] = 1;
+    } // foreach
+
+    foreach(FamilyTracker::GetAll() as $tracker) {
+      $familyId = $tracker->family;
+      if ($tracker->tuition != 0 || $tracker->currentYear == EnumFamilyTracker::registered) {
+	if  ($done[$familyId] != 1) print "check family " . $tracker->family . "\n";
+      }
+    } // foreach
+
+    //    $sql="select sum(tuition) from FamilyTracker where year= " . FamilyTracker::currYear;
+    //    $result = VidDb::query($sql);
+    //    $row = mysql_fetch_array($result);
+    $databaseTuition = FamilyTracker::TuitionCollected();
+    $tuitionCheck = $databaseTuition == $totalTuition ? "OK" : "FAIL";
+    print "Total Tuition in file = " . $totalTuition . ", Database = " . $databaseTuition . ", Check: $tuitionCheck" . "\n";
+
+    $lang = array();
+    $grade = array();
+    foreach (self::$students as $student) {
+      $level = $student->GradeAt(Calendar::RegistrationSession);
+      if ($level > 9) $level = 9;
+      if ($level != "KG")
+	empty($lang[$student->languagePreference]) ? $lang[$student->languagePreference]=1 : $lang[$student->languagePreference]++;
+      empty($grade[$level]) ? $grade[$level]= 1 : $grade[$level]++ ;
+    }
+    foreach ($lang as $key => $value) {
+      print "Language: $key, Count: $value\n";
+    }
+    foreach ($grade as $key => $value) {
+      print "Grade: $key, Count: $value\n";
+    }
+			
+    print "Count of Students = " . count(self::$students) . "\n";
+
+  } // public static
+
+  public static function itemDelivery2011() {
     $totalCD = array();
     $totalPB = array();
     $totalBag = array();
@@ -1585,9 +1703,9 @@ class TwoYearLayout {
   }
 }
 
+Admission::Payment2012(); exit();
 //Admission::InviteNew(); exit();
-Admission::ExistingFamilies(); exit();
-
+//Admission::ExistingFamilies(); exit();
 //Admission::AdultLanguage(); exit();
 
 //Teachers::AddTeacher(79, "hetalapurva@gmail.com", 0) ; exit();
