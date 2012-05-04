@@ -421,8 +421,9 @@ class Admission {
   //  const DataFile = "/home/umesh/Dropbox/Vidyalaya-Management/Administration/2011.csv";
   const DataFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission/Admission.csv";
   const OrientationFile = "/home/umesh/workspace/vidphp/admission2011/orientation1.txt";
-  const assesssmentFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/data/assessment.csv";
-  const rosterDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/roster/";
+  //  const assesssmentFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/data/assessment.csv";
+  const assesssmentFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission/assessment.csv";
+  const rosterDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-12/roster/";
   public static $students = Array ();
 
   private static function sendItemEmail($familyId, $cd, $pb, $bag) {
@@ -1344,9 +1345,10 @@ AGREEMENT;
   
     print "Family id: $family->id, $subject; Name: " . $family->parentsName() . "\n";
 
-    // return;
+    //    return;
     $salutation = "<p>Dear " . $family->parentsName() . ",";
-    $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/orientation2012.html");
+        $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/orientation2012.html");
+    // $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/reminder-orientation.htnl");
     $mail->AltBody = "Family: $family->id"; //Text Body
 
     if(!$mail->Send()) {
@@ -1354,12 +1356,13 @@ AGREEMENT;
       return;
     }  
     print  "Message has been sent  ";
+    // return;
     $count = FamilyTracker::UpdateStatus($family->id, EnumFamilyTracker::pendingRegistration, 0);
     if ($count != 1 ) {
       print "problem updating database, count = $count\n";
       return;
     }
-    print "Databse updated successfully\n";
+    print "Database updated successfully\n";
   }
 
   public static function InviteNew() {
@@ -1367,6 +1370,7 @@ AGREEMENT;
     foreach (FamilyTracker::GetAll() as $tracker) {
       $family = Family::GetItemById($tracker->family);
       if ($tracker->currentYear != EnumFamilyTracker::pendingInvitation) continue;
+      //if ($tracker->currentYear != EnumFamilyTracker::pendingRegistration) continue;
       if ($tracker->previousYear == EnumFamilyTracker::registered) continue;
       if ($tracker->previousYear != EnumFamilyTracker::waitlist) die("famiy $family->id is neither registered nor waitlist");
       print "$i. Family id: $family->id, Name: " . $family->parentsName() . "\n";
@@ -1437,8 +1441,8 @@ class TwoYearLayout {
   const Continuing = "Continuing";
   const Change = "Change";
 	
-  const LeavingStudentsFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/leaving.csv";
-  const EnrolledStudentsFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/enrolled.csv";
+  const LeavingStudentsFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission/leaving.csv";
+  const EnrolledStudentsFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission/enrolled.csv";
 	
   private static $objArray = Array ();
   private static $orientation = Array();
@@ -1493,7 +1497,7 @@ class TwoYearLayout {
   }
 
   private static function prevYearFromDatabase () {
-    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Eastlake,2010) as $enrollment) {
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS,2011) as $enrollment) {
       if (empty(self::$objArray[$enrollment->student->id])) self::$objArray[$enrollment->student->id] = new TwoYearLayout();
       $twoyear = self::GetItemById($enrollment->student->id);
       $twoyear->previousYear->updateFromEnrollment($enrollment);
@@ -1501,7 +1505,7 @@ class TwoYearLayout {
   }
 	
   private static function currentYearFromDatabase () {
-    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS,2011) as $enrollment) {
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS,2012) as $enrollment) {
       if (empty(self::$objArray[$enrollment->student->id])) self::$objArray[$enrollment->student->id] = new TwoYearLayout();
       $twoyear = self::GetItemById($enrollment->student->id);
       //print "setting this year value for $enrollment->student->id\n";
@@ -1522,7 +1526,8 @@ class TwoYearLayout {
   }
 
   private static function currentYearFromFile() {
-    $filename = "/home/umesh/Dropbox/Vidyalaya-Management/Administration/2011.csv";
+    //    $filename = "/home/umesh/Dropbox/Vidyalaya-Management/Administration/2011.csv";
+    $filename = Admission::DataFile;
     if (($handle = fopen($filename, "r")) !== FALSE) {
       $header = fgetcsv($handle, 0, ",");
       $header = fgetcsv($handle, 0, ",");
@@ -1530,9 +1535,9 @@ class TwoYearLayout {
       $totalTuition=0;
       $done=array();
       $fileTuition = array();
-      while ((list($family,$Check , $base, $new , $DVD , $CD , $PB , $Bag , $Ann , $Total ,$foo, $ch1 , $ch2 , $ch3 )
+      while ((list($familyId,$Check , $base, $new , $adj , $CD , $PB , $Bag , $date , $total ,$foo, $ch1 , $ch2 , $ch3 )
 	      = fgetcsv($handle, 0, ",")) !== FALSE) {
-	if (!empty($family)) {
+	if (!empty($familyId)) {
 	  if (!empty($ch1)) self::updateNewStudent($ch1);
 	  if (!empty($ch2)) self::updateNewStudent($ch2);
 	  if (!empty($ch3)) self::updateNewStudent($ch3);
@@ -1542,6 +1547,7 @@ class TwoYearLayout {
   }
 	
   private static function loadAssessment() {
+    return;
     $filename = Admission::assesssmentFile;
     $count = array();
     if (($handle = fopen($filename, "r")) !== FALSE) {
@@ -1557,6 +1563,7 @@ class TwoYearLayout {
   }
 
   private static function orientationList() {
+    return;
     $filename = Admission::OrientationFile;
     $count = array();
     if (($handle = fopen($filename, "r")) !== FALSE) {
@@ -1608,6 +1615,7 @@ class TwoYearLayout {
   }
 
   public static function assignClass() {
+    AvailableClass::CreateClassCourseCatalog();
     self::firstTimeCall();
     $count = 0;
     foreach (self::$objArray as $studentid => $twoYear) {
@@ -1619,9 +1627,9 @@ class TwoYearLayout {
       $count++;
 				
       if($student->GradeAt(Calendar::RegistrationSession) == "KG") {
-	$class = AvailableClass::findAvailableClass(2011, Department::Kindergarten, 0, null);
+	$class = AvailableClass::findAvailableClass(Calendar::RegistrationYear(), Department::Kindergarten, 0, null);
 	if ($class ==null) {
-	  print "Error:KG not found for year 2011\n";
+	  print "Error:KG not found for year " .Calendar::RegistrationYear() . "\n";
 	} else {
 	  print "insert into Enrollment set student = $student->id, availableClass = $class->id;\n";
 	}
@@ -1630,9 +1638,9 @@ class TwoYearLayout {
 				
       // all others require culture and language. Let us do culture first
       $level = $twoYear->thisYear->cultureLevel;
-      $class = AvailableClass::findAvailableClass(2011, Department::Culture, $level, null);
+      $class = AvailableClass::findAvailableClass(Calendar::RegistrationYear(), Department::Culture, $level, null);
       if ($class ==null) {
-	print "Error:Culture level $level not found for year 2011\n";
+	print "Error:Culture level $level not found for year " .Calendar::RegistrationYear() . "\n";
       } else {
 	print "insert into Enrollment set student = $student->id, availableClass = $class->id;\n";
       }
@@ -1647,9 +1655,9 @@ class TwoYearLayout {
       } else {
 	$level = 1; 
       }
-      $class = AvailableClass::findAvailableClass(2011, $department, $level, null);
+      $class = AvailableClass::findAvailableClass(Calendar::RegistrationYear(), $department, $level, null);
       if ($class ==null) {
-	print "Error:Department $department,  level $level not found for year 2011\n";
+	print "Error:Department $department,  level $level not found for year " .Calendar::RegistrationYear() . "\n";
       } else {
 	print "insert into Enrollment set student = $student->id, availableClass = $class->id;\n";
       }
@@ -1703,7 +1711,7 @@ class TwoYearLayout {
   }
 }
 
-Admission::Payment2012(); exit();
+//Admission::Payment2012(); exit();
 //Admission::InviteNew(); exit();
 //Admission::ExistingFamilies(); exit();
 //Admission::AdultLanguage(); exit();
@@ -1727,7 +1735,7 @@ Admission::Payment2012(); exit();
 
 //FamilyTracker::loadPayments();exit();
 //FamilyTracker::UpdateFamilyTracker(); exit();
-//TwoYearLayout::assignClass(); exit();
+ TwoYearLayout::assignClass(); exit();
 ///TwoYearLayout::checkFeePaid(); exit();
 //TwoYearLayout::twoYearCsv(); exit();
 //Admission::Validation(2011); exit();

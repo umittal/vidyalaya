@@ -514,8 +514,8 @@ class AvailableClass {
 
 
 	public function IsChangeAllowed() {
-	  return false;
-	  if ($this->session == "2011-12") return true;
+	  //	  return false;
+	  if ($this->session == "2012-13") return true;
 	}
 
 	public function short() {
@@ -546,6 +546,21 @@ class AvailableClass {
 	    if ($item->room->id === $roomId) $list[]= $item;
 	  }
 	  return $list;
+	}
+
+	public static function CreateClassCourseCatalog() {
+	  $year = Calendar::RegistrationYear() - 2010;
+	  $room = 19;
+
+	  if (count(self::GetAllYear($year)) !=0 ) {
+	    print "Error: To create all classes for course cataglog, no class should be setp for the year\n";
+	    return; // return if any class exists for the year
+	  }
+
+	  foreach(CourseCatalog::GetAll() as $course) {
+	    $sql = "insert into AvailableClass Set course = $course->id, year = $year , room = $room, section =' ' \n";
+	    $result = VidDb::query($sql);
+	  }
 	}
 
 	private static function firstTimeCall() {

@@ -84,6 +84,7 @@ class Dataserver {
     $from = $_POST["currentClass"];
     $to = $_POST["newClass"];
     $studentId = $_POST["studentId"];
+
     
     $fromClass = AvailableClass::GetItemById($from);
     if ($fromClass == null) self::error("class not found");

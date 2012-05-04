@@ -415,8 +415,13 @@ EOT;
 
 	  $this->template->setCurrentBlock("TRACKER");
 	  $this->template->setVariable("FAMILYID",$family->id);
+	  $this->template->setVariable("HOMEPHONE",$family->phone);
 	  $this->template->setVariable("PARENT",$family->parentsName());
-	  $this->template->setVariable("PREVIOUS",EnumFamilyTracker::NameFromId($row["FamilyTracker.previousYear"]));
+	  if ($row["FamilyTracker.previousYear"] == EnumFamilyTracker::waitlist) {
+	    $this->template->setVariable("PREVIOUS",$family->priority_date );
+	  } else {
+	    $this->template->setVariable("PREVIOUS",EnumFamilyTracker::NameFromId($row["FamilyTracker.previousYear"]));
+	  }
 	  $this->template->setVariable("CURRENT",EnumFamilyTracker::NameFromId($row["FamilyTracker.currentYear"]));
 	  $this->template->setVariable("YEAR",$ryear+2010);
 	  $this->template->parseCurrentBlock();
@@ -433,9 +438,11 @@ EOT;
 
     // ************************************************************
     case "AvailableCourse":
-      $year = isset($_GET['year']) ?  $_GET['year'] : null;
+      //      $year = isset($_GET['year']) ?  $_GET['year'] : null;
+      $year = isset($_POST['year']) ?  $_POST['year'] : null;
       if ($year == null) $year=Calendar::CurrentYear();
-      $facility = isset($_GET['facility']) ?  $_GET['facility'] : null;
+      //      $facility = isset($_GET['facility']) ?  $_GET['facility'] : null;
+      $facility = isset($_POST['facility']) ?  $_POST['facility'] : null;
       if ($facility =="") $facility=Facility::PHHS;
 
       $url = htmlentities($_SERVER['PHP_SELF']) . "?command=AvailableCourse";
@@ -463,7 +470,8 @@ EOT;
 
 	> 
       <label for="facility">Facility:</label> 
-	  <select id="facility" title="facility" name="facility" 
+<!--
+	  <select id="facility1" title="facility1" name="facility1" 
 	    dojoType="dijit.form.ComboBox"
         autoComplete="false"
         forceValidOption="true"
@@ -471,8 +479,15 @@ EOT;
 		<option value="1">Eastlake Elementary School</option>
 		<option selected  value="2">Parsippany Hills High School</option>
       </select>
-   <input type="submit" name="submit" value="Under Construction"><br>
+-->
+	  <select id="facility" title="facility" name="facility">
+		<option value="1">Eastlake Elementary School</option>
+		<option selected="selected"  value="2">Parsippany Hills High School</option>
+      </select>
+   <input type="submit" name="submit" value="GO"><br>
     </div>
+
+
 
 
 </form>
@@ -633,7 +648,9 @@ NAMAKOOL;
 
     // ************************************************************
     case "lcmatrix":
-      $style = <<<LOCALSTYLE
+      $url = htmlentities($_SERVER['PHP_SELF']) . "?command=lcmatrix";
+	$year = isset($_POST['year']) ?  $_POST['year'] : 2012;
+	$form = <<<LCMATRIXFORM
 <script type="text/javascript">
 $(document).ready( function() {
     \$table = $("#table1").tablesorter({widthFixed: true, widgets: ['zebra'],
@@ -647,16 +664,33 @@ $(document).ready( function() {
 
 });
 </script>
-      <style type="text/css">
-	td {padding-left: 15px; text-align: right;padding-top: 5px;}
-	tr.odd {background-color: #F0F0F6;}
-</style>
+<div class="formContainer">
+	<form method="post" action="$url"
+	dojoType = "dijit.form.Form">
 
-LOCALSTYLE;
+	<div class="formRow"> 
+	Year: <input type="text" name="year" id="year" value="$year" size=6
+           dojoType="dijit.form.ValidationTextBox" 
+           required="true"  
+	regExp="\b201\d\b"
+           promptMessage="Enter School Start Year."
+           invalidMessage="Invalid School Start Year." 
+           trim="true"
 
-      $year=2011;
+	> 
+   <input type="submit" name="submit" value="GO"><br>
+    </div>
+</form>
+</div>
+LCMATRIXFORM;
+
+      $this->template->setCurrentBlock('QUERY');
+      $this->template->setVariable('QUERY', $form);
+      $this->template->parseCurrentBlock();
+		
+
       $this->template->setCurrentBlock('RESULT');
-      $this->template->setVariable('RESULT', $style . Reports::lcmatrix($year));
+      $this->template->setVariable('RESULT',  Reports::lcmatrix($year));
       $this->template->parseCurrentBlock();
       print $this->template->get();
       break;		

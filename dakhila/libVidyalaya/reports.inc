@@ -398,7 +398,7 @@ class Reports {
       //      printf("%5d", $c);
       $html .= "<td>$c</td>";
     }
-    $html .= "</tr>\n";
+    $html .= "</tr></table>\n";
     //    print "\n$total\n";
     return $html;
   }
