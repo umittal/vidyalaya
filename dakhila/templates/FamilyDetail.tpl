@@ -51,7 +51,7 @@ dojo.require("dijit.form.Button");
 
 <div class="heading1">Family Details </div>
 
-<table>
+<table class="vidyalaya">  	  	  
 <!-- BEGIN HOME -->
 <tr><td>ID</td><td>{ID} (Home Phone: {HOMEPHONE})</td></tr>
 <tr><td rowspan=2>Home Address</td><td>{LINE1} {LINE2}</td></tr>
@@ -64,7 +64,7 @@ dojo.require("dijit.form.Button");
 <li class="section">Parents</li>
 
 
-<table>  	  	  
+<table class="vidyalaya">  	  	  
  <thead><tr><th>M/F<th>NAME<th>EMAIL<th>WORK<th>CELL<th>Call</tr></thead>
 <!-- BEGIN PARENTS -->
 <tr><td>{MF} </td><td>{NAME}</td><td> {EMAIL}</td><td>{WORK}</td><td>{CELL}</td><td>{ISCONTACTABLE}</td></tr>
@@ -72,7 +72,7 @@ dojo.require("dijit.form.Button");
 </table>
 
 <li class="section">Children</li> 
-<table>
+<table class="vidyalaya">  	  	  
 <thead><tr><th scope="col">ID<th>Gender<th>NAME<th>DOB</th><th>LANGUAGE</th><th>EMAIL<th width=30px>CELL</th></tr></thead>
 <!-- BEGIN CHILDREN -->
 <tr><td class="ou" onclick="showStudentDetails({ID})" onmouseover="this.style.cursor='pointer'">{ID}</td>
@@ -94,7 +94,7 @@ dojo.require("dijit.form.Button");
 <!-- END ADDCHILD -->
 
 <li class="section">Class Assignment (2011-12)</li>
-<table>
+<table class="vidyalaya">  	  	  
 <thead>
 <tr><th scope="col">Name<th>Class<th>Room<th width='400px' align="left">Teachers</tr>
 </thead>
@@ -107,7 +107,8 @@ dojo.require("dijit.form.Button");
 </table>
 
 <li class="section">Registration History</li>
-<table><tr><td>
+<table class="vidyalaya">  	  	  
+<tr><td>
 <table>
 <thead>
 <tr><th scope="col">Year<th>Previous<th>Current<th>Tuition</tr>

@@ -1347,7 +1347,8 @@ AGREEMENT;
 
     //    return;
     $salutation = "<p>Dear " . $family->parentsName() . ",";
-        $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/orientation2012.html");
+    //        $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/orientation2012.html");
+    $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/postorientation2012.html");
     // $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/reminder-orientation.htnl");
     $mail->AltBody = "Family: $family->id"; //Text Body
 
@@ -1356,7 +1357,7 @@ AGREEMENT;
       return;
     }  
     print  "Message has been sent  ";
-    // return;
+    //    return;
     $count = FamilyTracker::UpdateStatus($family->id, EnumFamilyTracker::pendingRegistration, 0);
     if ($count != 1 ) {
       print "problem updating database, count = $count\n";
@@ -1712,7 +1713,7 @@ class TwoYearLayout {
 }
 
 //Admission::Payment2012(); exit();
-//Admission::InviteNew(); exit();
+Admission::InviteNew(); exit();
 //Admission::ExistingFamilies(); exit();
 //Admission::AdultLanguage(); exit();
 

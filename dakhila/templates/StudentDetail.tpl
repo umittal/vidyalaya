@@ -105,7 +105,6 @@ dojo.require("dijit.Tooltip");
 		    r.set("value","Failed... " + error);		    
                 }
             };
-
             var deferred = dojo.xhrPost(xhrArgs);
 
         </script>
