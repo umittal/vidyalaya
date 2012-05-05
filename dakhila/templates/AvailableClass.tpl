@@ -59,7 +59,7 @@ dojo.require("dijit.Tooltip");
 
 
 <h3>Available classes</h3>
-<table id="maintable" cellspacing="0" class="tablesorter" width="400px">
+<table id="maintable" cellspacing="0" class="tablesorter" width="600px">
 
 
 <thead>
@@ -67,9 +67,9 @@ dojo.require("dijit.Tooltip");
 <th>Short</th>
 <th>Room</th>
 <th>Count</th>
-<th>Roster</th>
 <th>Capacity</th>
 <th>Free</th>
+<th>Teachers</th>
 </tr>
 </thead>
 
@@ -81,9 +81,9 @@ dojo.require("dijit.Tooltip");
 	<td align="right">{SHORT}</td>
 	<td class="ou" onclick="showRoomDetails({ROOMID})" onmouseover="this.style.cursor='pointer'" align="right">{ROOM}</td>
 	<td align="right">{COUNT}</td>
-	<td align="center">{ID}</td>
 	<td align="right">{CAPACITY}</td>
 	<td align="right">{FREE}</td>
+	<td>{TEACHERS}</td>
 </tr>
 <!-- END CLASS -->
 </tbody>

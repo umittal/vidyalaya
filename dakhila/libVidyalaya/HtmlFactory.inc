@@ -678,23 +678,16 @@ function DisplayAvailableClass($template, $year, $facility) {
 		$template->setVariable("DEPARTMENT", Department::NameFromId( $item->course->department));
 		$template->setVariable("ROOM", $item->room->roomNumber);
 		$template->setVariable("ROOMID", $item->room->id);
-		$template->setVariable("SHORT", $item->short());
+		$template->setVariable("SHORT", sprintf("<a href=\"$url?command=ClassRoster&classId=%s\">%s</a>", $item->id, $item->short()));
 		$template->setVariable("COUNT", $count);
+		$template->setVariable("TEACHERS", Teachers::TeacherListClassHtml($item->id));
 
-     		$template->setVariable("ID", $classLink);
+		//     		$template->setVariable("ID", $classLink);
 
 		$template->setVariable("CAPACITY", $item->room->capacity);
 		$template->setVariable("FREE", $item->room->capacity - $count);
 		 
 		$template->parseCurrentBlock();
-
-		//		$template->setVariable("LEVEL", $item->course->level);
-		//$template->setVariable("FULL", $item->course->full);
-		//		$template->setVariable("SECTION", $item->section);
-		//		$template->setVariable("YEAR", $item->year+2010);
-		//		$template->setVariable("START", $item->startTime);
-		//		$template->setVariable("END", $item->endTime);
-		
 
 	}
 }

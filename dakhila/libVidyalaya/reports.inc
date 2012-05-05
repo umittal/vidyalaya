@@ -327,8 +327,7 @@ class Reports {
   public static function lcmatrix($year) {
     $language = array(); $culture=array();
     foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year) as $item) {
-      $done[$item->student->id] = $item->student;
-      //      print "Printing Student " . $item->student->fullName() . "\n";
+      //      $done[$item->student->id] = $item->student;
       if ($item->class->course->department != Department::Culture) {
 	if (array_key_exists($item->student->id, $language) )
 	  print "oh oh , i am going to overwrite language for $item->student->id\n";
@@ -341,27 +340,37 @@ class Reports {
     }
 
     // Create LC map
-    $lcmap=array(); $ccarray=array();
+    $lcmap=array(); $ccarray=array(); $langarray=array();
     foreach ($culture as $studentId => $class) {
-      $ccarray[$class->short()] =1;
+      $ccarray[$class->short()] =$class->id;
       $key = $language[$studentId]->short() . ':' .$class->short();
+      $langarray[$language[$studentId]->short()] = $language[$studentId]->id;
       array_key_exists($key, $lcmap) ? $lcmap[$key]++ : $lcmap[$key]=1;
     }
+
+    $kg=0;
+    foreach ($language as $studentId => $class) {
+      if (array_key_exists($studentId, $culture)) continue;
+      if ($class->course->department == Department::Kindergarten) {
+	$kg++;
+	$kgclassid=$class->id;
+      } else {
+	print "Error- student $studentId is not in culture and not in kindergarten either, enrolled in $class->id\n";
+      }
+    }
+
     ksort($ccarray);
     $i=0;
 
     $html="<table id='table1' cellspacing='0' class='tablesorter'>\n";
     $html .= "<thead><tr><th>LANG</th>";
-    //    printf("%5s", "LANG"); 
     $vt=array();
     foreach ($ccarray as $key=>$item) {
       $vt[$i]=0;
       $ccarray[$key]=$i++; 
-      //      printf("%5s", $key);
-      $html .= "<th>$key</th>";
+      $html .= "<th><a href='/dakhila/php/dataViewer2.php?command=ClassRoster&classId=$item'>$key</a></th>";
     }
-    //    printf(" TOTAL\n"); 
-    $html .= "<th>Total</th></tr></thead>\n";
+    $html .= "<th>". count($ccarray) . "</th></tr></thead><tbody>\n";
     $vt[$i]=0;
 
     $lang2d=array();
@@ -373,33 +382,31 @@ class Reports {
       $total += $count;
     }
 
+    
     foreach($lang2d as $key=>$v1) {
-      //      printf ("%5s", $key); 
-      $html .= "<tr><td>$key</td>";
+      $langid = $langarray[$key];
+      $html .= "<tr><td><a href='/dakhila/php/dataViewer2.php?command=ClassRoster&classId=$langid'>$key</a></td>";
       $t =0;
       for ($i=0; $i< count($ccarray); $i++) {
 	if (isset($v1[$i])) {
-	  //	  printf ("%5s", $v1[$i]);
-	  $html .= "<td> $v1[$i]</td>";
+	  $html .= "<td style='padding-left: 15px; text-align: right;padding-top: 5px;'> $v1[$i]</td>";
 	  
 	  $t += $v1[$i]; $vt[$i]+=$v1[$i];
 	} else { 
-	  //	  printf ("%5s", "");
 	  $html .= "<td></td>";
 	}
       }
       $vt[$i]+=$t; 
-      //      printf ("%5d\n", $t); 
-      $html .= "<td>$t</td></tr>\n";
+      $html .= "<td style='padding-left: 15px; text-align: right;padding-top: 5px;font-weight:bold; background-color:grey;'>$t</td></tr>\n";
     }
-    //    print "TOTAL"; 
-    $html .= "<tr><td>Total</td>";
+    $html .= "</tbody><tfoot><tr><td>" . count($lang2d) ."</td>";
     foreach ($vt as $c) {
-      //      printf("%5d", $c);
-      $html .= "<td>$c</td>";
+      $html .= "<td style='padding-left: 15px; text-align: right;padding-top: 5px;font-weight:bold; background-color:grey;'>$c</td>";
     }
-    $html .= "</tr></table>\n";
-    //    print "\n$total\n";
+    $html .= "</tr></tfoot></table>\n";
+
+    $gt = $c+$kg;
+    $html .= "<p><a href='/dakhila/php/dataViewer2.php?command=ClassRoster&classId=$kgclassid'>KG</a> - $kg<br <br />Grand Total - $gt</p>\n";
     return $html;
   }
 
