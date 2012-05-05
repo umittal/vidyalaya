@@ -1,6 +1,3 @@
-        <style type="text/css">
-            .ou { font-style:oblique;text-decoration:underline; }
-        </style>
     <script>
          dojo.require("dijit.form.TextBox");    
 dojo.require("dijit.form.Form");
@@ -46,6 +43,10 @@ dojo.require("dijit.Tooltip");
 	Family ID: <input type="text" dojoType="dijit.form.TextBox" name="ID" id="familyId"> 
 	<input type="submit" name="go" value="GO"><br>
 	</form>
+
+<!-- BEGIN HIDDENFORMS -->
+{PERSONFORM}
+<!-- END HIDDENFORMS -->
 
 
 <h3>Class Roster</h3>

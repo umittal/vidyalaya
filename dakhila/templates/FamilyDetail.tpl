@@ -1,6 +1,3 @@
-        <style type="text/css">
-            .ou { font-style:oblique;text-decoration:underline; }
-        </style>
     <script>
          dojo.require("dijit.form.TextBox");    
 dojo.require("dijit.form.Form");

@@ -660,6 +660,11 @@ function DisplayCourseCatalog(&$template) {
 function DisplayAvailableClass($template, $year, $facility) {
 	$template->addBlockFile('RESULT', 'F_RESULT', 'AvailableClass.tpl');
 	$template->touchBlock('F_RESULT');
+
+	$templateName="HIDDENFORMS";
+	$template->setCurrentBlock($templateName);
+	$template->setVariable("PERSONFORM", file_get_contents("../html/PersonForm.inc"));
+	$template->parseCurrentBlock();
 	
 	$classCount = array();
 	foreach (Enrollment::GetAllEnrollmentForFacilitySession($facility, $year) as $item) {
@@ -699,6 +704,11 @@ function DisplayClassRoster($template, $classId) {
   $template->addBlockFile('RESULT', 'F_RESULT', 'ClassRoster.tpl');
   $template->touchBlock('F_RESULT');
 
+  $templateName="HIDDENFORMS";
+  $template->setCurrentBlock($templateName);
+  $template->setVariable("PERSONFORM", file_get_contents("../html/PersonForm.inc"));
+  $template->parseCurrentBlock();
+  
   $class = AvailableClass::GetItemById($classId);
   $template->setCurrentBlock("ROSTERHEAD");
   $template->setVariable("SESSION", $class->session);

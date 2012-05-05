@@ -1,8 +1,3 @@
-        <style type="text/css">
-            .ou { font-style:oblique;text-decoration:underline; }
-        </style>
-
-
 <script type="text/javascript">
 $(document).ready(function() {
     $table = $("#maintable")
@@ -66,7 +61,7 @@ function AddTeacher(classId) {
 	<input type="submit" name="go" value="GO"><br>
 	</form>
 
-<div dojoType="dijit.Dialog" id="formAddTeacher" title="Add Teacher for a class="display: none">
+<div dojoType="dijit.Dialog" id="formAddTeacher" title="Add Teacher for a class" style="display: none">
     <form dojoType="dijit.form.Form" id="AddForm" name="doineedit">
         <script type="dojo/event" event="onSubmit" args="e">
             dojo.stopEvent(e); // prevent the default submit
@@ -97,13 +92,16 @@ function AddTeacher(classId) {
             var deferred = dojo.xhrPost(xhrArgs);
 
         </script>
+
         <div class="dijitDialogPaneContentArea">
 	<label>email:</label> <div dojoType="dijit.form.ValidationTextBox" id="classId" disabled="disabled" style="width:50px" >nothing</div>
 	</div>
+
         <div class="dijitDialogPaneContentArea">
             <label for='email'>Email:</label>
             <div dojoType="dijit.form.ValidationTextBox" id="email" required="true"> </div>
         </div>
+
         <div class="dijitDialogPaneActionBar">
             <button dojoType="dijit.form.Button" type="submit">
                 Change
@@ -111,12 +109,16 @@ function AddTeacher(classId) {
             <button dojoType="dijit.form.Button" type="button" onClick="dijit.byId('formDialog2').hide();">
                 GO Back
             </button>
-        <div class="dijitDialogPaneContentArea">
-	<div dojoType="dijit.form.ValidationTextBox" id="response" disabled="disabled">nothing</div>
-	</div>
+	    <div class="dijitDialogPaneContentArea">
+	    <div dojoType="dijit.form.ValidationTextBox" id="response" disabled="disabled">nothing</div>
+	    </div>
         </div>
     </form>
 </div>
+
+<!-- BEGIN HIDDENFORMS -->
+{PERSONFORM}
+<!-- END HIDDENFORMS -->
 
 
 <h3>Available classes</h3>

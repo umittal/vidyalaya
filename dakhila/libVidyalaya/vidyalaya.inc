@@ -1890,7 +1890,8 @@ class Teachers {
  {
     $csv = array();
     foreach (self::TeacherListClass($classId) as $teacher) {
-      $csv[] = $teacher->IsLead ? "<b>" . $teacher->person->fullName() ."</b>"  :  $teacher->person->fullName();
+      $name = "<span class=\"ou\" onclick=\"showPersonDetails('" . $teacher->person->email . "')\">" .  $teacher->person->fullName() . "</span>";
+      $csv[] = $teacher->IsLead ? "<b> $name  </b>"  :  $name;
     }
     return implode(", ", $csv);
   }
