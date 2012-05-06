@@ -664,6 +664,7 @@ function DisplayAvailableClass($template, $year, $facility) {
 	$templateName="HIDDENFORMS";
 	$template->setCurrentBlock($templateName);
 	$template->setVariable("PERSONFORM", file_get_contents("../html/PersonForm.inc"));
+	$template->setVariable("ADDTEACHERDIALOG", file_get_contents("../html/addTeacherDialog.inc"));
 	$template->parseCurrentBlock();
 	
 	$classCount = array();
@@ -675,17 +676,32 @@ function DisplayAvailableClass($template, $year, $facility) {
 	foreach (AvailableClass::GetAllYear($year) as $item) {
 	  $count = empty($classCount[$item->id]) ? 0 :$classCount[$item->id];
 	  if ($count==0) continue;
-		$templateName="CLASS";
-		$template->setCurrentBlock($templateName);
+	  $templateName="CLASS";
+	  $template->setCurrentBlock($templateName);
+	  
+	  $url=$_SERVER['PHP_SELF'];
+	  $classLink=sprintf("<a href=\"$url?command=ClassRoster&classId=%s\">%s</a>", $item->id, $item->id);
+	  $template->setVariable("DEPARTMENT", Department::NameFromId( $item->course->department));
+	  $template->setVariable("ROOM", $item->room->roomNumber);
+	  $template->setVariable("ROOMID", $item->room->id);
+	  $short = $item->short();
+	  $template->setVariable("SHORT", sprintf("<a href=\"$url?command=ClassRoster&classId=%s\">%s</a>", $item->id, $short));
+	  $template->setVariable("COUNT", $count);
+	  
+	  $teachers = Teachers::TeacherListClassHtml($item->id);
+	  $addTeacherButton =  <<< BUTTONHERE
+	  <button data-dojo-type="dijit.form.Button" type="button">
+    <script type="dojo/method" event="onClick" args="evt">
+        // Do something:
+	    addTeacher($item->id, '$short' );
+    </script>
+    AddTeacher
+</button>
 
-		$url=$_SERVER['PHP_SELF'];
-		$classLink=sprintf("<a href=\"$url?command=ClassRoster&classId=%s\">%s</a>", $item->id, $item->id);
-		$template->setVariable("DEPARTMENT", Department::NameFromId( $item->course->department));
-		$template->setVariable("ROOM", $item->room->roomNumber);
-		$template->setVariable("ROOMID", $item->room->id);
-		$template->setVariable("SHORT", sprintf("<a href=\"$url?command=ClassRoster&classId=%s\">%s</a>", $item->id, $item->short()));
-		$template->setVariable("COUNT", $count);
-		$template->setVariable("TEACHERS", Teachers::TeacherListClassHtml($item->id));
+BUTTONHERE;
+	  if ($item->year == (Calendar::RegistrationYear() - 2010)) $teachers .= $addTeacherButton;
+	  $template->setVariable("TEACHERS", $teachers);
+
 
 		//     		$template->setVariable("ID", $classLink);
 

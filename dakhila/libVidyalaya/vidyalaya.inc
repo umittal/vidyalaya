@@ -1841,7 +1841,7 @@ class Teachers {
 
     $sql = "insert into teachers values ($classId, $mfs, $mfsid, $IsLead)";
     
-    $result = VidDb::query($sql);
+    return VidDb::query($sql);
   }
 
   private static function ArrayFromQuery($query) {

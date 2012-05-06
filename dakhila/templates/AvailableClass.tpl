@@ -30,6 +30,8 @@ $(document).ready(function() {
          dojo.require("dijit.form.TextBox");    
 dojo.require("dijit.form.Form");
 dojo.require("dijit.Tooltip");
+    dojo.require("dijit.form.Button");
+
 			// When the DOM and reources are ready....
 			dojo.ready(function(){
 				// Add tooltip of his picture
@@ -46,13 +48,7 @@ dojo.require("dijit.Tooltip");
 	if (form) {form.submit();} else {alert ("form not found");}
       }
 
-function AddTeacher(classId) {
-  var formDlg = dijit.byId("formAddTeacher");
-  a = dijit.byId("classId");
-  a.set("value", classId);
-  formDlg.show();
-}
-    </script>
+     </script>
 
 	<form method="post" action="/dakhila/php/dataViewer2.php?command=Room" style="display:none" id="RoomForm"
 	dojoType="dijit.form.Form"
@@ -61,63 +57,9 @@ function AddTeacher(classId) {
 	<input type="submit" name="go" value="GO"><br>
 	</form>
 
-<div dojoType="dijit.Dialog" id="formAddTeacher" title="Add Teacher for a class" style="display: none">
-    <form dojoType="dijit.form.Form" id="AddForm" name="doineedit">
-        <script type="dojo/event" event="onSubmit" args="e">
-            dojo.stopEvent(e); // prevent the default submit
-            if (!this.isValid()) {
-                window.alert('Please fix fields');
-                return;
-            }
-
-	a = dijit.byId("classId");
-	classId=a.value;
-	r = dijit.byId("response");
-	r.set("value"," Form being sent...");
-	    
-	    qObject = new Object();
-	    qObject.studentId = studentId;
-             var xhrArgs ={
-                  url: '/dakhila/php/dataserver.php?command=ChangeClass',
-		  postData:queryString,
-                load: function(data, ioArgs) {
-		    r.set("value","Success ..." + data);		    
-                },
-                error: function(error, ioArgs) {
-                    //We'll 404 in the demo, but that's okay.  We don't have a 'postIt' service on the
-                    //docs server.
-		    r.set("value","Failed... " + error);		    
-                }
-            };
-            var deferred = dojo.xhrPost(xhrArgs);
-
-        </script>
-
-        <div class="dijitDialogPaneContentArea">
-	<label>email:</label> <div dojoType="dijit.form.ValidationTextBox" id="classId" disabled="disabled" style="width:50px" >nothing</div>
-	</div>
-
-        <div class="dijitDialogPaneContentArea">
-            <label for='email'>Email:</label>
-            <div dojoType="dijit.form.ValidationTextBox" id="email" required="true"> </div>
-        </div>
-
-        <div class="dijitDialogPaneActionBar">
-            <button dojoType="dijit.form.Button" type="submit">
-                Change
-            </button>
-            <button dojoType="dijit.form.Button" type="button" onClick="dijit.byId('formDialog2').hide();">
-                GO Back
-            </button>
-	    <div class="dijitDialogPaneContentArea">
-	    <div dojoType="dijit.form.ValidationTextBox" id="response" disabled="disabled">nothing</div>
-	    </div>
-        </div>
-    </form>
-</div>
-
 <!-- BEGIN HIDDENFORMS -->
 {PERSONFORM}
+{ADDTEACHERDIALOG}
 <!-- END HIDDENFORMS -->
 
 

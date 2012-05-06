@@ -28,6 +28,9 @@ case "InsertClass":
 case "InsertChild":
   DataInsert::InsertChild();
   break;
+case "AddTeacher":
+  DataInsert::AddTeacher();
+  break;
 default:
 
   break;
@@ -131,6 +134,21 @@ class DataInsert {
     $id = mysql_insert_id();
     header("HTTP/1.0 200 ");
     print "$id";
+  }
+
+  public static function AddTeacher() {
+      $classId = isset($_POST['classId']) ?  $_POST['classId'] : null;
+      $isLead = isset($_POST['isLead']) ?  $_POST['isLead'] : 0;
+      $email = isset($_POST['email']) ?  $_POST['email'] : null;
+
+      $result = Teachers::AddTeacher($classId, $email, $isLead);
+    if ($result == FALSE) {
+      header("HTTP/1.0 200 ");
+      print "Error insert failed, " . mysql_error();
+      return;
+    }
+    header("HTTP/1.0 200 ");
+    print "ok";
   }
 
 
