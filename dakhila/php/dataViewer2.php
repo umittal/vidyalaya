@@ -435,6 +435,40 @@ EOT;
       print $this->template->get();
       break;
 
+    // ************************************************************
+    case "WaitlistStudents":
+      $this->template->addBlockFile('RESULT', 'F_RESULT', 'WaitlistStudents.tpl');
+      $this->template->touchBlock('F_RESULT');
+
+      $count=0;
+      foreach (FamilyTracker::GetAll() as $tracker) {
+	$family = Family::GetItemById($tracker->family);
+	if ($tracker->previousYear == EnumFamilyTracker::registered) continue;
+	if ($tracker->previousYear != EnumFamilyTracker::waitlist) die("famiy $family->id is neither registered nor waitlist");
+	if (!($tracker->currentYear == EnumFamilyTracker::registered || 
+	      $tracker->currentYear == EnumFamilyTracker::pendingRegistration || 
+	      $tracker->currentYear == EnumFamilyTracker::pendingInvitation )) continue;
+
+
+	foreach ($family->EligibleChildren() as $child) {
+	  $this->template->setCurrentBlock("WAITLIST");
+	  $this->template->setVariable("ID",$child->id);
+	  $this->template->setVariable("LANGUAGE",$child->LanguageInterest());
+	  $this->template->setVariable("FIRST",$child->firstName);
+	  $this->template->setVariable("LAST",$child->lastName);
+	  $this->template->setVariable("PARENTS",$family->parentsName());
+	  $this->template->setVariable("STATUS",EnumFamilyTracker::NameFromId($tracker->currentYear));
+	  $this->template->parseCurrentBlock();
+	  $count++;
+	}
+      }
+      
+      $this->template->setCurrentBlock("COUNT");
+      $this->template->setVariable("COUNT",$count);
+      $this->template->parseCurrentBlock();
+      
+      print $this->template->get();
+      break;
 
     // ************************************************************
     case "AvailableCourse":

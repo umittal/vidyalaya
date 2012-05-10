@@ -25,6 +25,9 @@
             <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=FamilyTracker"'>
                 Family Tracker
             </div>
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=WaitlistStudents"'>
+                Waitlist
+            </div>
         </div>
     </div>
     <div dojoType="dijit.PopupMenuBarItem">
