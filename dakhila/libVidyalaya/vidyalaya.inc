@@ -162,9 +162,25 @@ class Student {
     return self::$objArray[$key];
   }
 
+  private static function ArrayFromQuery($query) {
+    $students = Array();
+    
+    $result = VidDb::query($query);
+    while ($row = mysql_fetch_alias_array($result)) {
+      $students[] = new self($row);
+    }
+    return $students;
+  }
+  
   private static function firstTimeCall() {
   	if (!empty(self::$objArray)) return;
   	GetAllData();
+  }
+
+  public static function FindStudentsForKey($phone) {
+    $query = "select * from Students2003 where EmergencyContact = '$phone' or PrimaryDoctor = '$phone'
+              or Dentist = '$phone' or Hospital = '$phone'";
+    return self::ArrayFromQuery($query);
   }
 
   public static function GetItemById($key) {
@@ -2225,6 +2241,7 @@ class FamilyTracker {
 	public $previousYear = null;
 	public $currentYear =null;
 	public $tuition =null;
+	public $registrationDate =null;
 
 	public static $objArray = Array ();
 	public static $students = Array ();
@@ -2302,6 +2319,7 @@ class FamilyTracker {
 		$this->previousYear= $row["FamilyTracker.previousYear"];
 		$this->currentYear = $row["FamilyTracker.currentYear"];
 		$this->tuition = $row["FamilyTracker.tuition"];
+		$this->registrationDate = $row["FamilyTracker.registrationDate"];
 	}
 
 
@@ -2608,16 +2626,6 @@ function GetAllData() {
 			print "Big Data Looup";
 			break;
 	}
-
-	//	$hostname = "vidyalaya.db.4718809.hostedresource.com";
-	//	$databasename = "vidyalaya";
-	//	$username = "vidyalaya";
-	//	$password = "Praveen38";
-	//	if (!$connection = @ mysql_connect($hostname, $username, $password))
-	//	die("Cannot connect using hostname=$hostname, user=$username, password=$password\n");
-	//	if (!mysql_selectdb($databasename, $connection))
-	//	showerror();
-
 
 	$dictStudents = CreateDictionary();
 

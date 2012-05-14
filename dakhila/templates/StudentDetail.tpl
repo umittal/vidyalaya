@@ -221,6 +221,7 @@ dojo.require("dijit.Tooltip");
 <h3>Student Details</h3>
 <ol>
 
+<table><tr><td>
 <li class="section">Student</li>
 
 <table class="tablesorter">
@@ -237,6 +238,22 @@ dojo.require("dijit.Tooltip");
 <!-- END STUDENT -->
 </table>
 
+</td><td>
+
+<li class="section">Contacts</li>
+<!-- BEGIN CHANGEBUTTON -->
+{CHANGECONTACT}
+<!-- END CHANGEBUTTON -->
+
+<table class="tablesorter">
+<thead>
+<tr><th>Type</th><th>Phone</th><th>Name</th><th>Address</th><th>Email</th><th>URL</th></tr>
+</thead>
+<!-- BEGIN OTHERCONTACT -->
+<tr><td>{TYPE}</td><td>{PHONE}</td><td>{NAME}</td><td>{ADDR}</td><td>{EMAIL}</td><td>{URL}</td></tr>
+<!-- END OTHERCONTACT -->
+</table>
+</td></tr></table>
 
 <li class="section">Parents</li>
 
@@ -270,20 +287,6 @@ dojo.require("dijit.Tooltip");
 </tbody>
 </table>
 
-<li class="section">Contacts</li>
-<!-- BEGIN CHANGEBUTTON -->
-{CHANGECONTACT}
-
-<!-- END CHANGEBUTTON -->
-
-<table class="tablesorter">
-<thead>
-<tr><th>Type</th><th>Phone</th><th>Name</th><th>Address</th><th>Email</th><th>URL</th></tr>
-</thead>
-<!-- BEGIN OTHERCONTACT -->
-<tr><td>{TYPE}</td><td>{PHONE}</td><td>{NAME}</td><td>{ADDR}</td><td>{EMAIL}</td><td>{URL}</td></tr>
-<!-- END OTHERCONTACT -->
-</table>
 
 </ol>
 

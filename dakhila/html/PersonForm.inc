@@ -7,6 +7,7 @@ function showPersonDetails(emailzigzag) {
   if (form) {form.submit();} else {alert ("form not found");}
 }
 </script>
+
 <form method="post" action="/dakhila/php/dataViewer2.php?command=person" style="display:none" id="PersonForm" dojoType="dijit.form.Form">
 
   <input type="text" dojoType="dijit.form.TextBox" name="email" id="emailzigzag"> 

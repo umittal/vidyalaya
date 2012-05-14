@@ -53,6 +53,9 @@
             <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=AvailableCourse"'>
                 Classes
             </div>
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=OtherContacts"'>
+                Contacts
+            </div>
             <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=Registration"'>
                 Registration Form
             </div>
@@ -71,6 +74,9 @@
             </div>
             <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=newClass"'>
                 Class
+            </div>
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=newRegistration"'>
+                Registration
             </div>
         </div>
     </div>

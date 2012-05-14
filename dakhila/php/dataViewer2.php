@@ -169,6 +169,27 @@ class DataViewer {
       print $this->template->get();
       break;
 
+    case "newRegistration":
+      $url = htmlentities($_SERVER['PHP_SELF']) . "?command=newRegistration";
+      $this->template->setCurrentBlock('QUERY');
+      $html = str_replace("URL", $url, file_get_contents("../html/formNewRegistration.inc"));
+      $this->template->setVariable("QUERY", $html);
+      $this->template->parseCurrentBlock();
+
+      $html="";
+      $this->template->setCurrentBlock('RESULT');
+      if($_POST['update']) $html = "<p>update</p>";
+      if($_POST['register']) $html = "<p>register</p>";
+      $this->template->setVariable("RESULT", $html);
+      $this->template->parseCurrentBlock();
+
+
+      $this->template->addBlockFile('BOTTOM', 'F_BOTTOM', 'LayoutBottom.tpl');
+      $this->template->touchBlock('F_BOTTOM');
+      
+      print $this->template->get();
+      break;
+
     // ************************************************************
     case "newClass":
       $this->template->setCurrentBlock('RESULT');
@@ -199,12 +220,65 @@ EOT;
       $this->template->parseCurrentBlock();
 
 
-      //      if(isset($_POST['submit'])) {
+      //      if(isset($_POST['omsubmit'])) {
 	if (isset($familyId)) {
 	    $family = Family::GetItemById($familyId);
 	    DisplayFamilyV3($this->template, $family);
 	  }
 	//      }
+      print $this->template->get();
+      break;
+
+    // ************************************************************
+    case "OtherContacts":
+      $url = htmlentities($_SERVER['PHP_SELF']) . "?command=OtherContacts";
+      $phone = isset($_POST['phone']) ?  $_POST['phone'] : null;
+
+      $form = <<<EOT
+<script>
+  dojo.require("dijit.form.Button"); 
+</script>
+        <form  dojoType="dijit.form.Form" id="phonesearch" name="phonesearch" method="post" action="$url">
+   <script type="dojo/method" data-dojo-event="onReset">
+        return confirm('Press OK to reset widget values');
+    </script>
+
+    <script type="dojo/method" data-dojo-event="onSubmit">
+        if(this.validate()){
+            return confirm('Form is valid, press OK to submit');
+        }else{
+            alert('Form contains invalid data.  Please correct first');
+            return false;
+        }
+        return true;
+    </script>
+	Phone number:     <input type="text" id="phone" name="phone"
+    dojoType="dijit.form.ValidationTextBox"
+    promptMessage="Enter Contact  Phone(xxx-xxx-xxxx)." 
+    size="12"
+    maxLength="12"
+	value="$phone"
+    style="width: 120px;" 
+    required="true"
+     regExp="^[0-9]\d{2}-\d{3}-\d{4}$"
+    invalidmessage="Telephone number format: xxx-xxx-xxxx"
+    />
+
+<button dojoType="dijit.form.Button" type="submit" >Search</button>
+</form>
+
+EOT;
+      $this->template->setCurrentBlock('QUERY');
+      $this->template->setVariable('QUERY', $form);
+      $this->template->parseCurrentBlock();
+
+      if (isset($phone)) {
+	$phone = preg_replace('/[^0-9]/', '', $phone);
+	//	print "<p>looking up $phone</p>\n";
+	$contact = OtherContacts::ObjectFromKey($phone);
+	DisplayContact($this->template, $contact);
+      }
+      //      }
       print $this->template->get();
       break;
 
@@ -439,6 +513,10 @@ EOT;
     case "WaitlistStudents":
       $this->template->addBlockFile('RESULT', 'F_RESULT', 'WaitlistStudents.tpl');
       $this->template->touchBlock('F_RESULT');
+
+	  $this->template->setCurrentBlock("HIDDENFORMS");
+	  $this->template->setVariable("STUDENTFORM", file_get_contents("../html/StudentForm.inc"));
+	  $this->template->parseCurrentBlock();
 
       $count=0;
       foreach (FamilyTracker::GetAll() as $tracker) {

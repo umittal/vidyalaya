@@ -35,7 +35,7 @@ $(document).ready(function() {
 <tbody>
 <!-- BEGIN WAITLIST -->
 <tr>
-<td>{ID}</td>
+<td class="ou" onclick="showStudentDetails({ID})" onmouseover="this.style.cursor='pointer'">{ID}</td>
 <td>{LANGUAGE}</td>
 <td>{FIRST}</td>
 <td>{LAST}</td>

@@ -539,6 +539,51 @@ function DisplayStudent(&$template, $student) {
 	DisplayStudentTemplate($template, $student);
 }
 
+function DisplayContactStudent(&$template, $student, $type) {
+  $templateName="STUDENTS";
+  $template->setCurrentBlock($templateName);
+  $template->setVariable("TYPE",  $type);
+  $template->setVariable("ID",  $student->id);
+  $template->setVariable("NAME",  $student->fullName());
+  $template->setVariable("PARENTS", $student->parentsName() );
+  $template->setVariable("ENROLLED", "" );
+  $template->parseCurrentBlock();
+}
+
+// ******** Other Contacts
+function DisplayContact(&$template, $contact) {
+  if ($contact == null) return;
+  $template->addBlockFile('RESULT', 'F_RESULT', 'OtherContact.tpl');
+  $template->touchBlock('F_RESULT');
+
+  $templateName="OTHERCONTACT";
+  $template->setCurrentBlock($templateName);
+  $template->setVariable("PHONE",  formatPhone($contact->phone));
+  $template->setVariable("NAME",  $contact->name);
+  $address = $contact->addr1;
+  if ($contact->addr2 != null) $addres .= "<br /> $contact->addr2";
+  if ($contact->zip != null) {
+    $zip = Zipcodes::ObjectFromKey($contact->zip);
+    $address .= "<br /> $zip->city $zip->state, $zip->zipcodes";
+  }
+  $template->setVariable("ADDR",  $address);
+
+  $template->setVariable("EMAIL",  $contact->email);
+  if (!empty($contact->url)) {
+    $url = "<a href='$contact->url' target='_blank'>url</a>";
+    $template->setVariable("URL",  $url);
+  }
+  $template->parseCurrentBlock();
+
+  foreach (Student::FindStudentsForKey($contact->phone) as $student) {
+    if ($student->contacts["Emergency"] == $contact->phone) DisplayContactStudent($template, $student, "Emergency");
+    if ($student->contacts["Primary"] == $contact->phone) DisplayContactStudent($template, $student, "Primary");
+    if ($student->contacts["Dentist"] == $contact->phone) DisplayContactStudent($template, $student, "Dentist");
+    if ($student->contacts["Hospital"] == $contact->phone) DisplayContactStudent($template, $student, "Hospital");
+  }
+
+}
+
 
 // ******** Registration Form
 function DisplayRegistrationTemplate (&$template, $family) {
