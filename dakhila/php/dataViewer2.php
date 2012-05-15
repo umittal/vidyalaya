@@ -514,9 +514,9 @@ EOT;
       $this->template->addBlockFile('RESULT', 'F_RESULT', 'WaitlistStudents.tpl');
       $this->template->touchBlock('F_RESULT');
 
-	  $this->template->setCurrentBlock("HIDDENFORMS");
-	  $this->template->setVariable("STUDENTFORM", file_get_contents("../html/StudentForm.inc"));
-	  $this->template->parseCurrentBlock();
+      $this->template->setCurrentBlock("HIDDENFORMS");
+      $this->template->setVariable("STUDENTFORM", file_get_contents("../html/StudentForm.inc"));
+      $this->template->parseCurrentBlock();
 
       $count=0;
       foreach (FamilyTracker::GetAll() as $tracker) {

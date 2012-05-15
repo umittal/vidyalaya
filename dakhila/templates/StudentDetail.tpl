@@ -247,10 +247,10 @@ dojo.require("dijit.Tooltip");
 
 <table class="tablesorter">
 <thead>
-<tr><th>Type</th><th>Phone</th><th>Name</th><th>Address</th><th>Email</th><th>URL</th></tr>
+<tr><th>Type</th><th>Phone</th><th>Name</th></tr>
 </thead>
 <!-- BEGIN OTHERCONTACT -->
-<tr><td>{TYPE}</td><td>{PHONE}</td><td>{NAME}</td><td>{ADDR}</td><td>{EMAIL}</td><td>{URL}</td></tr>
+<tr><td>{TYPE}</td><td class="ou" onclick="showContactDetails('{PHONE}')" onmouseover="this.style.cursor='pointer'">{PHONE}</td><td>{NAME}</td></tr>
 <!-- END OTHERCONTACT -->
 </table>
 </td></tr></table>
@@ -290,3 +290,6 @@ dojo.require("dijit.Tooltip");
 
 </ol>
 
+<!-- BEGIN HIDDENFORMS -->
+{CONTACTFORM}
+<!-- END HIDDENFORMS -->

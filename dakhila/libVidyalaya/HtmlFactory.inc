@@ -420,18 +420,19 @@ function DisplayStudentTemplate (&$template, $student) {
 	    $contact = OtherContacts::ObjectFromKey($phone);
 	    $template->setVariable("PHONE",  formatPhone($phone));
 	    $template->setVariable("NAME",  $contact->name);
+
 	    $address = $contact->addr1;
 	    if ($contact->addr2 != null) $addres .= "<br /> $contact->addr2";
 	    if ($contact->zip != null) {
 	      $zip = Zipcodes::ObjectFromKey($contact->zip);
 	      $address .= "<br /> $zip->city $zip->state, $zip->zipcodes";
 	    }
-	    $template->setVariable("ADDR",  $address);
+	    //	    $template->setVariable("ADDR",  $address);
 
-	    $template->setVariable("EMAIL",  $contact->email);
+	    //	    $template->setVariable("EMAIL",  $contact->email);
 	    if (!empty($contact->url)) {
 	      $url = "<a href='$contact->url' target='_blank'>url</a>";
-	      $template->setVariable("URL",  $url);
+	      //	      $template->setVariable("URL",  $url);
 	    }
 	  }
 	  $template->parseCurrentBlock();
@@ -536,6 +537,11 @@ function DisplayStudent(&$template, $student) {
   if ($student == null) return;
 	$template->addBlockFile('RESULT', 'F_RESULT', 'StudentDetail.tpl');
 	$template->touchBlock('F_RESULT');
+
+  $template->setCurrentBlock("HIDDENFORMS");
+  $template->setVariable("CONTACTFORM", file_get_contents("../html/ContactForm.inc"));
+  $template->parseCurrentBlock();
+  
 	DisplayStudentTemplate($template, $student);
 }
 
@@ -556,12 +562,16 @@ function DisplayContact(&$template, $contact) {
   $template->addBlockFile('RESULT', 'F_RESULT', 'OtherContact.tpl');
   $template->touchBlock('F_RESULT');
 
+  $template->setCurrentBlock("HIDDENFORMS");
+  $template->setVariable("STUDENTFORM", file_get_contents("../html/StudentForm.inc"));
+  $template->parseCurrentBlock();
+  
   $templateName="OTHERCONTACT";
   $template->setCurrentBlock($templateName);
   $template->setVariable("PHONE",  formatPhone($contact->phone));
   $template->setVariable("NAME",  $contact->name);
   $address = $contact->addr1;
-  if ($contact->addr2 != null) $addres .= "<br /> $contact->addr2";
+  if ($contact->addr2 != null) $address .= "<br /> $contact->addr2";
   if ($contact->zip != null) {
     $zip = Zipcodes::ObjectFromKey($contact->zip);
     $address .= "<br /> $zip->city $zip->state, $zip->zipcodes";
