@@ -7,6 +7,9 @@
 <tr><td>{PHONE}</td><td>{NAME}</td><td>{ADDR}</td><td>{EMAIL}</td><td>{URL}</td></tr>
 <!-- END OTHERCONTACT -->
 </table>
+<!-- BEGIN EDITBUTTON -->
+{EDITCONTACT}
+<!-- END EDITBUTTON -->
 
 <h3>Students</h3>
 <table class="tablesorter">
@@ -20,4 +23,5 @@
 
 <!-- BEGIN HIDDENFORMS -->
 {STUDENTFORM}
+{EDITFORM}
 <!-- END HIDDENFORMS -->

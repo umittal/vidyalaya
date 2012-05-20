@@ -564,6 +564,7 @@ function DisplayContact(&$template, $contact) {
 
   $template->setCurrentBlock("HIDDENFORMS");
   $template->setVariable("STUDENTFORM", file_get_contents("../html/StudentForm.inc"));
+  $template->setVariable("EDITFORM", file_get_contents("../html/editContact.inc"));
   $template->parseCurrentBlock();
   
   $templateName="OTHERCONTACT";
@@ -584,6 +585,25 @@ function DisplayContact(&$template, $contact) {
     $template->setVariable("URL",  $url);
   }
   $template->parseCurrentBlock();
+
+  $fakemail =empty($contact->email) ? "ignore@me.com" : $contact->email;
+  $fakeurl =empty($contact->url) ? "http://ignoreme.com" : $contact->url;
+
+	$change =  <<< BUTTONHERE2
+	  <button data-dojo-type="dijit.form.Button" type="button">
+    <script type="dojo/method" event="onClick" args="evt">
+        // Do something:
+	  editContact('$contact->phone', '$contact->name', '$contact->addr1', '$contact->addr2', '$contact->zip', '$fakemail', '$fakeurl');
+    </script>
+    Edit
+</button>
+
+BUTTONHERE2;
+	$templateName="EDITBUTTON";
+	$template->setCurrentBlock($templateName);
+	$template->setVariable("EDITCONTACT",  $change);
+	$template->parseCurrentBlock();
+
 
   foreach (Student::FindStudentsForKey($contact->phone) as $student) {
     if ($student->contacts["Emergency"] == $contact->phone) DisplayContactStudent($template, $student, "Emergency");

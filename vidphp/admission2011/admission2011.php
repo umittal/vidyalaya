@@ -1291,17 +1291,18 @@ AGREEMENT;
     $mail->Subject = $subject;
 
     // attachments
-    $customizedPdf = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission/pdf/Family-". $family->id . ".pdf";
+    //    $customizedPdf = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission/pdf/Family-". $family->id . ".pdf";
     //    $mail->AddAttachment("$customizedPdf"); // attachment
     //   $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Management/Admission/Volunteer2011.pdf"); // attachment
     //   $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Management/Admission/ParticipationAgreement.pdf"); // attachment
   
-    print "Family id: $family->id, Name: " . $family->parentsName() . "\n";
+    print "Family id: $family->id, Name: " . $family->parentsName() . " $subject\n";
 
     $salutation = "<p>Dear " . $family->parentsName() . ",";
-    $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/reminder-existing-2.html");
+    $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/reminder-all.html");
     $mail->AltBody = "Family: $family->id"; //Text Body
 
+    //    return;
     if(!$mail->Send()) {
       echo "Mailer Error: " . $mail->ErrorInfo . "\n";
     }  else {
@@ -1313,13 +1314,13 @@ AGREEMENT;
   public static function ExistingFamilies() {
     $i=1;
     foreach (FamilyTracker::GetAll() as $tracker) {
-      if ($tracker->family != 482) continue;
-      if ($tracker->previousYear != EnumFamilyTracker::registered) continue;
+      if ($tracker->family <  461) continue;
+      //      if ($tracker->previousYear != EnumFamilyTracker::registered) continue;
       if ($tracker->currentYear != EnumFamilyTracker::pendingRegistration) continue;
       print $tracker->family . ", previous: " . EnumFamilyTracker::NameFromId($tracker->previousYear) . ", current: " 
 	. EnumFamilyTracker::NameFromId($tracker->currentYear) . "\n";
       $family = Family::GetItemById($tracker->family);
-      print "$i. Family id: $family->id, Name: " . $family->parentsName() . "\n";
+      print "-->$i. Family id: $family->id, Name: " . $family->parentsName() . "\n";
       $i++;
       self::AnnounceExisting($family);
       
@@ -1714,7 +1715,7 @@ class TwoYearLayout {
 
 //Admission::Payment2012(); exit();
 //Admission::InviteNew(); exit();
-//Admission::ExistingFamilies(); exit();
+Admission::ExistingFamilies(); exit();
 //Admission::AdultLanguage(); exit();
 
 //Teachers::AddTeacher(79, "hetalapurva@gmail.com", 0) ; exit();
@@ -1736,7 +1737,7 @@ class TwoYearLayout {
 
 //FamilyTracker::loadPayments();exit();
 //FamilyTracker::UpdateFamilyTracker(); exit();
- TwoYearLayout::assignClass(); exit();
+// TwoYearLayout::assignClass(); exit();
 ///TwoYearLayout::checkFeePaid(); exit();
 //TwoYearLayout::twoYearCsv(); exit();
 //Admission::Validation(2011); exit();

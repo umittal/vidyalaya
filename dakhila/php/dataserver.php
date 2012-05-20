@@ -26,6 +26,9 @@ case "ChangeClass":
 case "UpdateContacts":
   Dataserver::UpdateContacts();
   break;
+case "UpdateContactDetail":
+  Dataserver::UpdateContactDetail();
+  break;
 case "TrackerChange":
   Dataserver::TrackerChange();
   break;
@@ -125,6 +128,57 @@ class Dataserver {
     print "$rowcount row  updated";
   }
 
+  public static function UpdateContactDetail() {
+    $values = array();
+    foreach ($_POST as $key => $value) {
+      $value = trim($value);
+      if (empty($value)) continue;
+      switch($key) {
+      case "phone":
+	$phone = $value;
+	break;
+      case "name":
+	$values[] = "name = '$value'";
+	break;
+      case "addr1":
+	$values[] = "addr1 = '$value'";
+	break;
+      case "addr2":
+	$values[] = "addr2 = '$value'";
+	break;
+      case "zip":
+	$values[] = "zip = '$value'";
+	break;
+      case "email":
+	$value = preg_replace('/ignore@me.com/', '', $value);
+	$values[] = "email = '$value'";
+	break;
+      case "url":
+	$value = preg_replace('#http://ignoreme.com#', '', $value);
+	$values[] = "url = '$value'";
+	break;
+      default:
+	self::error("Did not expect Key $key");
+      }
+    }
+    if (empty($values)) {
+      self::error("No Values Found");
+    }
+
+    $sql = "update OtherContacts Set " . implode(",", $values) . " where phone='$phone'";
+    print $sql;
+    $result = VidDb::query($sql);
+    if ($result == FALSE) {
+      header("HTTP/1.0 200 ");
+      print "Error insert failed, " . mysql_error();
+      return;
+    }
+    header("HTTP/1.0 200 ");
+    print "Phone $phone updated sucessfully";
+
+  }
+
+
   public static function UpdateContacts() {
     $studentId = $_POST["studentId"];
     $emergency = preg_replace('/[^0-9]/', '', $_POST["emergency"]);
@@ -167,9 +221,9 @@ class Dataserver {
   }
 
   public static function InsertFamily() {
-      self::error("I am loser");
     $values = array();
     foreach ($_POST as $key => $value) {
+      $value = trim($value);
       if (empty($value)) continue;
       switch($key) {
       case "homePhone":
