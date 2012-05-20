@@ -1715,7 +1715,7 @@ class TwoYearLayout {
 
 //Admission::Payment2012(); exit();
 //Admission::InviteNew(); exit();
-Admission::ExistingFamilies(); exit();
+//Admission::ExistingFamilies(); exit();
 //Admission::AdultLanguage(); exit();
 
 //Teachers::AddTeacher(79, "hetalapurva@gmail.com", 0) ; exit();
@@ -1737,7 +1737,7 @@ Admission::ExistingFamilies(); exit();
 
 //FamilyTracker::loadPayments();exit();
 //FamilyTracker::UpdateFamilyTracker(); exit();
-// TwoYearLayout::assignClass(); exit();
+TwoYearLayout::assignClass(); exit();
 ///TwoYearLayout::checkFeePaid(); exit();
 //TwoYearLayout::twoYearCsv(); exit();
 //Admission::Validation(2011); exit();

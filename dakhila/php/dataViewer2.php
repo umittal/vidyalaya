@@ -230,6 +230,51 @@ EOT;
       break;
 
     // ************************************************************
+    case "OtherContactsList":
+      $url = htmlentities($_SERVER['PHP_SELF']) . "?command=OtherContactsList";
+      $this->template->addBlockFile('RESULT', 'F_RESULT', 'OtherContactList.tpl');
+      $this->template->touchBlock('F_RESULT');
+      $this->template->setCurrentBlock("HIDDENFORMS");
+      $this->template->setVariable("CONTACTFORM", file_get_contents("../html/ContactForm.inc"));
+      $this->template->parseCurrentBlock();
+  
+      
+      $templateName="CONTACTS";
+
+      $query ="SELECT 
+  phone,
+  OtherContacts.`name`,
+  COUNT(DISTINCT ID) 
+FROM
+  OtherContacts 
+  LEFT OUTER JOIN `Students2003` 
+    ON (
+      phone = Students2003.`EmergencyContact` 
+      OR phone = Students2003.`Hospital` 
+      OR phone = `Students2003`.`Dentist` 
+      OR phone = Students2003.`PrimaryDoctor`
+    ) 
+
+GROUP BY phone,
+  OtherContacts.`name` 
+  ORDER BY COUNT(DISTINCT id) DESC";
+
+      $result = VidDb::query($query);
+      while ($row = mysql_fetch_array($result)) {
+	$phone = $row[0];
+	$name = $row[1];
+	$count = $row[2];
+	$this->template->setCurrentBlock($templateName);
+	$this->template->setVariable("PHONE", formatPhone($phone));
+	$this->template->setVariable("NAME", $name);
+	$this->template->setVariable("COUNT", $count);
+	$this->template->parseCurrentBlock();
+      }
+      
+      print $this->template->get();
+      break;
+	
+    // ************************************************************
     case "OtherContacts":
       $url = htmlentities($_SERVER['PHP_SELF']) . "?command=OtherContacts";
       $phone = isset($_POST['phone']) ?  $_POST['phone'] : null;
