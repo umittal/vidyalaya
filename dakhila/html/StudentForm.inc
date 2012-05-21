@@ -9,7 +9,7 @@
 
 
 <form method="post" action="/dakhila/php/dataViewer2.php?command=Student" style="display:none" id="studentForm" dojoType="dijit.form.Form">
-   Student ID: <input type="text" dojoType="dijit.form.TextBox" name="ID" id="studentId"> 
+         Student ID: <input type="text" dojoType="dijit.form.TextBox" name="ID"  id="studentId"> 
    <input type="submit" name="go" value="GO"><br>
 </form>
 

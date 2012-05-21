@@ -1,4 +1,5 @@
 <h3>Contact Detail</h3>
+
 <table class="tablesorter">
 <thead>
 <tr><th>Phone</th><th>Name</th><th>Address</th><th>Email</th><th>URL</th></tr>

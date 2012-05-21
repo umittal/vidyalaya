@@ -283,6 +283,7 @@ GROUP BY phone,
 <script>
   dojo.require("dijit.form.Button"); 
 </script>
+<a href="/dakhila/php/dataViewer2.php?command=OtherContactsList">Contact List</a>
         <form  dojoType="dijit.form.Form" id="phonesearch" name="phonesearch" method="post" action="$url">
    <script type="dojo/method" data-dojo-event="onReset">
         return confirm('Press OK to reset widget values');

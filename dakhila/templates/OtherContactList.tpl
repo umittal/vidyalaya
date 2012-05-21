@@ -35,7 +35,7 @@ $(document).ready(function() {
 		<img src="/dakhila/icons/prev.png" class="prev"/>
 		<input type="text" class="pagedisplay"/>
 		<img src="/dakhila/icons/next.png" class="next"/>
-		<img src="/dakhila/pager/icons/last.png" class="last"/>
+		<img src="/dakhila/icons/last.png" class="last"/>
 		<select class="pagesize">
 			<option selected="selected"  value="10">10</option>
 			<option value="20">20</option>
