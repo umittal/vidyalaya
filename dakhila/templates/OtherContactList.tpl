@@ -31,11 +31,11 @@ $(document).ready(function() {
 
 <div id="pager" class="pager">
 	<form>
-		<img src="../addons/pager/icons/first.png" class="first"/>
-		<img src="../addons/pager/icons/prev.png" class="prev"/>
+		<img src="/dakhila/icons/first.png" class="first"/>
+		<img src="/dakhila/icons/prev.png" class="prev"/>
 		<input type="text" class="pagedisplay"/>
-		<img src="../addons/pager/icons/next.png" class="next"/>
-		<img src="../addons/pager/icons/last.png" class="last"/>
+		<img src="/dakhila/icons/next.png" class="next"/>
+		<img src="/dakhila/pager/icons/last.png" class="last"/>
 		<select class="pagesize">
 			<option selected="selected"  value="10">10</option>
 			<option value="20">20</option>
