@@ -78,6 +78,9 @@
             <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=newRegistration"'>
                 Registration
             </div>
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=newEvent"'>
+                Event
+            </div>
         </div>
     </div>
 

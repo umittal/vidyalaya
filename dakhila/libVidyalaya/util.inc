@@ -84,6 +84,15 @@ function GetSingleIntArgument() {
 
 }
 
+function formatTime($timestring) {
+  list ($h, $m, $s) = explode(":", $timestring);
+  $ampm = "AM";
+  $ampm = $h > 12 ? "PM" : "AM";
+  $hh = $h > 12 ? $h - 12 : $h;
+  return "$hh:$m $ampm";
+}
+
+
 function formatPhone($num) 
 { 
 #    $num = ereg_replace('[^0-9]', '', $num); 

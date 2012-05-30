@@ -173,7 +173,7 @@ var deferred = dojo.xhrPost(xhrArgs);
 	</tr>
 
   <tr><td>Priority Date</td>
-  <td><input type="text" name="priority" id="priority" value=""
+  <td><input type="text" name="priority" id="priority" value="now"
     data-dojo-type="dijit.form.DateTextBox"
     required="true" />
   </td>
@@ -295,6 +295,7 @@ var deferred = dojo.xhrPost(xhrArgs);
 	</div>
 
 </form>
+</div>
 
 <form target="_blank" dojoType="dijit.form.Form" method="post" action="/dakhila/php/userdata.php?command=addChild">
 <input type="text" data-dojo-type="dijit.form.TextBox" style="display:none;"  name="familyId" id="familyId" /> 
@@ -307,5 +308,4 @@ var deferred = dojo.xhrPost(xhrArgs);
 <button dojoType="dijit.form.Button" type="submit" id="showFamily"  >View Family</button>
 </form>
 
-</div>
 

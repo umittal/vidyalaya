@@ -302,9 +302,25 @@ RESETFORM;
     print $this->template->get();
   }
 
+  // ************************************************************
+  public function EventCalendar() {
+    $this->SetMenu();
+    $this->template->setCurrentBlock('QUERY');
+    $html = file_get_contents("../html/queryEventCalendar.inc");
+    $this->template->setVariable("QUERY", $html);
+    $this->template->parseCurrentBlock();
+
+    $params=null;
+    Reports::DisplayEventCalendar($this->template, 0, $params);
+
+    print $this->template->get();
+  }
+
 
   private function SetMenu() {
     $dojomenu = file_get_contents("../html/usermenu.inc");
+
+    // todo: switch logout/login
 
     $this->template->setCurrentBlock('MENU');
     $this->template->setVariable('MENU', $dojomenu);
@@ -313,12 +329,17 @@ RESETFORM;
     $this->template->addBlockFile('BOTTOM', 'F_BOTTOM', 'LayoutBottom.tpl');
     $this->template->touchBlock('F_BOTTOM');
 	
+    $this->template->setCurrentBlock('FOOTER');
+
+    if (isset($_SESSION)) {
     $username=$_SESSION["loginUsername"];
     $dbserver=$_SESSION["dbserver"];
     $count=$_SESSION['count'];
-
-    $this->template->setCurrentBlock('FOOTER');
     $this->template->setVariable("FOOTER", "Copyright (c) 2011 Vidyalaya Inc., ($username,$dbserver, $count )");
+    } else {
+    $this->template->setVariable("FOOTER", "Copyright (c) 2011 Vidyalaya Inc., Public Access");
+    }
+
     $this->template->parseCurrentBlock();
   }
 

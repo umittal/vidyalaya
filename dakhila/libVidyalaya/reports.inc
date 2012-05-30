@@ -324,6 +324,24 @@ class Reports {
     return $html;
   }
 
+  public static function DisplayEventCalendar($template, $count, $params) {
+    $template->addBlockFile('RESULT', 'F_RESULT', 'EventCalendar.tpl');
+    $template->touchBlock('F_RESULT');
+    
+    $templateName="EVENTS";
+    foreach (EventCalendar::ListScheduledEvents(1, 0, $count) as $event) {
+      $template->setCurrentBlock($templateName);
+      $template->setVariable("WEEK", $event->weekNumber);
+      $template->setVariable("TYPE", EventCalendarType::StringFromId($event->eventType));
+      $template->setVariable("DATE", $event->date);
+      $template->setVariable("START", $event->startTime);
+      $template->setVariable("END", $event->endTime);
+      $template->setVariable("DESCRIPTION", $event->LongDescription());
+      $template->parseCurrentBlock();
+    }
+    
+  }
+
   public static function lcmatrix($year) {
     $language = array(); $culture=array();
     foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year) as $item) {

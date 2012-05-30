@@ -169,6 +169,18 @@ class DataViewer {
       print $this->template->get();
       break;
 
+    // ************************************************************
+    case "newEvent":
+      $this->template->setCurrentBlock('RESULT');
+      $html = file_get_contents("../html/formNewEvent.inc");
+      $this->template->setVariable("RESULT", $html);
+      $this->template->parseCurrentBlock();
+      $this->template->addBlockFile('BOTTOM', 'F_BOTTOM', 'LayoutBottom.tpl');
+      $this->template->touchBlock('F_BOTTOM');
+      
+      print $this->template->get();
+      break;
+
     case "newRegistration":
       $url = htmlentities($_SERVER['PHP_SELF']) . "?command=newRegistration";
       $this->template->setCurrentBlock('QUERY');

@@ -1607,6 +1607,34 @@ Class EventCalendar {
     return new self(mysql_fetch_alias_array(VidDb::query($query)));
   }
 
+  public function LongDescription() {
+    if (is_null($this->class)) {
+      $classUrl = "";
+    } else {
+      $classUrl = "Class: ". $this->class->urlRoster();
+    }
+    if (empty($this->portalId)) {
+      $portalUrl = "";
+    } else {
+      $portalUrl = "<a href=\"http://www.vidyalaya.us/shiksha/index.php?id=$this->portalId\">Shiksha</a>";
+    }
+    return "$classUrl $portalUrl $this->description";
+  }
+
+  private static function ArrayFromQuery($query, $sortFunc = "FamilyTracker::CompareFamilyId") {
+    $localarray = Array();
+    $result = VidDb::query($query);
+    while ($row = mysql_fetch_alias_array($result)) {
+      $localarray[] = new self($row);
+    }
+    return $localarray;
+  }
+
+  public static function ListScheduledEvents($session, $start, $count) {
+    $query = "Select * from EventCalendar order by date asc, starttime asc";
+    return self::ArrayFromQuery($query);
+  }
+
   public function __construct($row) {
     if ($row==null) return;
     $this->id = $row["EventCalendar.id"];
@@ -1614,8 +1642,8 @@ Class EventCalendar {
     $this->date = $row["EventCalendar.date"];
     $this->weekNumber = $row["EventCalendar.weeknumber"];
     $this->portalId = $row["EventCalendar.portalid"];
-    $this->startTime = $row["EventCalendar.starttime"];
-    $this->endTime = $row["EventCalendar.endtime"];
+    $this->startTime = formatTime($row["EventCalendar.starttime"]);
+    $this->endTime = formatTime($row["EventCalendar.endtime"]);
     $this->class = is_null($row["EventCalendar.class"]) ? null : AvailableClass::GetItemById($row["EventCalendar.class"]);
     $this->description = $row["EventCalendar.description"];
   }
