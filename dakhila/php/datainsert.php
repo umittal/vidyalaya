@@ -22,6 +22,9 @@ case "InsertFamily":
 case "waitlistme":
   DataInsert::waitlistme();
   break;
+case "InsertEvent":
+  DataInsert::InsertEvent();
+  break;
 case "InsertClass":
   DataInsert::InsertClass();
   break;
@@ -151,12 +154,67 @@ class DataInsert {
     print "ok";
   }
 
+  public static function InsertEvent() {
+    $values = array();
+    foreach ($_POST as $key => $value) {
+      $value = trim($value);
+      if (empty($value)) continue;
+      $startHour = $startMinute = $startampm = $endHour = $endMinute = $endampm = "";
+      switch($key) {
+      case "eventType":
+	$values[] = "eventtype = $value";
+	break;
+      case "eventDate":
+	$values[] = "date = '$value'";
+	break;
+      case "portalId":
+	$values[] = "portalid = $value";
+	break;
+      case "classId":
+	$values[] = "class = $value";
+	break;
+      case "description":
+	$values[] = "description = '$value'";
+	break;
+
+      case "startHour":
+      case "startMinute":
+      case "startampm":
+      case "endHour":
+      case "endMinute":
+      case "endampm":
+	$$key=$value;
+	break;
+      default:
+	self::error("Did not expect Key $key");
+      }
+    }
+    //    if (!(empty($startHour) && empty($startMinute) && empty($startampm))) $values[] = "starttime = " . formatSqlTime($startHour, $startMinute, $startampm);
+    //    if (!(empty($endHour) && empty($endMinute) && empty($endampm))) $values[] = "endtime = " . formatSqlTime($endHour, $endMinute, $endampm);
+
+    if (empty($values)) {
+      self::error("No Values Found");
+    }
+
+    $sql = "insert into EventCalendar Set " . implode(",", $values);
+    //    self::error($sql);
+    $result = VidDb::query($sql);
+    if ($result == FALSE) {
+      header("HTTP/1.0 200 ");
+      print "Error insert failed, " . mysql_error();
+      return;
+    }
+    $id = mysql_insert_id();
+    header("HTTP/1.0 200 ");
+    print "$id";
+  }
+
 
   public static function InsertClass() {
     $values = array();
     foreach ($_POST as $key => $value) {
-      if (empty($value)) continue;
       $value = trim($value);
+      if (empty($value)) continue;
       switch($key) {
       case "course":
 	$values[] = "course = $value";

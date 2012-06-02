@@ -1286,7 +1286,7 @@ AGREEMENT;
     $mail =   Mail::SetupMailAdmissions();
     Mail::SetFamilyAddress(&$mail, $family, $production);
 
-    $subject = "Vidyalaya Admission 2012-13, Family $family->id";
+    $subject = "Vidyalaya Admission 2012-13, Family $family->id, Last Call";
     if ($production == 0) $subject = "[Test] $subject";
     $mail->Subject = $subject;
 
@@ -1308,13 +1308,13 @@ AGREEMENT;
     }  else {
       echo "Message has been sent\n";
     }
-
+    sleep(5);
   }
 
   public static function ExistingFamilies() {
     $i=1;
     foreach (FamilyTracker::GetAll() as $tracker) {
-      if ($tracker->family <  461) continue;
+      //  if ($tracker->family <  461) continue;
       //      if ($tracker->previousYear != EnumFamilyTracker::registered) continue;
       if ($tracker->currentYear != EnumFamilyTracker::pendingRegistration) continue;
       print $tracker->family . ", previous: " . EnumFamilyTracker::NameFromId($tracker->previousYear) . ", current: " 
@@ -1382,6 +1382,43 @@ AGREEMENT;
       if (!file_exists($customizedPdf)) Reports::RegistrationPacketFamily($family);
       self::AnnounceOrientation($family);
     }
+    return;
+  }
+
+  public static function Mela2012() {
+    $i=1;
+    foreach (FamilyTracker::GetAll() as $tracker) {
+      $family = Family::GetItemById($tracker->family);
+      //      if ($tracker->currentYear != EnumFamilyTracker::pendingInvitation) continue;
+      //if ($tracker->currentYear != EnumFamilyTracker::pendingRegistration) continue;
+      if ($tracker->previousYear == EnumFamilyTracker::registered) continue;
+      if ($tracker->previousYear != EnumFamilyTracker::waitlist) die("famiy $family->id is neither registered nor waitlist");
+      print "$i. Family id: $family->id, Name: " . $family->parentsName() . "\n";
+      $i++;
+
+      $customizedPdf = "/home/umesh/Dropbox/Vidyalaya-Management/Administration/Mela2012.pdf";
+      $production=1;
+      $mail =   Mail::SetupMailInfo();
+      Mail::SetFamilyAddress(&$mail, $family, $production);
+
+      $subject = "Vidyalaya Mela Invitation - Sunday June 3, 2012, 10AM-1PM";
+      if ($production == 0) $subject = "[Test] $subject";
+      $mail->Subject = $subject;
+      $mail->AddAttachment("$customizedPdf"); // attachment
+      print "Family id: $family->id, $subject; Name: " . $family->parentsName() . "\n";
+
+      //      continue;
+      $salutation = "<p>Dear " . $family->parentsName() . ",";
+      $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/mela.html");
+      $mail->AltBody = "Family: $family->id"; //Text Body
+
+      if(!$mail->Send()) {
+	echo "Mailer Error: " . $mail->ErrorInfo . "\n";
+	continue;
+      }  
+      print  "Message has been sent  ";
+      sleep(5);
+    } //foreach
     return;
   }
 
@@ -1714,7 +1751,8 @@ class TwoYearLayout {
 }
 
 //Admission::Payment2012(); exit();
-Admission::InviteNew(); exit();
+Admission::Mela2012(); exit();
+//Admission::InviteNew(); exit();
 //Admission::ExistingFamilies(); exit();
 //Admission::AdultLanguage(); exit();
 
