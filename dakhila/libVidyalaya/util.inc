@@ -84,12 +84,32 @@ function GetSingleIntArgument() {
 
 }
 
+function formatSqlTime($h, $m, $ampm) {
+  if (empty($h)) $h=0;
+  if (empty($m)) $m=0;
+if (strval(intval($h)) != strval($h)) return  "Error: Bad Hour ==$h==";
+if (strval(intval($m)) != strval($m)) return  "Error: Bad Minute ==$m==";
+  if  ($h < 0 || $h > 12) return "Error: Bad Hour $h";
+  if ($m < 0 || $m > 59) return "Error: Bad Minute $m";
+  switch ($ampm) {
+  case "AM": break;
+  case "PM": 
+    $h +=12;
+    break;
+  default:
+    return "Error: Bad ampm $ampm";
+  }
+  return sprintf("%02d:%02d:00", $h, $m);
+}
+
 function formatTime($timestring) {
+  if (empty($timestring)) return "";
   list ($h, $m, $s) = explode(":", $timestring);
+  if ($h==0 && $m==0) return "";
   $ampm = "AM";
   $ampm = $h > 12 ? "PM" : "AM";
   $hh = $h > 12 ? $h - 12 : $h;
-  return "$hh:$m $ampm";
+  return sprintf("%02d:%02d $ampm", $hh, $m);
 }
 
 

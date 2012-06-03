@@ -156,10 +156,10 @@ class DataInsert {
 
   public static function InsertEvent() {
     $values = array();
+    $startHour = $startMinute = $startampm = $endHour = $endMinute = $endampm = "";
     foreach ($_POST as $key => $value) {
       $value = trim($value);
       if (empty($value)) continue;
-      $startHour = $startMinute = $startampm = $endHour = $endMinute = $endampm = "";
       switch($key) {
       case "eventType":
 	$values[] = "eventtype = $value";
@@ -168,36 +168,49 @@ class DataInsert {
 	$values[] = "date = '$value'";
 	break;
       case "portalId":
-	$values[] = "portalid = $value";
+	if (!empty($value)) $values[] = "portalid = $value";
 	break;
       case "classId":
-	$values[] = "class = $value";
+	if (!empty($value)) $values[] = "class = $value";
 	break;
       case "description":
 	$values[] = "description = '$value'";
 	break;
 
       case "startHour":
+	$startHour = $value;
+	break;
       case "startMinute":
+	$startMinute = $value;
+	break;
       case "startampm":
+	$startampm = $value;
+	break;
       case "endHour":
+	$endHour = $value;
+	break;
       case "endMinute":
+	$endMinute = $value;
+	break;
       case "endampm":
-	$$key=$value;
+	$endampm = $value;
+	break;
+	error_log("key $key, value $value");
 	break;
       default:
 	self::error("Did not expect Key $key");
       }
     }
-    //    if (!(empty($startHour) && empty($startMinute) && empty($startampm))) $values[] = "starttime = " . formatSqlTime($startHour, $startMinute, $startampm);
-    //    if (!(empty($endHour) && empty($endMinute) && empty($endampm))) $values[] = "endtime = " . formatSqlTime($endHour, $endMinute, $endampm);
+    //    error_log("start = $startHour, $startMinute, $startampm, end = $endHour, $endMinute, $endampm,\n");
+    if (!(is_null($startHour) && is_null($startMinute) && is_null($startampm))) $values[] = "starttime = '" . formatSqlTime($startHour, $startMinute, $startampm) . "'";
+    if (!(is_null($endHour) && is_null($endMinute) && is_null($endampm))) $values[] = "endtime = '" . formatSqlTime($endHour, $endMinute, $endampm). "'";
 
     if (empty($values)) {
       self::error("No Values Found");
     }
 
     $sql = "insert into EventCalendar Set " . implode(",", $values);
-    //    self::error($sql);
+    // self::error($sql);
     $result = VidDb::query($sql);
     if ($result == FALSE) {
       header("HTTP/1.0 200 ");

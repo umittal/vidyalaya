@@ -81,7 +81,7 @@
     style="width: 3em;" 
     data-dojo-type="dijit.form.ValidationTextBox"
     data-dojo-props="validator:dojox.validate.isInRange,
-        constraints:{ min:1, max:999},
+        constraints:{ min:0, max:999},
         promptMessage: 'Shiksha Portal Document Id',
         invalidMessage:'Enter valid document id between 0 and 999'"
     </td>
@@ -152,4 +152,6 @@
 	</div>
 
 </form>
+
+     <a href="/dakhila/php/userdata.php?command=EventCalendar">Calendar Viewer</a>
 </div>

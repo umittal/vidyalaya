@@ -24,6 +24,8 @@ $(document).ready(function() {
 
 
 </script>
+
+<p><a href="/dakhila/php/dataViewer2.php?command=newEvent">New Event</a></p>
 <h3>Events</h3>
 <table id="maintable" cellspacing="0" class="tablesorter" width="600px">
 <thead>
