@@ -6,14 +6,12 @@ require_once "$rootDir/libVidyalaya/vidyalaya.inc";
 require_once "$rootDir/libVidyalaya/HtmlFactory.inc";
 require_once "$rootDir/libVidyalaya/reports.inc";
 
-
-
-// register is special since it is not authenticated
+VidSession::startSession(); //let us start a session, not same as authenticating user
 $command=isset($_GET["command"]) ? $_GET["command"] : "register";
 if (empty($command)) $command="register";
 $userdata = new UserData("../templates");
 switch ($command) {
-case "register":
+case "register":// register is special since it is not authenticated
   $userdata->register();
   break;
 default:
@@ -318,7 +316,8 @@ RESETFORM;
 
 
   private function SetMenu() {
-    $dojomenu = file_get_contents("../html/usermenu.inc");
+    //    $dojomenu = file_get_contents("../html/usermenu.inc");
+    $dojomenu = VidSession::Menu();
 
     // todo: switch logout/login
 
@@ -330,16 +329,7 @@ RESETFORM;
     $this->template->touchBlock('F_BOTTOM');
 	
     $this->template->setCurrentBlock('FOOTER');
-
-    if (isset($_SESSION)) {
-    $username=$_SESSION["loginUsername"];
-    $dbserver=$_SESSION["dbserver"];
-    $count=$_SESSION['count'];
-    $this->template->setVariable("FOOTER", "Copyright (c) 2011 Vidyalaya Inc., ($username,$dbserver, $count )");
-    } else {
-    $this->template->setVariable("FOOTER", "Copyright (c) 2011 Vidyalaya Inc., Public Access");
-    }
-
+    $this->template->setVariable("FOOTER", VidSession::FooterWeb());
     $this->template->parseCurrentBlock();
   }
 

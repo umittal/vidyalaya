@@ -1759,7 +1759,7 @@ Class Codes { // various codes used in the business
 
   private static function firstTimeCall() {
     if (!empty(self::$objArray)) return;
-    $query = "select * from Codes order by category, code, Department, role" ;
+    $query = "select * from Codes order by category, sortOrder, Department, role, code" ;
     $result = VidDb::query($query);
     while ($row = mysql_fetch_alias_array($result)) {
       $key = $row["Codes.id"];

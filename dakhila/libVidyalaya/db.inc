@@ -24,12 +24,37 @@ class VidSession {
     }
   }
 
+  public static function IsLoggedIn() {
+    VidSession::startSession();
+    if (!isset($_SESSION["loginUsername"])) {
+      return false;
+    }
+    return true;
+  }
 
-  public static function  sessionAuthenticate()
-  {
+  public static function Menu() {
+    if (!VidSession::IsLoggedIn()) return file_get_contents("../html/openmenu.inc");
+    $username=$_SESSION["loginUsername"];
+    if ($username != "umesh@vidyalaya.us") return file_get_contents("../html/usermenu.inc");
+    return file_get_contents("../html/menu.inc");
+  }
+
+  public static function FooterWeb() {
+    if (self::IsLoggedIn()) {
+      $username=$_SESSION["loginUsername"];
+      $dbserver=VidDB::ServerType();
+      $count=$_SESSION['count'];
+      return "Copyright (c) 2012 Vidyalaya Inc., ($username,$dbserver, $count )";
+    } else {
+      return "Copyright (c) 2012 Vidyalaya Inc., Public Access";
+    }
+  }
+
+  public static function  sessionAuthenticate()  {
     self::startSession();
     // 1. Check if the user hasn't logged in
-    if (!isset($_SESSION["loginUsername"])) {
+   
+ if (!isset($_SESSION["loginUsername"])) {
 	// The request does not identify a session
       $_SESSION["message"] = "You are not authorized to access the URL {" . $_SERVER["REQUEST_URI"] ."}" ;
 	header("Location: /dakhila/php/dataViewer2.php?command=login");
@@ -47,9 +72,7 @@ class VidSession {
 	header("Location: /dakhila/php/dataViewer2.php?command=login");
 	exit();
       }
-
   }
-
 }
    
 class VidDb {
@@ -60,6 +83,12 @@ class VidDb {
   private static $connection = null;
 
   public static $dbserver=null;
+
+  public static function ServerType() {
+    if (!VidSession::IsLoggedIn()) return "Not logged in";
+    if ($_SESSION["dbserver"] == self::$hostname) return "Production Server";
+    return "Test Server";
+  }
 
   private static function showerror() {
       die("Error " . mysql_errno() . " : " . mysql_error());

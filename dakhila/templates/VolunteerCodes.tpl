@@ -7,9 +7,9 @@ $(document).ready(function() {
 
 <h4>1. Class Room</h4>
 
-<table class="vidyalaya" borer=1>
+<table class="vidyalaya"  width="800px">
 <thead>
-<tr><th rowspan=2>&nbsp;</th><th colspan=3>Language</th><th rowspan=2>Culture</th><th rowspan=2>Public Speaking</th></tr>
+<tr><th rowspan=2>&nbsp;</th><th colspan=3 align="center">Language</th><th rowspan=2>Culture</th><th rowspan=2>Public Speaking</th></tr>
 <tr><th>Hindi</th><th>Gujarati</th><th>Telugu</th></tr>
 </thead>
 <tbody>
@@ -26,16 +26,24 @@ $(document).ready(function() {
 <h4>{CATEGORYID}: {DESC}</h4>
 <!-- END CATEGORY -->
 
-<table class="tablesorter">
+<table class="tablesorter" width="800px">
 <thead>
-<tr><th>ID</th><th>Code</th><th>Department</th><th>Role</th><th>Hours</th><th>Requirement</th>
+<tr><th>ID</th>
+<!-- <th>Code</th> -->
+<th width="160px">Sub-Category</th><th width="100px">Task</th>
+<!-- <th>Hours</th><th>Requirement</th> -->
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 
 <!-- BEGIN VOLUNTEERCODE -->
-<tr style="border-top:1px;"><td rowspan=2>{ID}</td><td>{CODE}</td><td>{DEPARTMENT}</td><td>{ROLE}</td><td>{HOURS}</td><td>{REQUIREMENT}</td></tr>
-<tr><td colspan=5>{DESCRIPTION}</td></tr>
+<tr><td>{ID}</td>
+<!-- <td>{CODE}</td> -->
+
+<td>{DEPARTMENT}</td><td>{ROLE}</td>
+<!-- <td>{HOURS}</td><td>{REQUIREMENT}</td></tr><tr> -->
+<td>{DESCRIPTION}</td></tr>
 <!-- END VOLUNTEERCODE -->
 
 </tbody>

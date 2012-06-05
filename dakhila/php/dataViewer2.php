@@ -40,7 +40,8 @@ class DataViewer {
 
     $table .= "</tr></table>\n";
 
-    $dojomenu = file_get_contents("../html/menu.inc");
+    //    $dojomenu = file_get_contents("../html/menu.inc");
+    $dojomenu = VidSession::Menu();
 
     $this->template->setCurrentBlock('MENU');
     $this->template->setVariable('MENU', $dojomenu);
@@ -54,7 +55,7 @@ class DataViewer {
     $count=$_SESSION['count'];
 
     $this->template->setCurrentBlock('FOOTER');
-    $this->template->setVariable("FOOTER", "Copyright (c) 2011 Vidyalaya Inc., ($username,$dbserver, $count )");
+    $this->template->setVariable("FOOTER", VidSession::FooterWeb());
     $this->template->parseCurrentBlock();
   }
 
