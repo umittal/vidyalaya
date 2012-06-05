@@ -25,7 +25,7 @@ class Department {
 	, Telugu = 3
 	, Culture = 4
 	, Kindergarten = 5
-	, Prayer = 6
+	, PublicSpeaking = 6
 	;
 
 	public static $colors = Array (
@@ -34,7 +34,7 @@ class Department {
 				       Department::Telugu => "#dd1100", 
 				       Department::Culture => "#ff0066", 
 				       Department::Kindergarten => "#AA7", 
-				       Department::Prayer => "##AA7", 
+				       Department::PublicSpeaking => "##AA7", 
 				       );
 
 	public function Name() {
@@ -59,7 +59,7 @@ class Department {
 			case 3: return "Telugu";
 			case 4: return "Culture";
 			case 5: return "Kindergarten";
-			case 6: return "Prayers";
+			case 6: return "Public Speaking";
 			default: return "Unknown";
 		}
 	}
@@ -127,30 +127,26 @@ class Student {
 
   public static $objArray = Array ();
 
-  public static $currentlyEnrolled = Array ();
+  private static $everEnrolled = Array ();
 
   private static function firstTimeEnrolled() {
-    if (!empty(self::$currentlyEnrolled)) return;
-    $thisyear=Calendar::RegistrationYear() - 2011;
+    if (!empty(self::$everEnrolled)) return;
 
-    $query = "select distinct student from Enrollment 
-              left join AvailableClass on Enrollment.availableClass = AvailableClass.id
-               where AvailableClass.year = $thisyear 
-              ";
+    $query = "select distinct student from Enrollment ";
     $result = VidDb::query($query);
     while ($row = mysql_fetch_array($result)) {
-      self::$currentlyEnrolled[$row[0]] = 1;
+      self::$everEnrolled[$row[0]] = 1;
     }
   }
 
-  public static function IsCurrentlyEnrolledId($id) {
+  public static function WasEverEnrolledId($id) {
     self::firstTimeEnrolled();
-    $result = array_key_exists ($id, self::$currentlyEnrolled);
+    $result = array_key_exists ($id, self::$everEnrolled);
     return $result;
   }
 
-  public function IsCurrentlyEnrolled() {
-    return self::IsCurrentlyEnrolledId($this->id);
+  public function WasEverEnrolled() {
+    return self::WasEverEnrolledId($this->id);
   }
 
   
@@ -1670,8 +1666,61 @@ Class CodesStatus {
   }
 } // Class CodesStatus
 
+// ************** 
+Class EnumCodesCategory { // Various Categories of Volunteering Codes
+  const unknown = 0 // hopefully we never see it
+    , ClassLevel = 1 // Class Level Education, Department
+    , SchoolLevel = 2 // School Level Education Activity
+    , Event = 3 // Event Coordination
+    , Service = 4 // All Year Service
+    , Task = 5 // Individual General Purpose Task, Category:TaskName
+    ;
+
+    public static function NameFromId($id) {
+    	switch ($id) {
+	case self::ClassLevel: return "Class Level";
+	case self::SchoolLevel: return "General Assembly";
+	case self::Event: return "Annual Events";
+	case self::Service: return "Services";
+	case self::Task: return "Tasks";
+	default: return "Unknown $id";
+    	}
+    }
+
+} // Class CodesCategory 
+
+// ************** 
+Class EventCoordination {
+  public $id=null;
+  public $event = null;
+  public $code = null;
+  public $mfsCodeOwner = null;
+  public $mfsIdCodeOwner = null;
+  public $person = null;
+  public $description = null;
+}
+
+// ************** 
+Class EventItem { // Program item in the event
+  public $id=null;
+  public $event=null;
+  public $class=null;
+  public $item=null;
+}
+
+// ************** 
+Class EventItemParticipant { // Program item participant list
+  public $eventItem;
+  public $role;
+  public $mfs;
+  public $mfsId;
+  public $person;
+}
+
+// ************** 
 Class Codes { // various codes used in the business
   public $code = null;
+  public $category = null;
   public $status = null;
   public $department = null;
   public $role = null;
@@ -1682,7 +1731,7 @@ Class Codes { // various codes used in the business
   public static function VolunteerCodeHtml() {
     
     $html = "<div class='vidyalaya'>\n";
-    $html .= "<h3>Teaching Roles</h3>\n<table border=1>\n";
+    $html .= "<h3>Academic Roles</h3>\n<table border=1>\n";
     $html .= "<thead><tr><th>Code</th><th>Department</th><th>Role</th><th>Hours</th>";
     $html .= "<th>Requirement</th></thead>\n";
     foreach (self::GetTeacherCodes() as $item) {
@@ -1691,9 +1740,9 @@ Class Codes { // various codes used in the business
       $html .= "<tr><td colspan=4>$item->description</td></tr>\n";
     }
     $html .= "</table>\n";
-    print $html;
+    //    print $html;
 
-    $html = "<h3>Non-teaching Volunteer Roles</h3>\n<table border=1>\n";
+    $html .= "<h3>Non-academic Roles</h3>\n<table border=1>\n";
     $html .= "<thead><tr><th>Code</th><th>Department</th><th>Role</th><th>Hours</th>";
     $html .= "<th>Requirement</th><th>?</th></thead>\n";
     foreach (self::GetNonTeacherVolunteerCodes() as $item) {
@@ -1710,10 +1759,10 @@ Class Codes { // various codes used in the business
 
   private static function firstTimeCall() {
     if (!empty(self::$objArray)) return;
-    $query = "select * from Codes";
+    $query = "select * from Codes order by category, code, Department, role" ;
     $result = VidDb::query($query);
     while ($row = mysql_fetch_alias_array($result)) {
-      $key = $row["Codes.code"];
+      $key = $row["Codes.id"];
       if (!array_key_exists($key, self::$objArray)) 
 	self::$objArray[$key] = new self($row);
     }
@@ -1729,6 +1778,9 @@ Class Codes { // various codes used in the business
   }
   public static function GetNonTeacherVolunteerCodes() {
     return self::ArrayForCode(CodesStatus::Volunteer | CodesStatus::Active );
+  }
+  public static function GetAllVolunteerCodes() {
+    return array_merge(self::GetTeacherCodes(), self:: GetNonTeacherVolunteerCodes());
   }
 
   private static function ArrayForCode($code) {
@@ -1749,6 +1801,8 @@ Class Codes { // various codes used in the business
 
   public function __construct($row) {
     if ($row==null) return;
+    $this->id = $row["Codes.id"];
+    $this->category = $row["Codes.category"];
     $this->code = $row["Codes.code"];
     $this->status = $row["Codes.status"];
     $this->department = $row["Codes.Department"];

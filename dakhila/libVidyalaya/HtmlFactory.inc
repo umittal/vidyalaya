@@ -127,7 +127,7 @@ function DisplayPersonTemplate (&$template, $person) {
 	}
 
 	if ($isDirty) {
-	  $templateName="VOLUNTEERROLES";
+	  $templateName="CATEGORYBLOCK";
 	  $template->setCurrentBlock($templateName);
 	  $template->parseCurrentBlock();
 	}
@@ -658,7 +658,7 @@ function DisplayRegistrationChildren(&$template, $student) {
 	 $template->setVariable("AGE", intval($age));
        }
 	$template->setVariable("GRADE", $student->GradeAt(Calendar::RegistrationSession));
-	if (!$student->IsCurrentlyEnrolled()) $template->setVariable("NEW", "NEW");
+	if (!$student->WasEverEnrolled()) $template->setVariable("NEW", "NEW");
 	
 	
 	$template->parseCurrentBlock();
@@ -891,11 +891,12 @@ function DisplayRoom(&$template, $room) {
     $roster =  "<a href=\"/dakhila/php/dataViewer2.php?command=ClassRoster&classId=$item->id\">" . 
       $item->short() . "</a>";
 
+    $count = isset($classCount[$item->id]) ?  $classCount[$item->id] : 0;
 
     $template->setVariable("SESSION", $item->session);
     $template->setVariable("TIME", "$item->startTime - $item->endTime" );
     $template->setVariable("CLASS", $roster);
-    $template->setVariable("COUNT", $classCount[$item->id]);
+    $template->setVariable("COUNT", $count);
     $template->parseCurrentBlock();
   }
 

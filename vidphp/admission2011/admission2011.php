@@ -1751,8 +1751,8 @@ class TwoYearLayout {
 }
 
 //Admission::Payment2012(); exit();
-Admission::Mela2012(); exit();
-//Admission::InviteNew(); exit();
+//Admission::Mela2012(); exit();
+Admission::InviteNew(); exit();
 //Admission::ExistingFamilies(); exit();
 //Admission::AdultLanguage(); exit();
 

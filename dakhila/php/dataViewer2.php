@@ -745,6 +745,13 @@ NAMAKOOL;
 
 
     // ************************************************************
+    case "VolunteerCodes":
+      $this->template->setCurrentBlock('RESULT');
+      $this->template->setVariable('RESULT', Reports::VolunteerCodes($this->template));
+      $this->template->parseCurrentBlock();
+      print $this->template->get();
+      break;
+    // ************************************************************
     case "EventRSVP":
       $url = htmlentities($_SERVER['PHP_SELF']) . "?command=EventRSVP";
       $itemId = isset($_POST['ID']) ?  $_POST['ID'] : null;

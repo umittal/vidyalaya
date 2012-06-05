@@ -50,6 +50,42 @@ class VidBook {
 
 class Reports {
 
+  public static function VolunteerCodes($template) {
+    $template->addBlockFile('RESULT', 'F_RESULT', 'VolunteerCodes.tpl');
+    $template->touchBlock('F_RESULT');
+    $saved = -1; //it will never be -1 in the database
+    foreach(Codes::GetAllVolunteerCodes() as $code) {
+      if ($code->category ==1 ) continue;
+      // header
+      if ($saved > 0 and $saved != $code->category) {
+	$templateName="CATEGORYBLOCK";
+	$template->setCurrentBlock($templateName);
+	$template->parseCurrentBlock();
+      }
+      if ($saved != $code->category) {
+	$templateName="CATEGORY";
+	$template->setCurrentBlock($templateName);
+	$template->setVariable("CATEGORYID", $code->category);
+	$template->setVariable("DESC", EnumCodesCategory::NameFromId($code->category));
+	$template->parseCurrentBlock();
+	$saved=$code->category;
+      }
+
+      // table
+      $templateName="VOLUNTEERCODE";
+      $template->setCurrentBlock($templateName);
+      $template->setVariable("ID", $code->id);
+      $template->setVariable("CODE", $code->code);
+      $template->setVariable("DEPARTMENT", $code->department);
+      $template->setVariable("ROLE", $code->role);
+      $template->setVariable("HOURS", $code->hours);
+      $template->setVariable("REQUIREMENT", $code->requirement);
+      $template->setVariable("DESCRIPTION", $code->description);
+      $template->parseCurrentBlock();
+    }
+    
+  }
+
   private  static function RegistrationPacketHtml($family) {  
 	$students = Student::AllStudents();
 	$templateDir = realpath(dirname(__FILE__)."/../templates");
