@@ -372,6 +372,7 @@ function DisplayFamilyV2(&$template, $family, $students) {
 
 // ******** Family - use this
 function DisplayFamilyV3(&$template, $family) {
+  if (is_null($family)) return;
 	$template->addBlockFile('RESULT', 'F_RESULT', 'FamilyDetail.tpl');
 	$template->touchBlock('F_RESULT');
 	DisplayFamilyTemplateV3($template, $family);

@@ -46,7 +46,7 @@ dojo.require("dijit.form.Button");
 	</form>
 
 
-<div class="heading1">Family Details </div>
+<h3>Family Details </h3>
 
 <table class="vidyalaya">  	  	  
 <!-- BEGIN HOME -->

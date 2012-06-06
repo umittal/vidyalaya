@@ -91,6 +91,8 @@ class DataViewer {
 
   // ************************************************************
   public function login() {
+    $this->SetMenu();
+
     $html = file_get_contents("../html/login.inc");
     $this->template->setCurrentBlock('RESULT');
     $this->template->setVariable("RESULT", $html);
@@ -103,33 +105,45 @@ class DataViewer {
   // ************************************************************
   public function DoIt($command) {
 
+    // ************************************************************
     if ($command == "logout") {
       VidSession::startSession();
       $message = "<p>";
-
       // An authenticated user has logged out -- be polite and thank them for using your application.
       if (isset($_SESSION["loginUsername"]))
 	$message .= "Thanks {$_SESSION["loginUsername"]} for using the Application.";
-
       // Some script, possibly the setup script, may have set up a  logout message
       if (isset($_SESSION["message"])) {
-	  $message .= "<p>Message: " . $_SESSION["message"];
-	  unset($_SESSION["message"]);
-	}
-
-      $message .= "<p> To login again, please click <a href=\"$this->thispage?command=login\">here</a>\n";
-
+	$message .= "<p>Message: " . $_SESSION["message"];
+	unset($_SESSION["message"]);
+      }
+      
+      // Unset all of the session variables.
+      $_SESSION = array();
+      // If it's desired to kill the session, also delete the session cookie.
+      // Note: This will destroy the session, and not just the session data!
+      if (ini_get("session.use_cookies")) {
+	$params = session_get_cookie_params();
+	setcookie(session_name(), '', time() - 42000,
+		  $params["path"], $params["domain"],
+		  $params["secure"], $params["httponly"]
+		  );
+      }
       session_destroy(); // Destroy the session.
+
+      $this->SetMenu();
+      $message .= "<p> To login again, please click <a href=\"$this->thispage?command=login\">here</a>\n";
       $this->template->setCurrentBlock('RESULT');
       $this->template->setVariable("RESULT", $message);
       $this->template->parseCurrentBlock();
-    print $this->template->get();
-
-    return;
-
+      print $this->template->get();
+      return;
     }
+
+
     VidSession::sessionAuthenticate();
-    if ($_SESSION["loginUsername"] != "umesh@vidyalaya.us") {
+    $this->SetMenu();
+    if ($command!= "Family" && !VidSession::IsSuperUser()) {
       $html = "<p>Sorry, only administrators are permitted access to this page, please click the back button on your browser</p>";
       $this->template->setCurrentBlock('RESULT');
       $this->template->setVariable('RESULT', $html);
@@ -137,7 +151,6 @@ class DataViewer {
       print $this->template->get();
       return;
     }
-    $this->SetMenu();
     switch ($command) {
 
     // ************************************************************
@@ -219,29 +232,31 @@ class DataViewer {
     case "Family":
       $url = htmlentities($_SERVER['PHP_SELF']) . "?command=Family";
       $familyId = isset($_POST['ID']) ?  $_POST['ID'] : null;
-      //      if (is_null($familyId) $familyId = isset($_POST['familyId']) ?  $_POST['familyId'] : null;
 
-      $form = <<<EOT
-	<form method="post" action="$url">
-	Family ID: <input type="text" name="ID" value="$familyId"> 
-   <input type="submit" name="submit" value="GO"><br>
-</form>
+      if (VidSession::IsSuperUser()) {
+	$form = file_get_contents("../html/formLookupFamily.inc");
+	$form=preg_replace("/==FAMILYID==/", $familyId, $form);
+	$form=preg_replace("/==URL==/", $url, $form);
 
-EOT;
-      $this->template->setCurrentBlock('QUERY');
-      $this->template->setVariable('QUERY', $form);
-      $this->template->parseCurrentBlock();
+	$this->template->setCurrentBlock('QUERY');
+	$this->template->setVariable('QUERY', $form);
+	$this->template->parseCurrentBlock();
+      }
 
+      if (isset($familyId)) {
+	if (VidSession::IsSuperUser()) {
+	  $family = Family::GetItemById($familyId);
+	} else {
+	  $email = $_SESSION["loginUsername"];
+	  $person = Person::PersonFromEmail($email); 
+	  $family=is_null($person) ? null : $person->home;
+	}
+	DisplayFamilyV3($this->template, $family);
+      }
 
-      //      if(isset($_POST['omsubmit'])) {
-	if (isset($familyId)) {
-	    $family = Family::GetItemById($familyId);
-	    DisplayFamilyV3($this->template, $family);
-	  }
-	//      }
       print $this->template->get();
       break;
-
+      
     // ************************************************************
     case "OtherContactsList":
       $url = htmlentities($_SERVER['PHP_SELF']) . "?command=OtherContactsList";

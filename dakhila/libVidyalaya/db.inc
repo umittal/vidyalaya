@@ -32,10 +32,16 @@ class VidSession {
     return true;
   }
 
+  public static function IsSuperUser() {
+    if (!VidSession::IsLoggedIn()) return false;
+    $username=$_SESSION["loginUsername"];
+    if ($username == "umesh@vidyalaya.us") return true;
+    return false;
+  }
+
   public static function Menu() {
     if (!VidSession::IsLoggedIn()) return file_get_contents("../html/openmenu.inc");
-    $username=$_SESSION["loginUsername"];
-    if ($username != "umesh@vidyalaya.us") return file_get_contents("../html/usermenu.inc");
+    if (!VidSession::IsSuperUser()) return file_get_contents("../html/usermenu.inc");
     return file_get_contents("../html/menu.inc");
   }
 
