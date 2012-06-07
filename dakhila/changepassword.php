@@ -4,32 +4,22 @@ require "libVidyalaya/db.inc";
 VidSession::sessionAuthenticate();
 
 // Clean the data collected from the user
-$oldPassword = mysqlclean($_POST, "oldPassword", 10, $connection);
-$newPassword1 = mysqlclean($_POST, "newPassword1", 10, $connection);
-$newPassword2 = mysqlclean($_POST, "newPassword2", 10, $connection);
+$oldPassword = isset($_POST['oldPassword']) ?  $_POST['oldPassword'] : null;
+$newPassword1 = isset($_POST['newPassword1']) ?  $_POST['newPassword1'] : null;
+$newPassword2 = isset($_POST['newPassword2']) ?  $_POST['newPassword2'] : null;
 
-if (strcmp($newPassword1, $newPassword2) == 0 &&
-  authenticateUser($connection, $_SESSION["loginUsername"], $oldPassword))
-{
-  // OK to update the user password
-
-  // Create the digest of the password
-  $digest = md5(trim($newPassword1));
-
-  // Update the user row
-  $update_query = "UPDATE users SET password = '{$digest}'
-                   WHERE email = '{$_SESSION["loginUsername"]}'";
-
-  if (!$result = @ mysql_query ($update_query, $connection))
-    showerror();
-
-  $_SESSION["passwordMessage"] =
-    "Password changed for '{$_SESSION["loginUsername"]}'";
+$email =  $_SESSION["loginUsername"];
+if (strcmp($newPassword1, $newPassword2) != 0 ) {
+  $_SESSION["passwordMessage"] =     "new passwords do not match";
+} else if (VidDb::authenticateOrdinaryUser($email , $oldPassword)) {
+  if (VidDb::updatePassword($email, $newPassword1)){
+    $_SESSION["passwordMessage"] = "Password changed for '{$email}'";
+  } else {
+    $_SESSION["passwordMessage"] = "Password update failed";
+  }
 }
-else
-{
-  $_SESSION["passwordMessage"] =
-    "Could not change password for '{$_SESSION["loginUsername"]}'";
+else {
+  $_SESSION["passwordMessage"] = "password not changed for '{$email}' because old password was not verified";
 }
 
 // Relocate to the password form

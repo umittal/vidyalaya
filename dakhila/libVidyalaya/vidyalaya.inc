@@ -2617,26 +2617,6 @@ DATABASE_QUERY_UMESH;
   return $query;
 }
 
-// Process data returned from the database
-function mysql_fetch_alias_array($result) {
-    if (!($row = mysql_fetch_array($result)))
-    {
-        return null;
-    }
-
-    $assoc = Array();
-    $rowCount = mysql_num_fields($result);
-    
-    for ($idx = 0; $idx < $rowCount; $idx++)
-    {
-        $table = mysql_field_table($result, $idx);
-        $field = mysql_field_name($result, $idx);
-        $assoc["$table.$field"] = $row[$idx];
-    }
-    
-    return $assoc;
-}
-
 // Function called once we have connection to run query and process data to populate students
 function CreateDictionary() {
 

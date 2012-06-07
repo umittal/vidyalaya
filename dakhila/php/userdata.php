@@ -69,7 +69,7 @@ class UserData {
     if (is_null($person)) {
       print "person is not defined, I did not want to be here\n";
       print $this->template->get();
-      break;
+      return;
     }
 
     $name = $person->fullName();

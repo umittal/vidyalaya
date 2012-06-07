@@ -5,12 +5,12 @@ $password = $_POST["password"];
 
 // Authenticate the user
 if (VidDb::authenticateUser($username, $password)) {
-  header("Location: /dakhila/php/dataViewer2.php?command=home"); // Relocate back to the first page of the application
+  header("Location:" . VidSession::HomePage()); // Relocate back to the first page of the application
   exit();
 } 
 
 if (VidDb::authenticateOrdinaryUser($username, $password)) {
-  header("Location: /dakhila/php/userdata.php?command=home"); // Relocate back to the first page of the application
+  header("Location:" . VidSession::HomePage()); // Relocate back to the first page of the application
   exit();
 } 
 

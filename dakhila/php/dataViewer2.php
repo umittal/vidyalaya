@@ -7,7 +7,6 @@ require_once "$rootDir/libVidyalaya/HtmlFactory.inc";
 require_once "$rootDir/libVidyalaya/reports.inc";
 
 
-
 // login is special since it is not authenticated
 $command=isset($_GET["command"]) ? $_GET["command"] : "login";
 if (empty($command)) $command="login";
@@ -29,6 +28,7 @@ class DataViewer {
   private $thispage = null;
 
   private function SetMenu() {
+    /*
     $table = "<table width='100%'><tr>";
     $table .= "<td><a href=\"$this->thispage?command=home\">Home</a></td>";
     $table .= "<td><a href=\"$this->thispage?command=Teachers\">Teachers</a></td>";
@@ -39,8 +39,8 @@ class DataViewer {
     $table .= "<td align='right'>$rightside</td>";
 
     $table .= "</tr></table>\n";
+    */
 
-    //    $dojomenu = file_get_contents("../html/menu.inc");
     $dojomenu = VidSession::Menu();
 
     $this->template->setCurrentBlock('MENU');
@@ -50,10 +50,6 @@ class DataViewer {
     $this->template->addBlockFile('BOTTOM', 'F_BOTTOM', 'LayoutBottom.tpl');
     $this->template->touchBlock('F_BOTTOM');
 	
-    $username=$_SESSION["loginUsername"];
-    $dbserver=$_SESSION["dbserver"];
-    $count=$_SESSION['count'];
-
     $this->template->setCurrentBlock('FOOTER');
     $this->template->setVariable("FOOTER", VidSession::FooterWeb());
     $this->template->parseCurrentBlock();

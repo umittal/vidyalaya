@@ -267,10 +267,12 @@ function DisplayFamilyTemplateV3 (&$template, $family) {
 	  DisplayChildren($template, $student);
 	}
 
-	$templateName="ADDCHILD";
-	$template->setCurrentBlock($templateName);
-	$template->setVariable("ID", $family->id);
-	$template->parseCurrentBlock();
+	if (VidSession::IsSuperUser()) {
+	  $templateName="ADDCHILD";
+	  $template->setCurrentBlock($templateName);
+	  $template->setVariable("ID", $family->id);
+	  $template->parseCurrentBlock();
+	}
 
 
 	$templateName="HOME";
@@ -305,7 +307,7 @@ function DisplayFamilyTemplateV3 (&$template, $family) {
 
 	$sapi = php_sapi_name();
 	if ($sapi == "cli") return;
-
+	if (!VidSession::IsSuperUser()) return;
 	if (is_null($item) || $item->year != (Calendar::RegistrationYear() - 2010)) {
 	$trackerchange =  <<< WAITLISTME
 	  <button data-dojo-type="dijit.form.Button" type="button">
@@ -380,7 +382,8 @@ function DisplayFamilyV3(&$template, $family) {
 
 function GetChangeUrl($class, $student) {
 	 $url = $class->url();
-	  if (!$class->IsChangeAllowed()) return $url;
+	 //	 if (!VidSesssion::IsSuperUser()) return $url;
+	 if (!$class->IsChangeAllowed()) return $url;
 	  $name = $student->fullName();
 	  $short = $class->short();
 	  $change =  <<< BUTTONHERE

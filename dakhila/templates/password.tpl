@@ -25,7 +25,7 @@
   </table>
   <p><input type="submit" value="Update Password">
   </form>
-  <p><a href="/dakhila/php/dataViewer2.php?command=home">Home</a>
+  <p><a href="{HOMEPAGE}">Home</a>
   <p><a href="/dakhila/php/dataViewer2.php?command=logout">Logout</a>
 </body>
 </html>

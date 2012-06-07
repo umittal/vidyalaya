@@ -1,4 +1,24 @@
 <?php
+// Process data returned from the database
+function mysql_fetch_alias_array($result) {
+    if (!($row = mysql_fetch_array($result)))
+    {
+        return null;
+    }
+
+    $assoc = Array();
+    $rowCount = mysql_num_fields($result);
+    
+    for ($idx = 0; $idx < $rowCount; $idx++)
+    {
+        $table = mysql_field_table($result, $idx);
+        $field = mysql_field_name($result, $idx);
+        $assoc["$table.$field"] = $row[$idx];
+    }
+    
+    return $assoc;
+}
+
 
 class PlaceHolder {
   public static function shellclean($array, $index, $maxlength) {
@@ -37,6 +57,12 @@ class VidSession {
     $username=$_SESSION["loginUsername"];
     if ($username == "umesh@vidyalaya.us") return true;
     return false;
+  }
+
+  public static function HomePage() {
+    if (!VidSession::IsLoggedIn()) return "/dakhila";
+    if (VidSession::IsSuperUser()) return "/dakhila/php/dataViewer2.php?command=home";
+    return "/dakhila/php/userdata.php?command=home";
   }
 
   public static function Menu() {
@@ -161,9 +187,8 @@ class VidDb {
   }
 
   public static function authenticateUser($username, $password) {
-    $username = trim(strtolower($username));
-    if ($username != "umesh@vidyalaya.us") return false;
-    return self::authenticateOrdinaryUser($username, $password);
+    if (VidSession::IsSuperUser()) return self::authenticateOrdinaryUser($username, $password);
+    return false;
   }
 
 
