@@ -2,7 +2,7 @@
 require_once "vidyalaya.inc";
 require_once "HtmlFactory.inc";
 /** Error reporting */
-error_reporting(E_ALL);
+error_reporting(E_ALL | E_STRICT | E_NOTICE);
 
 class VidBook {
 	private $objPHPExcel = null;

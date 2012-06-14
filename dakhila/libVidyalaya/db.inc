@@ -35,6 +35,12 @@ class PlaceHolder {
 
 class VidSession {
   public static function startSession() {
+    $sapi = php_sapi_name();
+    switch ( $sapi ) {
+    case "cli":
+      return;
+    }
+
     if (!isset($_SESSION["count"])) {
       session_start();
       $_SESSION["count"]=1;

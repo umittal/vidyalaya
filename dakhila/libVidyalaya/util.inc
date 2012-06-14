@@ -272,7 +272,7 @@ Class Calendar {
 	
 }
 
-class EnumFamilyTracker {
+final class EnumFamilyTracker {
   const registered = 1;
   const waitlist = 2;
   const pendingRegistration = 3;

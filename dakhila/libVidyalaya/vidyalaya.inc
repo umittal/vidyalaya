@@ -1,7 +1,7 @@
 <?php
 require_once "util.inc";
 
-class Gender {
+final class Gender {
       const Girl = 1
       , Boy = 2
       , Unknown = 3
@@ -17,7 +17,7 @@ public static function NameFromId($number) {
 
 }
 
-class Department {
+final class Department {
 	public $id = null;
 
 	const Hindi = 1
@@ -1129,7 +1129,7 @@ class Volunteers {
 
 
 // ************** 
-class VolunteerRole {
+final class VolunteerRole {
   const ExtraCurricular = 1
     , Trustee = 2
     , Substitute = 4
@@ -1152,7 +1152,7 @@ class VolunteerRole {
 }
 
 // ************** 
-class MFS {
+final class MFS {
   const Mother = 1
     , Father = 2
     , Student = 3
@@ -1186,7 +1186,7 @@ class MFS {
 }
 
 // ************** 
-class ItemType {
+final class ItemType {
   const Event = 1
     , Merchandise = 2
     ;
@@ -1260,7 +1260,7 @@ Class Items {
 }
 
 // ************** 
-class ItemRegistrationStatus {
+final class ItemRegistrationStatus {
   const Interested = 1
     , Registered = 2
     , CancelRequest = 4
@@ -1544,7 +1544,7 @@ Class OtherContacts {
 
 } // end Class OtherContacts
 
-Class EventCalendarType {
+final Class EventCalendarType {
   const SchoolDay = 1
     , Yoga = 2
     , Presentation = 4
@@ -1646,7 +1646,7 @@ Class EventCalendar {
 } // Class EventCalendar
 
 // ************** 
-Class CodesStatus {
+final Class CodesStatus {
   const Active = 1
     , Volunteer = 2
     , Medical = 4
@@ -1667,7 +1667,7 @@ Class CodesStatus {
 } // Class CodesStatus
 
 // ************** 
-Class EnumCodesCategory { // Various Categories of Volunteering Codes
+final Class EnumCodesCategory { // Various Categories of Volunteering Codes
   const unknown = 0 // hopefully we never see it
     , ClassLevel = 1 // Class Level Education, Department
     , SchoolLevel = 2 // School Level Education Activity
@@ -2028,7 +2028,7 @@ class Teachers {
 
 
 // ************** 
-class StudentStatus {
+final class StudentStatus {
   public $id=null;
   public $name = null;
   

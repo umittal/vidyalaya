@@ -250,7 +250,8 @@ class DataInsert {
     }
 
     // Obviously we can do better than that
-    $values[] = "year = " . Calendar::RegistrationYear() -2010;
+    $year = Calendar::RegistrationYear() -2010;
+    $values[] = "year = " . $year;
     $values[] = "room = 19";
 
     $sql = "insert into AvailableClass Set " . implode(",", $values);
