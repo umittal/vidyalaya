@@ -1,6 +1,7 @@
 <?php
 require_once "vidyalaya.inc";
 require_once "HtmlFactory.inc";
+require_once "TwoYear.inc";
 /** Error reporting */
 error_reporting(E_ALL | E_STRICT | E_NOTICE);
 
@@ -49,6 +50,85 @@ class VidBook {
 }
 
 class Reports {
+
+  public static function TwoYearSummary($template) {
+    $continuing = array(); $leaving=array(); $newstudent=array();
+    $t_l = $t_c = $t_n = 0;
+    foreach(TwoYearLayout::GetAll() as $two) {
+      switch ($two->status) {
+      case TwoYearLayout::Leaving:
+	$course=Department::CharFromId($two->previousYear->language) . $two->previousYear->languageLevel;
+	$courslist[$course]=1;
+	if (!isset($leaving[$course])) {$leaving[$course]=1;}else{ $leaving[$course]++;}
+	$t_l++;
+	if (empty($two->previousYear->cultureLevel)) continue;
+	$course="C". $two->previousYear->cultureLevel;
+	$courslist[$course]=1;
+	if (!isset($leaving[$course])) {$leaving[$course]=1;}else{ $leaving[$course]++;}
+	break;
+      case TwoYearLayout::Continuing:
+      case TwoYearLayout::Change:
+	$course=Department::CharFromId($two->previousYear->language) . $two->previousYear->languageLevel;
+	$courslist[$course]=1;
+	$t_c++;
+	if (!isset($continuing[$course])) {$continuing[$course]=1;}else{ $continuing[$course]++;}
+	if (empty($two->previousYear->cultureLevel)) continue;
+	$course="C". $two->previousYear->cultureLevel;
+	$courslist[$course]=1;
+	if (!isset($continuing[$course])) {$continuing[$course]=1;}else{ $continuing[$course]++;}
+	break;
+      case TwoYearLayout::NewStudent:
+      case TwoYearLayout::Orientation:
+	$course=Department::CharFromId($two->thisYear->language) . $two->thisYear->languageLevel;
+	$courslist[$course]=1;
+	$t_n++;
+	if (!isset($newstudent[$course])) {$newstudent[$course]=1;}else{ $newstudent[$course]++;}
+	if (empty($two->thisYear->cultureLevel)) continue;
+	$course="C". $two->thisYear->cultureLevel;
+	$courslist[$course]=1;
+	if (!isset($newstudent[$course])) {$newstudent[$course]=1;}else{ $newstudent[$course]++;}
+	break;
+      default:
+	print "Error: invalid status $two->$status found\n";
+      }
+    }
+    $template->addBlockFile('RESULT', 'F_RESULT', 'TwoYearSummary.tpl');
+    $template->touchBlock('F_RESULT');
+    foreach ($courslist as $key => $value) {
+      $templateName="SUMMARY";
+      $template->setCurrentBlock($templateName);
+
+      //      $continuing = isset($continuing[$key]) ? $continuing[$key] : 0;
+      $cont = isset($continuing[$key]) ? $continuing[$key] : "";
+      $leave = isset($leaving[$key]) ? $leaving[$key] : "";
+      $newstu = isset($newstudent[$key]) ? $newstudent[$key] : "";
+      $previous = $cont+$leave;
+
+      $retension = sprintf ("%.2f%%", $cont/$previous*100);
+      $template->setVariable("PREVIOUS", $previous);
+      $template->setVariable("LEAVING", $leave);
+      $template->setVariable("CONTINUING", $cont);
+      $template->setVariable("RETENTION", $retension);
+
+      $template->setVariable("NEW", $newstu);
+
+
+
+      if ($key == "KG0") $key="KG";
+      $template->setVariable("COURSE", $key);
+      $template->parseCurrentBlock();
+    }
+    $templateName="TOTAL";
+    $template->setCurrentBlock($templateName);
+    $template->setVariable("PREVIOUS", $t_l + $t_c);
+    $template->setVariable("LEAVING", $t_l);
+    $template->setVariable("CONTINUING", $t_c);
+    $template->setVariable("RETENTION", sprintf("%.2f%%", $t_c*100/($t_c+$t_l)));
+    $template->setVariable("NEW", $t_n);
+    $template->parseCurrentBlock();
+
+
+  }
 
   public static function VolunteerCodes($template) {
     $template->addBlockFile('RESULT', 'F_RESULT', 'VolunteerCodes.tpl');

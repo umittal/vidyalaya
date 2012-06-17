@@ -88,6 +88,18 @@ final class Department {
 		}
 	}
 
+	public static function CharFromId($char) {
+		switch ($char) {
+			case 1: return "H";
+			case 2: return "G";
+			case 3: return "T";
+		        case 4: return "C";
+			case 5: return "KG";
+			case 6: return "P";
+			default: return null;
+		}
+	}
+
 
 	public static function NameFromPraveenSymbol($symbol) {
 		if (beginsWith($symbol, "KG")) {

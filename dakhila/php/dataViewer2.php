@@ -763,6 +763,15 @@ NAMAKOOL;
       $this->template->parseCurrentBlock();
       print $this->template->get();
       break;
+
+    // ************************************************************
+    case "TwoYearSummary":
+      $this->template->setCurrentBlock('RESULT');
+      $this->template->setVariable('RESULT', Reports::TwoYearSummary($this->template));
+      $this->template->parseCurrentBlock();
+      print $this->template->get();
+      break;
+
     // ************************************************************
     case "EventRSVP":
       $url = htmlentities($_SERVER['PHP_SELF']) . "?command=EventRSVP";
