@@ -124,8 +124,19 @@ dojo.require("dijit.form.Button");
 </td>
 </tr>
 </table>
-</ol>
 
+<li class="section">Other Contacts</li>
+<table class="tablesorter">
+<thead>
+<tr><th>Phone</th><th>Name</th><th>Address</th><th>Email</th><th>URL</th></tr>
+</thead>
+<!-- BEGIN OTHERCONTACT -->
+<tr><td>{PHONE}</td><td>{NAME}</td><td>{ADDR}</td><td>{EMAIL}</td><td>{URL}</td></tr>
+<!-- END OTHERCONTACT -->
+</table>
+
+
+</ol>
 <p></p>
 <div class="explanation">
 Note: Please email any changes to admission2012@vidyalaya.us and we will send you an updated package. 

@@ -139,7 +139,7 @@ class DataViewer {
 
     VidSession::sessionAuthenticate();
     $this->SetMenu();
-    if ($command!= "Family" && !VidSession::IsSuperUser()) {
+    if ($command!= "Family" && $command!= "FamilyPdf" && !VidSession::IsSuperUser()) {
       $html = "<p>Sorry, only administrators are permitted access to this page, please click the back button on your browser</p>";
       $this->template->setCurrentBlock('RESULT');
       $this->template->setVariable('RESULT', $html);
@@ -251,6 +251,24 @@ class DataViewer {
       }
 
       print $this->template->get();
+      break;
+      
+    // ************************************************************
+    case "FamilyPdf":
+      $url = htmlentities($_SERVER['PHP_SELF']) . "?command=Family";
+      $familyId = isset($_POST['ID']) ?  $_POST['ID'] : null;
+
+      if (isset($familyId)) {
+	if (VidSession::IsSuperUser()) {
+	  $family = Family::GetItemById($familyId);
+	} else {
+	  $email = $_SESSION["loginUsername"];
+	  $person = Person::PersonFromEmail($email); 
+	  $family=is_null($person) ? null : $person->home;
+	}
+	Reports::RegistrationPacketFamilyDownload($family);
+      }
+
       break;
       
     // ************************************************************

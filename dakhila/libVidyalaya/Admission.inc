@@ -1,6 +1,6 @@
 <?php
 
-$libDir="../../dakhila/libVidyalaya/";
+$libDir = realpath(dirname(__FILE__));
 require_once "$libDir/db.inc";
 require_once "$libDir/vidyalaya.inc";
 

@@ -18,6 +18,12 @@ dojo.require("dijit.form.Form");
 	idfield.attr("value", familyId);
 	if (form) {form.submit();} else {alert ("form not found");}
       }
+	function showFamilyPdf(familyId) {
+	var form=dijit.byId("familyPdf");
+	var idfield=dijit.byId("familyId");
+	idfield.attr("value", familyId);
+	if (form) {form.submit();} else {alert ("form not found");}
+      }
 	function addnewsletter(role, classId) {
 	var form=dijit.byId("newsletterForm");
 	var idfield=dijit.byId("role");
@@ -46,6 +52,13 @@ dojo.require("dijit.form.Form");
 	</form>
 
 	<form method="post" action="/dakhila/php/dataViewer2.php?command=Family" style="display:none" id="familyForm"
+	dojoType="dijit.form.Form"
+	>
+	Family ID: <input type="text" dojoType="dijit.form.TextBox" name="ID" id="familyId"> 
+	<input type="submit" name="go" value="GO"><br>
+	</form>
+
+	<form method="post" action="/dakhila/php/dataViewer2.php?command=FamilyPdf" style="display:none" id="familyPdf"
 	dojoType="dijit.form.Form"
 	>
 	Family ID: <input type="text" dojoType="dijit.form.TextBox" name="ID" id="familyId"> 
@@ -88,7 +101,8 @@ dojo.require("dijit.form.Form");
 <!-- END STUDENTLINK -->
 
 <!-- BEGIN FAMILYLINK -->
-<tr><td colspan=2 class="ou" onclick="showFamilyDetails({ID})" onmouseover="this.style.cursor='pointer'">FAMILY DETAILS</td><tr>
+<tr><td colspan=2 class="ou" onclick="showFamilyDetails({ID})" onmouseover="this.style.cursor='pointer'">Family Details</td><tr>
+<tr><td colspan=2 class="ou" onclick="showFamilyPdf({ID})" onmouseover="this.style.cursor='pointer'">Registration Packet</td><tr>
 <!-- END FAMILYLINK -->
 
 </table>

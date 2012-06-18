@@ -305,6 +305,10 @@ function DisplayFamilyTemplateV3 (&$template, $family) {
 	  $template->parseCurrentBlock();
 	}
 
+	foreach($family->allContacts() as $contact) {
+	  DisplaySingleContact(&$template, $contact);
+	}
+
 	$sapi = php_sapi_name();
 	if ($sapi == "cli") return;
 	if (!VidSession::IsSuperUser()) return;
@@ -561,16 +565,8 @@ function DisplayContactStudent(&$template, $student, $type) {
 }
 
 // ******** Other Contacts
-function DisplayContact(&$template, $contact) {
+function DisplaySingleContact (&$template, $contact) {
   if ($contact == null) return;
-  $template->addBlockFile('RESULT', 'F_RESULT', 'OtherContact.tpl');
-  $template->touchBlock('F_RESULT');
-
-  $template->setCurrentBlock("HIDDENFORMS");
-  $template->setVariable("STUDENTFORM", file_get_contents("../html/StudentForm.inc"));
-  $template->setVariable("EDITFORM", file_get_contents("../html/editContact.inc"));
-  $template->parseCurrentBlock();
-  
   $templateName="OTHERCONTACT";
   $template->setCurrentBlock($templateName);
   $template->setVariable("PHONE",  formatPhone($contact->phone));
@@ -589,6 +585,18 @@ function DisplayContact(&$template, $contact) {
     $template->setVariable("URL",  $url);
   }
   $template->parseCurrentBlock();
+}
+function DisplayContact(&$template, $contact) {
+  if ($contact == null) return;
+  $template->addBlockFile('RESULT', 'F_RESULT', 'OtherContact.tpl');
+  $template->touchBlock('F_RESULT');
+
+  $template->setCurrentBlock("HIDDENFORMS");
+  $template->setVariable("STUDENTFORM", file_get_contents("../html/StudentForm.inc"));
+  $template->setVariable("EDITFORM", file_get_contents("../html/editContact.inc"));
+  $template->parseCurrentBlock();
+  
+  DisplaySingleContact(&$template, $contact);
 
   $fakemail =empty($contact->email) ? "ignore@me.com" : $contact->email;
   $fakeurl =empty($contact->url) ? "http://ignoreme.com" : $contact->url;

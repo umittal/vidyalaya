@@ -248,6 +248,17 @@ class Reports {
 	return $html;
   }
 
+  public static function RegistrationPacketFamilyDownload($family) {
+    if (is_null($family)) return;
+    $html = Reports::RegistrationPacketHtml($family);
+    $html = str_replace('&nbsp;', '<span style="color:#fff;">x</span>',$html);
+    $dompdf = new DOMPDF();
+    $dompdf->load_html($html);
+    $dompdf->render();
+    $fileName = "Family-" . $family->id . ".pdf";
+    $dompdf->stream($fileName);
+  }
+
   public static function RegistrationPacketFamily($family) {
     if (is_null($family)) return;
     $html = Reports::RegistrationPacketHtml($family);

@@ -2214,6 +2214,18 @@ class Family {
 	  return $children;
 	}
 
+	public function allContacts() {
+	  $contacts = array();
+	  foreach ($this->children() as $student) {
+	    foreach ($student->contacts as $key => $phone) {
+	      if ($phone == null) continue;
+	    $contacts[$phone] = OtherContacts::ObjectFromKey($phone);
+
+	    }
+	  }
+	  return $contacts;
+	}
+
 
   public function setVariables($row) {
   	
