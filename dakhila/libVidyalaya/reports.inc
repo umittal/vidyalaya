@@ -171,7 +171,7 @@ class Reports {
 	$templateDir = realpath(dirname(__FILE__)."/../templates");
 	$pageheader = '<a href=""><img src="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/images/Vheader2.jpg" width="700" height="70" alt="php5 logo"/></a>';
 	$timestamp = date('d M Y h:i A');
-	$footer = '<div id="footer"> <table><tr><td>Copyright &#169; 2011 Vidyalya Inc., Printed at: .' 
+	$footer = '<div id="footer"> <table><tr><td>Copyright &#169; 2011 Vidyalya Inc., Printed at: ' 
 	  . $timestamp 
 	  . '</td><td style="text-align:right;"><div class="page-number"></div></td></tr></table></div>';
 
@@ -194,7 +194,7 @@ class Reports {
 
 	$template->addBlockFile('RESULT', 'F_RESULT', 'FamilyDetail.tpl');
 	$template->touchBlock('F_RESULT');
-	DisplayFamilyTemplateV3(&$template, $family);
+	DisplayFamilyTemplateV3($template, $family);
 
 	$html = $html . $template->get();	
 
@@ -251,12 +251,8 @@ class Reports {
   public static function RegistrationPacketFamilyDownload($family) {
     if (is_null($family)) return;
     $html = Reports::RegistrationPacketHtml($family);
-    $html = str_replace('&nbsp;', '<span style="color:#fff;">x</span>',$html);
-    $dompdf = new DOMPDF();
-    $dompdf->load_html($html);
-    $dompdf->render();
     $fileName = "Family-" . $family->id . ".pdf";
-    $dompdf->stream($fileName);
+    PrintFactory::HtmlToPdfToWeb($html, $fileName);
   }
 
   public static function RegistrationPacketFamily($family) {

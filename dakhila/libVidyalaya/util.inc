@@ -200,6 +200,14 @@ class PrintFactory {
     return $dompdf->output();
   }
 
+  static function HtmlToPdfToWeb($html, $fileName) {
+    $html = str_replace('&nbsp;', '<span style="color:#fff;">x</span>',$html);
+    $dompdf = new DOMPDF();
+    $dompdf->load_html($html);
+    $dompdf->render();
+    $dompdf->stream($fileName, array("Attachment" => 0));
+  }
+
 }
 
 Class Calendar {
@@ -221,11 +229,11 @@ Class Calendar {
 	}
 	
 	public static function NextYear() {
-		return CurrentYear() + 1;
+	  return self::CurrentYear() + 1;
 	}
 	
 	public static function PreviousYear() {
-		return CurrentYear() - 1;
+	  return self::CurrentYear() - 1;
 	}
 	
 	public static function Years($from, $to) {
@@ -447,7 +455,7 @@ class Mail {
     $subject = "Password Reset for Dakhila Portal";
     if ($production == 0) $subject = "[Test] $subject";
     $mail = self::SetupMailUmesh();
-    self::SetPersonAddress(&$mail, $person, $production);
+    self::SetPersonAddress($mail, $person, $production);
 
     $server=  $_SERVER['SERVER_NAME'];
     $mail->Subject = $subject;

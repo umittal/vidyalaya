@@ -70,6 +70,7 @@ function DisplayPersonTemplate (&$template, $person) {
 	$template->setVariable("CELL", $person->cellPhone);
 	$template->parseCurrentBlock();
 
+
 	if ($person->MFS != MFS::Student) {
 	  $templateName="FAMILYLINK";
 	  $template->setCurrentBlock($templateName);
@@ -80,7 +81,6 @@ function DisplayPersonTemplate (&$template, $person) {
 	  $template->setCurrentBlock($templateName);
 	  $template->setVariable("ID", $person->mfsId);
 	  $template->parseCurrentBlock();
-
 
 	  $templateName="PARENTS";
 	  $template->setCurrentBlock($templateName);
@@ -107,7 +107,7 @@ function DisplayPersonTemplate (&$template, $person) {
 	  $template->setCurrentBlock($templateName);
 	  $template->parseCurrentBlock();
 	}
-
+	
 	$isDirty = false;
 	$teachers = Teachers::GetTeacherFromPerson($person, Calendar::CurrentYear());
 	if (!is_null($teachers)) {
@@ -126,7 +126,7 @@ function DisplayPersonTemplate (&$template, $person) {
 	  }
 	}
 
-	if ($isDirty) {
+	if ($isDirty && false) {
 	  $templateName="CATEGORYBLOCK";
 	  $template->setCurrentBlock($templateName);
 	  $template->parseCurrentBlock();
@@ -188,11 +188,11 @@ function PersonDetailShowButton($template, $person, $event, $actionlabel, $actio
 }
 
 // ******** Student
-function DisplayPerson(&$template, $person) {
+function DisplayPerson($template, $person) {
   if ($person == null) return;
 	$template->addBlockFile('RESULT', 'F_RESULT', 'PersonDetail.tpl');
 	$template->touchBlock('F_RESULT');
-	DisplayPersonTemplate($template, $person);
+      	DisplayPersonTemplate($template, $person);
 }
 
 
@@ -306,7 +306,7 @@ function DisplayFamilyTemplateV3 (&$template, $family) {
 	}
 
 	foreach($family->allContacts() as $contact) {
-	  DisplaySingleContact(&$template, $contact);
+	  DisplaySingleContact($template, $contact);
 	}
 
 	$sapi = php_sapi_name();
@@ -762,7 +762,7 @@ function DisplayAvailableClass($template, $year, $facility) {
 	
 	foreach (AvailableClass::GetAllYear($year) as $item) {
 	  $count = empty($classCount[$item->id]) ? 0 :$classCount[$item->id];
-	  if ($count==0) continue;
+	  //	  if ($count==0) continue;
 	  $templateName="CLASS";
 	  $template->setCurrentBlock($templateName);
 	  

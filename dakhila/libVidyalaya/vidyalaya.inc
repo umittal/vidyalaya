@@ -144,7 +144,11 @@ class Student {
   private static function firstTimeEnrolled() {
     if (!empty(self::$everEnrolled)) return;
 
-    $query = "select distinct student from Enrollment ";
+    $year = Calendar::RegistrationYear() - 2010;
+    $query = "select distinct student from Enrollment 
+              left join AvailableClass on Enrollment.availableClass = AvailableClass.id
+	      where AvailableClass.year < $year
+             ";
     $result = VidDb::query($query);
     while ($row = mysql_fetch_array($result)) {
       self::$everEnrolled[$row[0]] = 1;

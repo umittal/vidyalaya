@@ -31,8 +31,7 @@ class UserData {
     $this->SetMenu();
     $email = $_SESSION["loginUsername"];
     $person = Person::PersonFromEmail($email); 
-    if (!is_null($person)) 
-      DisplayPerson($this->template, $person);
+    if (!is_null($person))  DisplayPerson($this->template, $person);
     print $this->template->get();
   }
 

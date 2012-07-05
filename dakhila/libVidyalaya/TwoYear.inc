@@ -22,8 +22,9 @@ class TwoYearEnrollment {
 			$this->cultureSection = $enrollment->class->section;
 				
 		} else {
-			$this->language =  $enrollment->class->course->department;
 			$this->languageLevel  = $enrollment->class->course->level;
+			$this->language =  $enrollment->class->course->level != 0 ? $enrollment->class->course->department 
+			  : $enrollment->student->languagePreference;
 			$this->languageSection = $enrollment->class->section;
 				
 		}
@@ -42,7 +43,6 @@ class TwoYearEnrollment {
 		$fields[] = $this->languageSection;
 		$fields[] = $this->cultureLevel;
 		$fields[] = $this->cultureSection;
-//		return implode (", ", $fields);
 	}
 }
 
@@ -199,6 +199,7 @@ class TwoYearLayout {
     $enrolledHandle = fopen(self::EnrolledStudentsFile, "w") or die ("cannot open file " . self::EnrolledStudentsFile);
     $leavingHandle = fopen(self::LeavingStudentsFile, "w") or die ("cannot open file " . self::LeavingStudentsFile);
     self::firstTimeCall();
+    fwrite($enrolledHandle, "student, family, curr lang,levl, sect, curr cult, levl, Fam Stat, Rec, Name, Prev lang,levl, sect, prev cult, levl\n");
     foreach (self::$objArray as $studentid => $twoYear) {
        $student = Student::GetItemById($studentid);
       $familyid = $student->family->id;
@@ -208,25 +209,18 @@ class TwoYearLayout {
       $fields = Array();
       $fields[] = $studentid;
       $fields[] = $familyid;
-      //			$fields[] = $twoYear->previousYear->csv();
-				
       if ($twoYear->status != self::Leaving) {
 	$fileHandle = $enrolledHandle;
-
-	//				$fields[] = $twoYear->thisYear->csv();
-	$twoYear->thisYear->csv(&$fields);
+	$twoYear->thisYear->csv($fields);
 	$fields[] = $twoYear->status;
 	$fields[] = $twoYear->assessment;
       } else {
-
 	$fileHandle = $leavingHandle;
-	$twoYear->previousYear->csv(&$fields);
+	$twoYear->previousYear->csv($fields);
 	$fields[] = $currFamilyStatus;
       }
       $fields[] = $student->fullName();
-				
-      if ($twoYear->status == self::Continuing) $twoYear->previousYear->csv(&$fields);
-				
+      if ($twoYear->status == self::Continuing) $twoYear->previousYear->csv($fields);
       fputcsv($fileHandle, $fields);
     }
 

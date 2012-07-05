@@ -242,7 +242,7 @@ FAMILYOPENINGDAY;
       //      if ($family->id != 436) return;
       if ($production == 0) $subject = "[Test] $subject";
       $mail = Mail::SetupMailSpa();
-      Mail::SetFamilyAddress(&$mail, $family, $production);
+      Mail::SetFamilyAddress($mail, $family, $production);
       $mail->Subject = $subject;
       $salutation = "<p>Dear " . $family->parentsName() . ",";
       $mail->Body = $salutation . $body . $footer;
@@ -365,7 +365,7 @@ FAMILYUPDATE;
       print "Trying to send email to id " . $family->id . "\n";
       if ($production == 0) $subject = "[Test] $subject";
       $mail = Mail::SetupMailSpa();
-      Mail::SetFamilyAddress(&$mail, $family, $production);
+      Mail::SetFamilyAddress($mail, $family, $production);
       $mail->Subject = $subject;
       $salutation = "<p>Dear " . $family->parentsName() . ",";
       $mail->Body = $salutation . $body . $footer;
@@ -831,7 +831,7 @@ AGREEMENT;
     $body = file_get_contents("adult.inc");
     if ($production == 0) $subject = "[Test] $subject";
     $mail = Mail::SetupMailSpaReplyAsmita();
-    Mail::SetFamilyAddress(&$mail, $family, $production);
+    Mail::SetFamilyAddress($mail, $family, $production);
     $mail->Subject = $subject;
     $salutation = "<p>Dear " . $family->parentsName() . ",";
     $mail->Body = $salutation . $body . $footer;
@@ -874,7 +874,7 @@ AGREEMENT;
 
     $production=1;
     $mail =   Mail::SetupMailAdmissions();
-    Mail::SetFamilyAddress(&$mail, $family, $production);
+    Mail::SetFamilyAddress($mail, $family, $production);
 
     $subject = "Vidyalaya Admission 2012-13, Family $family->id, Last Call";
     if ($production == 0) $subject = "[Test] $subject";
@@ -921,7 +921,7 @@ AGREEMENT;
   private static function AnnounceOrientation($family) {
     $production=1;
     $mail =   Mail::SetupMailAdmissions();
-    Mail::SetFamilyAddress(&$mail, $family, $production);
+    Mail::SetFamilyAddress($mail, $family, $production);
 
     $subject = "Vidyalaya Admission 2012-13, Family $family->id";
     if ($production == 0) $subject = "[Test] $subject";
@@ -989,7 +989,7 @@ AGREEMENT;
       $customizedPdf = "/home/umesh/Dropbox/Vidyalaya-Management/Administration/Mela2012.pdf";
       $production=1;
       $mail =   Mail::SetupMailInfo();
-      Mail::SetFamilyAddress(&$mail, $family, $production);
+      Mail::SetFamilyAddress($mail, $family, $production);
 
       $subject = "Vidyalaya Mela Invitation - Sunday June 3, 2012, 10AM-1PM";
       if ($production == 0) $subject = "[Test] $subject";

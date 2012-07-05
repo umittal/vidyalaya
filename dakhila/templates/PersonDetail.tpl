@@ -20,7 +20,7 @@ dojo.require("dijit.form.Form");
       }
 	function showFamilyPdf(familyId) {
 	var form=dijit.byId("familyPdf");
-	var idfield=dijit.byId("familyId");
+	var idfield=dijit.byId("familyId2");
 	idfield.attr("value", familyId);
 	if (form) {form.submit();} else {alert ("form not found");}
       }
@@ -45,45 +45,38 @@ dojo.require("dijit.form.Form");
     </script>
 
 	<form method="post" action="/dakhila/php/dataViewer2.php?command=Student" style="display:none" id="studentForm"
-	dojoType="dijit.form.Form"
-	>
+	dojoType="dijit.form.Form">
 	Student ID: <input type="text" dojoType="dijit.form.TextBox" name="ID" id="studentId"> 
 	<input type="submit" name="go" value="GO"><br>
 	</form>
 
 	<form method="post" action="/dakhila/php/dataViewer2.php?command=Family" style="display:none" id="familyForm"
-	dojoType="dijit.form.Form"
-	>
+	dojoType="dijit.form.Form">
 	Family ID: <input type="text" dojoType="dijit.form.TextBox" name="ID" id="familyId"> 
 	<input type="submit" name="go" value="GO"><br>
 	</form>
 
 	<form method="post" action="/dakhila/php/dataViewer2.php?command=FamilyPdf" style="display:none" id="familyPdf"
-	dojoType="dijit.form.Form"
-	>
-	Family ID: <input type="text" dojoType="dijit.form.TextBox" name="ID" id="familyId"> 
+	dojoType="dijit.form.Form">
+	Family ID: <input type="text" dojoType="dijit.form.TextBox" name="ID" id="familyId2"> 
 	<input type="submit" name="go" value="GO"><br>
 	</form>
 
 	<form method="post" action="/dakhila/php/userdata.php?command=editor" style="display:none" id="newsletterForm"
-	dojoType="dijit.form.Form"
-	>
+	dojoType="dijit.form.Form">
 	Role ID: <input type="text" dojoType="dijit.form.TextBox" name="role" id="role"> 
 	Class ID: <input type="text" dojoType="dijit.form.TextBox" name="classId" id="classId"> 
 	<input type="submit" name="go" value="GO"><br>
 	</form>
 
 	<form method="post" action="/dakhila/php/dataserver.php?command=RegisterEvent" style="display:none" id="registereventform"
-	dojoType="dijit.form.Form"
-	>
+	dojoType="dijit.form.Form">
 	MFS: <input type="text" dojoType="dijit.form.TextBox" name="MFS" id="MFS"> 
 	MFS ID: <input type="text" dojoType="dijit.form.TextBox" name="mfsId" id="mfsId"> 
 	ITEM ID: <input type="text" dojoType="dijit.form.TextBox" name="itemId" id="itemId"> 
 	Action: <input type="text" dojoType="dijit.form.TextBox" name="action" id="action"> 
 	<input type="submit" name="go" value="GO"><br>
 	</form>
-
-	
 
 <h3>Person Details</h3>
  
@@ -122,7 +115,7 @@ dojo.require("dijit.form.Form");
 <!-- BEGIN SHOWPARENTS -->
 <li class="section">Parents</li>
 <table class="tablesorter" >  	  	  
- <thead><tr><th>M/F<th>NAME<th>EMAIL<th>WORK<th>CELL<th>Directory</tr></thead>
+<thead><tr><th>M/F<th>NAME<th>EMAIL<th>WORK<th>CELL<th>Directory</tr></thead>
 <!-- BEGIN PARENTS -->
 <tr><td  class="ou" onclick="showFamilyDetails({ID})" onmouseover="this.style.cursor='pointer'">{MF} </td><td>{NAME}</td><td> {EMAIL}</td><td>{WORK}</td><td>{CELL}</td><td>{ISCONTACTABLE}</td></tr>
 <!-- END PARENTS -->  	  	  
@@ -132,7 +125,7 @@ dojo.require("dijit.form.Form");
 <!-- BEGIN VOLUNTEERROLES -->
 <li class="section">Volunteer Roles</li>
 <table class="tablesorter" >  	  	  
- <thead><tr><th>Role<th>CLASS</th><th>ROOM</th><th>Newsletter</th></tr></thead>
+<thead><tr><th>Role<th>CLASS</th><th>ROOM</th><th>Newsletter</th></tr></thead>
 <!-- BEGIN ROLE -->
 <tr><td>{ROLE} </td><td>{CLASS}</td><td>{ROOM}</td><td  class="ou" onclick="addnewsletter({ROLE}, {CLASSID})" onmouseover="this.style.cursor='pointer'">Newsletter</td></tr>
 <!-- END ROLE -->  	  	  
@@ -161,6 +154,5 @@ dojo.require("dijit.form.Form");
 <!-- END EVENTREGISTRATION -->
 </table>
 <!-- END SHOWEVENTS -->  	  	  
-
 
 </ol>

@@ -1238,7 +1238,7 @@ BODY;
 //EventManager::ReportParticipation(1); exit();
 //EventManager::PostPaymentFile(); exit();
 //Publications::LanguageAssessment(2011); exit();
-NewsletterHtml::Publish();
+//NewsletterHtml::Publish();
 //Publications::FamilyListForHandbookDistribution(2011); exit();
 //Publications::AttendanceSheet(2011); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
@@ -1246,7 +1246,7 @@ NewsletterHtml::Publish();
 
 //Publications::RosterSpa(2011); exit();
 
-//Publications::FullDumpFamilies();
+Publications::FullDumpFamilies();
 
 //Publications::BadgeFile(2011); exit();
 //Publications::CreateMailingLists(2011);exit();
