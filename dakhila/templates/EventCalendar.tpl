@@ -8,7 +8,7 @@ $(document).ready(function() {
 	headers : { 4:{sorter: false}}
 	});
     FilterText = "";
-    ColumnArray = ["Date", "Start"];
+    ColumnArray = ["Week", "", "Type", "Start", "End"];
 
 
       for (i=0;i<ColumnArray.length;i++) {
@@ -25,7 +25,10 @@ $(document).ready(function() {
 
 </script>
 
-<p><a href="/dakhila/php/dataViewer2.php?command=newEvent">New Event</a></p>
+<!-- BEGIN AUTHORIZED -->
+<a href="/dakhila/php/dataViewer2.php?command=newEvent">New Event</a>{EVENTID}
+<!-- END  AUTHORIZED -->
+
 <h3>Events</h3>
 <table id="maintable" cellspacing="0" class="tablesorter" width="600px">
 <thead>
@@ -34,7 +37,11 @@ $(document).ready(function() {
 
 <tbody>
 <!-- BEGIN EVENTS -->
-<tr><td>{WEEK}</td><td>{DATE}</td><td>{TYPE}</td><td>{START}</td><td>{END}</td><td>{DESCRIPTION}</td></tr>
+<tr><td>{WEEK}</td><td class="ou" onclick="showEventCalendarDetails({ID})" onmouseover="this.style.cursor='pointer'">{DATE}</td><td>{TYPE}</td><td>{START}</td><td>{END}</td><td>{DESCRIPTION}</td></tr>
 <!-- END EVENTS -->
 </tbody>
 </table>
+
+<!-- BEGIN HIDDENFORMS -->
+{EVENTCALENDARFORM}
+<!-- END HIDDENFORMS -->

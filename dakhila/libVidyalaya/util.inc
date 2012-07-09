@@ -192,7 +192,7 @@ class PrintFactory {
     return $html;
   }
 
-  function HtmlToPdf($html) {
+  static function HtmlToPdf($html) {
     $html = str_replace('&nbsp;', '<span style="color:#fff;">x</span>',$html);
     $dompdf = new DOMPDF();
     $dompdf->load_html($html);

@@ -297,7 +297,7 @@ BODY_WAITING;
 //Admission::itemDelivery(); exit();
 
 
-Evaluation::ProcessAllExcelFiles(); exit();
+//Evaluation::ProcessAllExcelFiles(); exit();
 
 //FamilyTracker::loadPayments();exit();
 //FamilyTracker::UpdateFamilyTracker(); exit();

@@ -596,7 +596,7 @@ function DisplayContact(&$template, $contact) {
   $template->setVariable("EDITFORM", file_get_contents("../html/editContact.inc"));
   $template->parseCurrentBlock();
   
-  DisplaySingleContact(&$template, $contact);
+  DisplaySingleContact($template, $contact);
 
   $fakemail =empty($contact->email) ? "ignore@me.com" : $contact->email;
   $fakeurl =empty($contact->url) ? "http://ignoreme.com" : $contact->url;

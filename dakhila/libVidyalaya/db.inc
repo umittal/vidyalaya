@@ -72,9 +72,10 @@ class VidSession {
   }
 
   public static function Menu() {
-    if (!VidSession::IsLoggedIn()) return file_get_contents("../html/openmenu.inc");
-    if (!VidSession::IsSuperUser()) return file_get_contents("../html/usermenu.inc");
-    return file_get_contents("../html/menu.inc");
+    global $htmlDir;
+    if (!VidSession::IsLoggedIn()) return file_get_contents("$htmlDir/openmenu.inc");
+    if (!VidSession::IsSuperUser()) return file_get_contents("$htmlDir/usermenu.inc");
+    return file_get_contents("$htmlDir/menu.inc");
   }
 
   public static function FooterWeb() {

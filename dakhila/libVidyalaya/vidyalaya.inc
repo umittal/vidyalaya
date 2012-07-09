@@ -491,7 +491,7 @@ class CourseCatalog {
 	
 	public function __construct($row) {
 		$this->id = $row["CourseCatalog.id"];
-		$this->department = $row["CourseCatalog.department"];
+ 		$this->department = $row["CourseCatalog.department"];
 		$this->level = $row["CourseCatalog.level"];
 		$this->short = $row["CourseCatalog.short"];
 		$this->full = $row["CourseCatalog.full"];
@@ -636,6 +636,10 @@ class AvailableClass {
 		return self::$objArray[$key];
 	}
 	
+	public function __toString() {
+	  return $this->short();
+	}
+
 	public function __construct($row) {
 		$this->id = $row["AvailableClass.id"];
 		$this->year= $row["AvailableClass.year"];
@@ -1566,6 +1570,7 @@ final Class EventCalendarType {
     , Presentation = 4
     , Meeting = 8
     , Activity = 16
+    , Holiday = 32
     ;
 
   public static function StringFromId($id) {
@@ -1580,6 +1585,8 @@ final Class EventCalendarType {
       return "Meeting";
     case EventCalendarType::Activity:
       return "Activity";
+    case EventCalendarType::Holiday:
+      return "Holiday";
     default: 
       return "?";
     }
@@ -1619,6 +1626,58 @@ Class EventCalendar {
     return new self(mysql_fetch_alias_array(VidDb::query($query)));
   }
 
+  public static function ListScheduledEvents($session, $start, $count) {
+    $query = "Select * from EventCalendar where date >= '$start' order by date asc, starttime asc";
+    return self::ArrayFromQuery($query);
+  }
+
+  private static function AddEvent ($eventType, $date, $portalId, $startTime, $endTime, $class, $description) {
+    $query = "insert EventCalendar (eventtype, DATE, weeknumber, portalid, starttime, endtime, class, description) values ($eventType, '$date', null, $portalId, '$startTime', '$endTime', $class, '$description')";
+    VidDb::query($query);
+  }
+
+  public static function UpdateWeekNumber($year) {
+    $startDate = "$year-09-01";
+    $nextYear = $year+1;
+    $endDate = "$nextYear-06-30";
+    $query = "select * from EventCalendar where date > '$startDate' and date < '$endDate' and eventtype = " . EventCalendarType::SchoolDay . " order by date";
+    print "$query\n";
+    $schooldays= self::ArrayFromQuery($query);
+
+    $weekno = 1;
+    foreach($schooldays as $day) {
+      if ($weekno != $day->weekNumber) {
+	$query = "update EventCalendar set weekNumber = $weekno where id=$day->id";
+	VidDb::query($query);
+      }
+      $weekno++;
+    }
+
+  }
+
+  private static function AddSchoolDay ($date) {
+    self::AddEvent(EventCalendarType::SchoolDay, $date, "null", "9:25AM", "11:45 AM", "null", null);
+  }
+
+  public static function AddSundays($year) {
+    if ($year < 2010) throw new Exception("year must be greater than 2010, " .  __FUNCTION__." in ".__FILE__." at ".__LINE__."\n");
+    $nextYear = $year +1;
+    $sundays = new DatePeriod(
+        new DateTime("first sunday of $year-09"),
+        DateInterval::createFromDateString('next sunday'),
+        new DateTime("last day of $nextYear-06")
+    );
+    //    $foo = new DateTime("first sunday of $year-09");
+    //    print "i got sundays, " . $foo->format("Y-m-d\n");
+    foreach($sundays as $sunday) {
+      echo $sunday->format("Y-m-d\n");
+      self::AddSchoolDay($sunday->format("Y-m-d"));
+      //print "I was here\n";
+    }
+    //    $foo = new DateTime("last day of $nextYear-06");
+    //    print "getting out, " . $foo->format("Y-m-d\n");;
+  }
+
   public function LongDescription() {
     if (is_null($this->class)) {
       $classUrl = "";
@@ -1633,6 +1692,13 @@ Class EventCalendar {
     return "$classUrl $portalUrl $this->description";
   }
 
+  public static function GetItemById($id) {
+    $query = "select * from EventCalendar where id=$id";
+    $items= self::ArrayFromQuery($query);
+    if (empty($items)) return null;
+    return $items[0];
+  }  
+
   private static function ArrayFromQuery($query, $sortFunc = "FamilyTracker::CompareFamilyId") {
     $localarray = Array();
     $result = VidDb::query($query);
@@ -1640,11 +1706,6 @@ Class EventCalendar {
       $localarray[] = new self($row);
     }
     return $localarray;
-  }
-
-  public static function ListScheduledEvents($session, $start, $count) {
-    $query = "Select * from EventCalendar order by date asc, starttime asc";
-    return self::ArrayFromQuery($query);
   }
 
   public function __construct($row) {

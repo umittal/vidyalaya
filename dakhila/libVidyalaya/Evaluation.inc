@@ -125,27 +125,18 @@ EOT;
 
   }
 
-  private static function ProcessOneExcelFile($filename, $enrolledStudent, $previous, $next) {
+  private static function ProcessOneExcelFile($filename, $enrolledStudent, $previous, $next, $previousEnrollment) {
     $array_data = array(); 
     $rowcount =0;
 
     $objReader = preg_match("/xls$/i", $filename) ? PHPExcel_IOFactory::createReader('Excel5') : PHPExcel_IOFactory::createReader('Excel2007');
-    //    $objReader = PHPExcel_IOFactory::createReader('Excel2007');
-    //    $objReader = PHPExcel_IOFactory::createReader('Excel5');
     $objReader->setReadDataOnly(true);
     $objPHPExcel = $objReader->load($filename);
     $worksheet=$objPHPExcel->getSheet(0);
-/*
-    $active_sheet = $objPHPExcel -> getActiveSheet();
-    foreach($active_sheet -> toArray() as $row_n => $row){
-      foreach($row as $cell_n => $cell){
-	// operations here
-	print "$row_n, $cell_n, " . $cell->getValue() . "\n";
-      }
-    }
-*/
     $a = "Recommended Language Level for 2012-13";
     $header = array(); $nextYear=0; $current="unknown";
+
+
     foreach ($worksheet->getRowIterator() as $row) {
       $cellIterator = $row->getCellIterator(); 
       $cellIterator->setIterateOnlyExistingCells(false); // Loop all cells, even if it is not set 
@@ -188,11 +179,24 @@ EOT;
 	  $nextId = 0;
 	  print "Error: $nextShort class could not be found in next array\n";
 	}
-	print "$studentId, $previousShort, $nextShort, $change \n";
+
+	// final checking before update
+
+	if ($previousEnrollment[$student->id] != $previousShort) print "Error: previous enrollment and current file does not match\n";
+	//	if ($enrolledStudent[$student->id] != $previousShort) print "Error: current enrollment " .
+	//							     $enrolledStudent[$student->id] . " and current file $previousShort does not match\n";
+
+	$sql = sprintf("update Enrollment set availableClass = %s where student = %s and availableClass = %s",
+		       $nextId, $studentId,$enrolledStudent[$studentId] );
+
+	print "$change $sql\n";
+
+	//	print "$studentId, $previousShort, $nextShort, $change, $rowIndex \n";
 	$rowcount++;
       }
     } 
-    print " $filename, row count = $rowcount";return $rowcount;
+    //    print " $filename, row count = $rowcount";
+    return $rowcount;
     print_r($array_data);
   }
 
@@ -202,7 +206,16 @@ EOT;
 
     $enrolledStudent = array();
     foreach(Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, Calendar::CurrentYear()) as $item) {
-      $enrolledStudent[$item->student->id] = 1;
+      if (Department::IsLanguage($item->class->course->department)) {
+	$enrolledStudent[$item->student->id] = $item->class->id;
+      }
+    }
+
+    $previousEnrollment = array();
+    foreach(Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, Calendar::PreviousYear()) as $item) {
+      if (Department::IsLanguage($item->class->course->department)) {
+	$previousEnrollment[$item->student->id] = $item->class->short();
+      }
     }
 
     $previousClassMap = array();
@@ -217,8 +230,8 @@ EOT;
     if ($handle = opendir($directory)) {
       while (false !== ($file = readdir($handle))) {
 	if ($file != "." && $file != ".." && preg_match("/xls/i", $file)) {
-	  $grandTotal += self::ProcessOneExcelFile("$directory/$file", $enrolledStudent, $previousClassMap, $classMap);
-	  print ", $i \n"; $i++;
+	  $grandTotal += self::ProcessOneExcelFile("$directory/$file", $enrolledStudent, $previousClassMap, $classMap, $previousEnrollment);
+	  //	  print ", $i \n"; $i++;
 	}
       }
       print "Grand total is $grandTotal\n";

@@ -317,7 +317,8 @@ class Reports {
 
       $deptTeachers = Teachers::TeacherListDepartment($dept, $year);
 
-      $avgStudentPerClass = $total/count($classCount); $avgStudentPerTeacher = $total/count($deptTeachers);
+      $avgStudentPerClass = count($classCount) !=0 ? $total/count($classCount) : 0; 
+      $avgStudentPerTeacher = count($deptTeachers) !=0 ? $total/count($deptTeachers) : 0;
       $html .= "<h3>" . Department::NameFromId($dept) . "</h3> (" . count($classCount) .  " classes, $total students, " . count($deptTeachers) . " Teachers";
       $html .= sprintf(", Student Count (Average): Per Class: %.2f , Per Teacher: %.2f)\n",$avgStudentPerClass,  $avgStudentPerTeacher);
       $html .= '<table id="table' . $dept .'" cellspacing="0" class="tablesorter">' . "\n";
@@ -339,8 +340,9 @@ class Reports {
 
 	$html .= "<tr><td rowspan=$rowcount valign='top'>" .  $class->short() . "</td>";
 
+	$classCount = isset($classCount[$class->id]) ? $classCount[$class->id] : 0;
 	$url=$_SERVER['PHP_SELF'] . "?command=ClassRoster&classId=$class->id";
-	$html .= "<td rowspan=$rowcount valign='top'><a href='$url'>" . $classCount[$class->id] . "</a></td>";
+	$html .= "<td rowspan=$rowcount valign='top'><a href='$url'>" . $classCount  . "</a></td>";
 
 	$url=$_SERVER['PHP_SELF'] . "?command=Room&id=" . $class->room->id;
 	$html .= "<td rowspan=$rowcount valign='top'><a href='$url'>" . $class->room->roomNumber . "</a></td>";
@@ -447,14 +449,63 @@ class Reports {
     return $html;
   }
 
-  public static function DisplayEventCalendar($template, $count, $params) {
+  public static function DisplayEventCalendarDetail($template, $params) {
+    $id = isset($_POST['EventCalendarId']) ?  $_POST['EventCalendarId'] : null;
+    if (empty($id)) return;
+
+    $event = EventCalendar::GetItemById($id);
+    if (empty($event)) return;
+
+    $template->addBlockFile('RESULT', 'F_RESULT', 'EventCalendarDetail.tpl');
+    $template->touchBlock('F_RESULT');
+    
+    $templateName="EVENTCALENDARDETAIL";
+    $template->setCurrentBlock($templateName);
+    $template->setVariable("ID", $event->id);
+    $template->setVariable("TYPE", EventCalendarType::StringFromId($event->eventType));
+    $template->setVariable("DATE", $event->date);
+    $template->setVariable("WEEKNUMBER", $event->weekNumber);
+    $template->setVariable("PORTAL", $event->portalId);
+    $template->setVariable("START", $event->startTime);
+    $template->setVariable("END", $event->endTime);
+    $template->setVariable("CLASS", $event->class);
+    $template->setVariable("DESCRIPTION", $event->description);
+    $template->parseCurrentBlock();
+
+    if (VidSession::IsSuperUser()) {
+      $templateName="BUTTONS";
+      $template->setCurrentBlock($templateName);
+      $template->setVariable("EVENTID", $event->id);
+      $template->parseCurrentBlock();
+    }
+
+  }
+
+
+  public static function DisplayEventCalendar($template, $params) {
+    $start = isset($_POST['startDate']) ?  $_POST['startDate'] : null;
+    if (empty($start)) return;
+    $count=0;
+
     $template->addBlockFile('RESULT', 'F_RESULT', 'EventCalendar.tpl');
     $template->touchBlock('F_RESULT');
     
+    $template->setCurrentBlock("HIDDENFORMS");
+    $template->setVariable("EVENTCALENDARFORM", file_get_contents("../html/EventCalendarForm.inc"));
+    $template->parseCurrentBlock();
+    
+    if (VidSession::IsSuperUser()) {
+      $templateName="AUTHORIZED";
+      $template->setCurrentBlock($templateName);
+      $template->setVariable("EVENTID", "");
+      $template->parseCurrentBlock();
+    }
+
     $templateName="EVENTS";
-    foreach (EventCalendar::ListScheduledEvents(1, 0, $count) as $event) {
+    foreach (EventCalendar::ListScheduledEvents(1, $start, $count) as $event) {
       $template->setCurrentBlock($templateName);
       $template->setVariable("WEEK", $event->weekNumber);
+      $template->setVariable("ID", $event->id);
       $template->setVariable("TYPE", EventCalendarType::StringFromId($event->eventType));
       $template->setVariable("DATE", $event->date);
       $template->setVariable("START", $event->startTime);

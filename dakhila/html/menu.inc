@@ -1,26 +1,17 @@
 <div dojoType="dijit.MenuBar" id="navMenu">
     <div dojoType="dijit.PopupMenuBarItem">
         <span>
-            Roster
+            Admission
         </span>
-        <div dojoType="dijit.Menu" id="fileMenu">
+        <div dojoType="dijit.Menu" id="admissionMenu">
             <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=home"'>
                 Home
             </div>
-            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=Teachers"'>
-                Teachers
-            </div>
-            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=ClassRoster"'>
-                Roster
-            </div>
-            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=Volunteers"'>
-                Volunteers
-            </div>
-            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=lcmatrix"'>
-                LC Matrix
-            </div>
-            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=RegistrationSummary"'>
-                Registration
+        <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=RegistrationSummary"'>
+            Registration
+        </div>
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=WaitlistStudents"'>
+                Waitlist
             </div>
             <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=FamilyTracker"'>
                 Family Tracker
@@ -28,16 +19,37 @@
             <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=TwoYearSummary"'>
                 Two Year
             </div>
-            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=WaitlistStudents"'>
-                Waitlist
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=Room"'>
+                Room
+            </div>
+   </div>
+   </div>
+
+    <div dojoType="dijit.PopupMenuBarItem">
+        <span>
+            Roster
+        </span>
+        <div dojoType="dijit.Menu" id="rosterMenu">
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=Teachers"'>
+                Teachers
+            </div>
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=AvailableCourse"'>
+                Classes
+            </div>
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=lcmatrix"'>
+                LC Matrix
+            </div>
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/html/grid.php"'>
+                Courses
             </div>
         </div>
     </div>
+
     <div dojoType="dijit.PopupMenuBarItem">
         <span>
             View
         </span>
-        <div dojoType="dijit.Menu" id="editMenu">
+        <div dojoType="dijit.Menu" id="viewMenu">
             <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=Family"'>
                 Family
             </div>
@@ -47,26 +59,14 @@
             <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=person"'>
                 Person
             </div>
-            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=Room"'>
-                Room
-            </div>
-            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/html/grid.php"'>
-                Courses
-            </div>
-            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=AvailableCourse"'>
-                Classes
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=Volunteers"'>
+                Volunteers
             </div>
             <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=OtherContacts"'>
                 Contacts
             </div>
             <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/userdata.php?command=EventCalendar" '>
                 Calendar
-            </div>
-            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=Registration"'>
-                Registration Form
-            </div>
-            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=MedicalForm"'>
-                Medical Form
             </div>
         </div>
     </div>
@@ -104,6 +104,22 @@
         </div>
     </div>
 
+    <div dojoType="dijit.PopupMenuBarItem">
+        <span>
+            Legacy
+        </span>
+        <div dojoType="dijit.Menu" id="legacyMenu">
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=ClassRoster"'>
+                Roster
+            </div>
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=Registration"'>
+                Registration Form
+            </div>
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=MedicalForm"'>
+                Medical Form
+            </div>
+        </div>
+   </div>
 
     <div dojoType="dijit.PopupMenuBarItem">
         <span>

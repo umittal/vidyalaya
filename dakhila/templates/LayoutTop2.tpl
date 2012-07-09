@@ -15,6 +15,7 @@
 
 	<script type="text/javascript" src="/dakhila/js/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="/dakhila/js/jquery.uitablefilter.js"></script>
+	<script type="text/javascript" src="/dakhila/js/core.js"></script>
 
         <script type="text/javascript">
 dojo.require('dojox.validate');
