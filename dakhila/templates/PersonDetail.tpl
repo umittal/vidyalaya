@@ -96,6 +96,7 @@ dojo.require("dijit.form.Form");
 <!-- BEGIN FAMILYLINK -->
 <tr><td colspan=2 class="ou" onclick="showFamilyDetails({ID})" onmouseover="this.style.cursor='pointer'">Family Details</td><tr>
 <tr><td colspan=2 class="ou" onclick="showFamilyPdf({ID})" onmouseover="this.style.cursor='pointer'">Registration Packet</td><tr>
+<tr><td colspan=2 class="ou" onclick="familyFeeCheck({ID})" onmouseover="this.style.cursor='pointer'">Fee Check</td><tr>
 <!-- END FAMILYLINK -->
 
 </table>

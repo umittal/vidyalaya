@@ -45,3 +45,7 @@ function deleteme(objname, id) {
     post_to_url("/dakhila/index.php", { 'command': 'deleteobj', 'objName':objname, 'objId':id }, "post");
 }
 
+function familyFeeCheck(id) {
+    post_to_url("/dakhila/index.php", { 'command': 'FamilyFeeCheck', 'ID':id }, "post");
+}
+

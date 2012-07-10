@@ -23,6 +23,7 @@ if (empty($command)) {
 //print "I am at comamnd: $command  in ".__FILE__." at ".__LINE__."\n";
 switch ($command) {
 case "deleteobj":
+case "FamilyFeeCheck":
   $dataviewer->DoIt($command);
 default:
   print "unknown comamnd, please go back";
