@@ -164,6 +164,26 @@ class TwoYearLayout {
       }
     }
   }
+
+  public static function updateRegistrationDate() {
+    $filename = Admission::DataFile;
+    if (is_readable($filename)) {
+      $handle = fopen($filename, "r");
+      $header = fgetcsv($handle, 0, ",");
+      $header = fgetcsv($handle, 0, ",");
+      $i=1;
+      $totalTuition=0;
+      $done=array();
+      $fileTuition = array();
+      print "debug, i was here\n";
+      while ((list($familyId,$Check , $base, $new , $adj , $CD , $PB , $Bag , $date , $total ,$foo, $ch1 , $ch2 , $ch3 )
+	      = fgetcsv($handle, 0, ",")) !== FALSE) {
+	if (!(empty($familyId) || empty($date))) {
+	  print "Update FamilyTracker set registrationDate = '$date' where family=$familyId and year=2;\n";
+	}
+      }
+    }
+  }
 	
   private static function loadAssessment() {
     return;
@@ -274,9 +294,6 @@ class TwoYearLayout {
       } else {
 	print "insert into Enrollment set student = $student->id, availableClass = $class->id;\n";
       }
-			
-				
-				
       print "$count: $studentid needs to be enrolled";
       print "\n";
     }

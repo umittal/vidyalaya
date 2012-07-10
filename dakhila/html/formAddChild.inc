@@ -107,6 +107,7 @@ var deferred = dojo.xhrPost(xhrArgs);
 	  <td>
 	    <input type="text" size="20" name="Email" id="Email" 
  		   dojoType="dijit.form.ValidationTextBox" 
+  value="a@b.c"
   required="false"
     validator="dojox.validate.isEmailAddress"
 		   promptMessage="Enter Child  email address."

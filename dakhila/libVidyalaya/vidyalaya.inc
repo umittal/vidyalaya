@@ -250,6 +250,10 @@ class Student {
   public function fullName() {
   	return $this->firstName . " " . $this->lastName;
   }
+
+  public function __toString() {
+    return $this->fullName();
+  }
   
   public function CellEmail() {
   	$fields = array();
@@ -871,6 +875,25 @@ class Enrollment{
 	  return 0;
 	}
 
+  private static $firstYearArray = Array ();
+
+  public static function firstYear($studentId) {
+    if (empty(self::$firstYearArray)) {
+      $query="select * from Enrollment";
+      foreach (self::ArrayFromQuery($query) as $e) {
+	if (array_key_exists($e->student->id, self::$firstYearArray)) {
+	  if ($e->class->year < self::$firstYearArray[$e->student->id]) self::$firstYearArray[$e->student->id] = $e->class->year;
+	} else {
+	  self::$firstYearArray[$e->student->id] = $e->class->year;
+	}
+	//	print "debug: first year for $e->student->id is " . $e->class->year . "\n";
+      }
+    }
+    $year =  array_key_exists($studentId, self::$firstYearArray) ? self::$firstYearArray[$studentId] : 5000;
+    //    print "debug: first year for $studentId is $year\n";
+    return $year;
+  }
+
 	// return all families in an availableclass
 	public static function GetFamilies($class) {
 	  $families = array();
@@ -956,6 +979,29 @@ class Enrollment{
 			inner join AvailableClass on Enrollment.availableClass = AvailableClass.id
 			inner join Rooms on AvailableClass.room = Rooms.id
 		where AvailableClass.year = $year and Rooms.facility = $facility
+		";
+		return self::ArrayFromQuery($query);	
+	}
+
+	public static function GetAllForyear($year) {
+		if ($year >= 2010) $year -= 2010;
+		
+		$query = "select * 
+		from Enrollment
+			inner join AvailableClass on Enrollment.availableClass = AvailableClass.id
+		where AvailableClass.year = $year 
+		";
+		return self::ArrayFromQuery($query);	
+	}
+
+	public static function FamilyHistory($familyId) {
+		if ($year >= 2010) $year -= 2010;
+		
+		$query = "select * 
+		from Enrollment
+			inner join AvailableClass on Enrollment.availableClass = AvailableClass.id
+                        inner join Students2003 on Enrollment.student = Students2003.ID
+		where Students2003.PARENT_ID = $familyId
 		";
 		return self::ArrayFromQuery($query);	
 	}
@@ -2430,12 +2476,16 @@ class FamilyTracker {
 
 	private static function firstTimeCall() {
 		if (!empty(self::$objArray)) return;
+		self::$objArray = self::GetAllForYear(2012);
+		return;
+		/*
 		$query = "select * from FamilyTracker where year=2";
 		$result  = VidDb::query($query);
 		while ($row = mysql_fetch_alias_array($result)) {
 			$key = $row["FamilyTracker.family"];
 			if (!array_key_exists($key, self::$objArray)) self::$objArray[$key] = new self($row);
 		}
+		*/
 	}
 
 	private static function ArrayFromQuery($query, $sortFunc = "FamilyTracker::CompareFamilyId") {
@@ -2477,6 +2527,12 @@ class FamilyTracker {
 	public static function CurrentYearStatus ($family){
 		self::firstTimeCall();
 		return self::$objArray[$family]->currentYear;
+	}
+
+	public static function GetAllForYear($year)  {
+	  if ($year >= 2010) $year -= 2010;
+	  $query = "select * from FamilyTracker where year=$year";
+	  return self::ArrayFromQuery($query, "FamilyTracker::CompareFamilyId");
 	}
 
 	public static function FamilyHistory($familyId)  {
