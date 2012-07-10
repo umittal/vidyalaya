@@ -6,51 +6,75 @@ require_once "TwoYear.inc";
 error_reporting(E_ALL | E_STRICT | E_NOTICE);
 
 class VidBook {
-	private $objPHPExcel = null;
+  private $objPHPExcel = null;
 	
-	public function fillData($sheet) {
+  public function fillData($sheet) {
 
 
-		$sheet->getColumnDimension('B')->setAutoSize(true);
-		$love = "I love you";
-		$sheet->setCellValue('A1', 'Terms and conditions');
-		$sheet->setCellValue('A3', $love);
-	}
+    $sheet->getColumnDimension('B')->setAutoSize(true);
+    $love = "I love you";
+    $sheet->setCellValue('A1', 'Terms and conditions');
+    $sheet->setCellValue('A3', $love);
+  }
 	
-	public function setActiveSheet($id, $title, $header) {
-		$this->objPHPExcel->createSheet($id);
-		$this->objPHPExcel->setActiveSheetIndex($id);
-		$this->objPHPExcel->getActiveSheet()->setTitle($title);
-		$sheet = $this->objPHPExcel->getActiveSheet();
-		$sheet->getHeaderFooter()->setOddHeader('&L&B'.$header.'&RPrinted on &D');
-		$sheet->getHeaderFooter()->setOddFooter('&L&B' . $this->objPHPExcel->getProperties()->getTitle() . '&RPage &P of &N');
-		$sheet->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_PORTRAIT);
-		$sheet->getPageSetup()->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4);
-		return $sheet;
-	}
+  public function setActiveSheet($id, $title, $header) {
+    $this->objPHPExcel->createSheet($id);
+    $this->objPHPExcel->setActiveSheetIndex($id);
+    $this->objPHPExcel->getActiveSheet()->setTitle($title);
+    $sheet = $this->objPHPExcel->getActiveSheet();
+    $sheet->getHeaderFooter()->setOddHeader('&L&B'.$header.'&RPrinted on &D');
+    $sheet->getHeaderFooter()->setOddFooter('&L&B' . $this->objPHPExcel->getProperties()->getTitle() . '&RPage &P of &N');
+    $sheet->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_PORTRAIT);
+    $sheet->getPageSetup()->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4);
+    return $sheet;
+  }
 	
-	public function __construct() {
-		require_once "PHPExcel/PHPExcel.php";
-		$this->objPHPExcel = new PHPExcel();
-		$this->objPHPExcel->getProperties()->setCreator("Umesh Mittal")
-			->setLastModifiedBy("Umesh Mittal")
-			->setTitle("Vidyalaya Report")
-			->setSubject("Office 2007 XLSX Test Document")
-			->setDescription("Test document for Office 2007 XLSX, generated using PHP classes.")
-			->setKeywords("office 2007 openxml php")
-			->setCategory("Test result file");
-	}
+  public function __construct() {
+    require_once "PHPExcel/PHPExcel.php";
+    $this->objPHPExcel = new PHPExcel();
+    $this->objPHPExcel->getProperties()->setCreator("Umesh Mittal")
+      ->setLastModifiedBy("Umesh Mittal")
+      ->setTitle("Vidyalaya Report")
+      ->setSubject("Office 2007 XLSX Test Document")
+      ->setDescription("Test document for Office 2007 XLSX, generated using PHP classes.")
+      ->setKeywords("office 2007 openxml php")
+      ->setCategory("Test result file");
+  }
 	
-	public function SaveWorkbook($fileName) {
-		$objWriter = new PHPExcel_Writer_Excel2007($this->objPHPExcel);
-		$objWriter->save($fileName);
-	}
+  public function SaveWorkbook($fileName) {
+    $objWriter = new PHPExcel_Writer_Excel2007($this->objPHPExcel);
+    $objWriter->save($fileName);
+  }
 
 
 }
 
 class Reports {
 
+  public static function FeeCheckFamily($template, $items) {
+    if (empty($items)) return;
+    $template->addBlockFile('RESULT', 'F_RESULT', 'FeeCheck.tpl');
+    $template->touchBlock('F_RESULT');
+    foreach ($items as $item) {
+      $templateName="BLOCK";
+      $template->setCurrentBlock($templateName);
+      $template->setVariable("FAMILYID", $item->family->id);
+      $template->setVariable("SESSION",Calendar::SessionFromYear($item->year));
+      $template->setVariable("PARENTS", $item->family->parentsName());
+      $template->setVariable("REGISTRATIONDATE", $item->registrationDate);
+      $template->setVariable("TUITION", $item->tuition);
+      $template->setVariable("NEWENROLLMENT", $item->newEnrollment);
+      $template->setVariable("ADJUSTMENT", $item->adjustment);
+      $template->setVariable("REQUIRED", $item->required);
+      $template->setVariable("PAID", $item->paid);
+      $template->setVariable("DIFF", $item->diff);
+      $status = $item->diff == 0 ? "OK" : "NOT OK";
+      $template->setVariable("STATUS", $status);
+
+      $template->parseCurrentBlock();
+    }
+  }
+	
   public static function TwoYearSummary($template) {
     $continuing = array(); $leaving=array(); $newstudent=array();
     $t_l = $t_c = $t_n = 0;
@@ -167,85 +191,85 @@ class Reports {
   }
 
   private  static function RegistrationPacketHtml($family) {  
-	$students = Student::AllStudents();
-	$templateDir = realpath(dirname(__FILE__)."/../templates");
-	$pageheader = '<a href=""><img src="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/images/Vheader2.jpg" width="700" height="70" alt="php5 logo"/></a>';
-	$timestamp = date('d M Y h:i A');
-	$footer = '<div id="footer"> <table><tr><td>Copyright &#169; 2011 Vidyalya Inc., Printed at: ' 
-	  . $timestamp 
-	  . '</td><td style="text-align:right;"><div class="page-number"></div></td></tr></table></div>';
+    $students = Student::AllStudents();
+    $templateDir = realpath(dirname(__FILE__)."/../templates");
+    $pageheader = '<a href=""><img src="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/images/Vheader2.jpg" width="700" height="70" alt="php5 logo"/></a>';
+    $timestamp = date('d M Y h:i A');
+    $footer = '<div id="footer"> <table><tr><td>Copyright &#169; 2011 Vidyalya Inc., Printed at: ' 
+      . $timestamp 
+      . '</td><td style="text-align:right;"><div class="page-number"></div></td></tr></table></div>';
 
-	// Header 
-	$template = new HTML_Template_ITX($templateDir);
-	$template->loadTemplatefile("Layout.tpl", true, true);
-	$template->addBlockFile('TOP', 'F_TOP', 'LayoutTop.tpl');
-	$template->touchBlock('F_TOP');
-	$html = $template->get();
+    // Header 
+    $template = new HTML_Template_ITX($templateDir);
+    $template->loadTemplatefile("Layout.tpl", true, true);
+    $template->addBlockFile('TOP', 'F_TOP', 'LayoutTop.tpl');
+    $template->touchBlock('F_TOP');
+    $html = $template->get();
 
-	// Family Detail Form - one per family
-	$template = new HTML_Template_ITX($templateDir);
-	$template->loadTemplatefile("Layout.tpl", true, true);
+    // Family Detail Form - one per family
+    $template = new HTML_Template_ITX($templateDir);
+    $template->loadTemplatefile("Layout.tpl", true, true);
 
-	$template->addBlockFile('CONTENT', 'F_CONTENT', 'LayoutContent.tpl');
-	$template->touchBlock('F_CONTENT');
-	$template->setCurrentBlock('HEADER');
-	$template->setVariable("HEADER", $pageheader);
-	$template->parseCurrentBlock();
+    $template->addBlockFile('CONTENT', 'F_CONTENT', 'LayoutContent.tpl');
+    $template->touchBlock('F_CONTENT');
+    $template->setCurrentBlock('HEADER');
+    $template->setVariable("HEADER", $pageheader);
+    $template->parseCurrentBlock();
 
-	$template->addBlockFile('RESULT', 'F_RESULT', 'FamilyDetail.tpl');
-	$template->touchBlock('F_RESULT');
-	DisplayFamilyTemplateV3($template, $family);
+    $template->addBlockFile('RESULT', 'F_RESULT', 'FamilyDetail.tpl');
+    $template->touchBlock('F_RESULT');
+    DisplayFamilyTemplateV3($template, $family);
 
-	$html = $html . $template->get();	
+    $html = $html . $template->get();	
 
-	$html = $html . $footer . '<DIV style="page-break-after:always"></DIV>';
+    $html = $html . $footer . '<DIV style="page-break-after:always"></DIV>';
 
-	// Registration Form - one per family
-	$template = new HTML_Template_ITX($templateDir);
-	$template->loadTemplatefile("Layout.tpl", true, true);
+    // Registration Form - one per family
+    $template = new HTML_Template_ITX($templateDir);
+    $template->loadTemplatefile("Layout.tpl", true, true);
 
-	$template->addBlockFile('CONTENT', 'F_CONTENT', 'LayoutContent.tpl');
-	$template->touchBlock('F_CONTENT');
+    $template->addBlockFile('CONTENT', 'F_CONTENT', 'LayoutContent.tpl');
+    $template->touchBlock('F_CONTENT');
 
-	$template->setCurrentBlock('HEADER');
-	$template->setVariable("HEADER", $pageheader);
-	$template->parseCurrentBlock();
+    $template->setCurrentBlock('HEADER');
+    $template->setVariable("HEADER", $pageheader);
+    $template->parseCurrentBlock();
 
-	$template->addBlockFile('RESULT', 'F_RESULT', 'Registration.tpl');
-	$template->touchBlock('F_RESULT');
-	DisplayRegistrationTemplate($template, $family, $students);
+    $template->addBlockFile('RESULT', 'F_RESULT', 'Registration.tpl');
+    $template->touchBlock('F_RESULT');
+    DisplayRegistrationTemplate($template, $family, $students);
 
-	$html = $html . $template->get();	
+    $html = $html . $template->get();	
 	
-	// Medical Information Form - one per student
-	foreach ($family->EligibleChildren() as $student) {
-	  $html = $html . $footer . '<DIV style="page-break-after:always"></DIV>';
+    // Medical Information Form - one per student
+    foreach ($family->EligibleChildren() as $student) {
+      $html = $html . $footer . '<DIV style="page-break-after:always"></DIV>';
 	  	  
-	  $template = new HTML_Template_ITX($templateDir);
-	  $template->loadTemplatefile("Layout.tpl", true, true);
-	  $template->addBlockFile('CONTENT', 'F_CONTENT', 'LayoutContent.tpl');
-	  $template->touchBlock('F_CONTENT');
-	  $template->setCurrentBlock('HEADER');
-	  $template->setVariable("HEADER", $pageheader);
-	  $template->parseCurrentBlock();
+      $template = new HTML_Template_ITX($templateDir);
+      $template->loadTemplatefile("Layout.tpl", true, true);
+      $template->addBlockFile('CONTENT', 'F_CONTENT', 'LayoutContent.tpl');
+      $template->touchBlock('F_CONTENT');
+      $template->setCurrentBlock('HEADER');
+      $template->setVariable("HEADER", $pageheader);
+      $template->parseCurrentBlock();
 	  
-	  $template->addBlockFile('RESULT', 'F_RESULT', 'MedicalInformation.tpl');
-	  $template->touchBlock('F_RESULT');
-	  DisplayStudentMedicatlInformationTemplate($template, $student);	
-	  $html = $html . $template->get();			
-	}
+      $template->addBlockFile('RESULT', 'F_RESULT', 'MedicalInformation.tpl');
+      $template->touchBlock('F_RESULT');
+      DisplayStudentMedicatlInformationTemplate($template, $student);	
+      $html = $html . $template->get();			
+    }
 	
-	// Footer
-	$template = new HTML_Template_ITX($templateDir);
-	$template->loadTemplatefile("Layout.tpl", true, true);
-	$template->addBlockFile('BOTTOM', 'F_BOTTOM', 'LayoutBottom.tpl');
-	$template->setCurrentBlock('FOOTER');
-	$template->setVariable("FOOTER", $footer);
-	$template->parseCurrentBlock();
-	$template->touchBlock('F_BOTTOM');
-	$html = $html . $template->get();
+    // Footer
+    $template = new HTML_Template_ITX($templateDir);
+    $template->loadTemplatefile("Layout.tpl", true, true);
+    $template->addBlockFile('BOTTOM', 'F_BOTTOM', 'LayoutBottom.tpl');
+    $template->setCurrentBlock('FOOTER');
+    $template->setVariable("FOOTER", $footer);
+    $template->parseCurrentBlock();
+    $template->touchBlock('F_BOTTOM');
+    $html = $html . $template->get();
 
-	return $html;
+    return $html;
   }
 
   public static function RegistrationPacketFamilyDownload($family) {
@@ -281,8 +305,8 @@ class Reports {
       $html .= $item->person->home->phone . "</td><td>" . $item->person->cellPhone . "</td><td>";
       $html.=  VolunteerRole::IdToString($item->role) . "</td><td>" . $item->person->email . "</td></tr>\n"; 
     }
-   $html .= "</tbody></table>\n";
-   return $html;
+    $html .= "</tbody></table>\n";
+    return $html;
   }
 
   private static function TeacherDetail($teacher) {
@@ -355,11 +379,11 @@ class Reports {
 	$html .= "<td rowspan=$rowcount valign='top'>" .  $class->course->full .  "</td></tr>\n";
 	for ($j=1; $j < $rowcount; $j++) {
 	  $html .= "<tr>";
-	for ($k=0; $k < 3; $k++) {
-	  if ($i < count($teacherlist)) {$html .= "<td width='150px'>" . self::TeacherDetail($teacherlist[$i]) . "</td>";}
-	  else {$html .= "<td width='150px'>&nbsp;</td>";}
-	  $i++;
-	}
+	  for ($k=0; $k < 3; $k++) {
+	    if ($i < count($teacherlist)) {$html .= "<td width='150px'>" . self::TeacherDetail($teacherlist[$i]) . "</td>";}
+	    else {$html .= "<td width='150px'>&nbsp;</td>";}
+	    $i++;
+	  }
 	  $html .= "</tr>\n";
 	}
 
@@ -367,7 +391,7 @@ class Reports {
       $html .= "</tbody></table>\n";
     }
 
-   return $html;
+    return $html;
   }
 
   private static function EventRSVPTable ($items, &$html, $lastUpdate, $heading, $amount) {
@@ -616,172 +640,172 @@ class Reports {
 }
 
 class RoomUtilization {
-	private static $objArray = Array();
+  private static $objArray = Array();
 
-	private static function firstTimeCall($facility, $year) {
-		if (!empty(self::$objArray)) return;
-		$enrollment = Enrollment::GetAllEnrollmentForFacilitySession($facility, $year);
-		foreach ($enrollment as $item) {
-			$room = $item->class->room;
-			self::$objArray[$room->id][$item->class->id][] = $item;
-		}
-		return self::$objArray;
+  private static function firstTimeCall($facility, $year) {
+    if (!empty(self::$objArray)) return;
+    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession($facility, $year);
+    foreach ($enrollment as $item) {
+      $room = $item->class->room;
+      self::$objArray[$room->id][$item->class->id][] = $item;
+    }
+    return self::$objArray;
+  }
+
+
+  public static function utilization($facility, $year) {
+    self::firstTimeCall ($facility, $year);
+    $i = 1;
+    foreach (self::$objArray as  $roomid => $availableClass) {
+      $room = Rooms::GetItemById($roomid);
+      print "$i. Room Number: $room->roomNumber, capacity: $room->capacity\n";
+      foreach ($availableClass as $classid => $students) {
+	$classa = AvailableClass::GetItemById($classid);
+	$cc = CourseCatalog::GetItemById($classa->course->id);
+	print "$classa->startTime - $classa->endTime: Course: " . $classa->short().
+	  ", student = " . count($students) . "\n";	
+      }
+      $i++;
+      print "\n";
+    }
+    return Array();
+  }
+
+  public static function utilizationDept($facility, $year, $dept) {
+    self::firstTimeCall ($facility, $year);
+    $i = 1;
+    $workbook = new VidBook();
+    foreach (self::$objArray as  $roomid => $availableClass) {
+      $room = Rooms::GetItemById($roomid);
+      foreach ($availableClass as $classid => $enrollments) {
+	$classa = AvailableClass::GetItemById($classid);
+	$cc = CourseCatalog::GetItemById($classa->course->id);
+
+	if ($cc->department == $dept) {
+	  print "$i. Room Number: $room->roomNumber, Course: " . $classa->short(). "\n";
+	  $sheet = $workbook->setActiveSheet($i-1	, $classa->short(), $classa->short());
+	  $sheet->setCellValue('A1', "Room Number: $room->roomNumber, Course: " . $classa->short());
+	  $row = 2;
+	  foreach ($enrollments as $enrollment) {
+	    $student = $enrollment->student;
+	    $sheet->getColumnDimension('C')->setAutoSize(true);
+	    $sheet->setCellValue('B'.$row, $student->id);
+	    $sheet->setCellValue('C'.$row, $student->fullName());
+	    //print "$student->id, ". $student->fullName() . "\n";
+	    $row++;
+	  }
+	  //					$workbook->fillData($sheet); // this needs to go in loop
+	  $i++;
 	}
-
-
-	public static function utilization($facility, $year) {
-		self::firstTimeCall ($facility, $year);
-		$i = 1;
-		foreach (self::$objArray as  $roomid => $availableClass) {
-			$room = Rooms::GetItemById($roomid);
-			print "$i. Room Number: $room->roomNumber, capacity: $room->capacity\n";
-			foreach ($availableClass as $classid => $students) {
-				$classa = AvailableClass::GetItemById($classid);
-				$cc = CourseCatalog::GetItemById($classa->course->id);
-				print "$classa->startTime - $classa->endTime: Course: " . $classa->short().
-				", student = " . count($students) . "\n";	
-			}
-			$i++;
-			print "\n";
-		}
-		return Array();
-	}
-
-	public static function utilizationDept($facility, $year, $dept) {
-		self::firstTimeCall ($facility, $year);
-		$i = 1;
-		$workbook = new VidBook();
-		foreach (self::$objArray as  $roomid => $availableClass) {
-			$room = Rooms::GetItemById($roomid);
-			foreach ($availableClass as $classid => $enrollments) {
-				$classa = AvailableClass::GetItemById($classid);
-				$cc = CourseCatalog::GetItemById($classa->course->id);
-
-				if ($cc->department == $dept) {
-					print "$i. Room Number: $room->roomNumber, Course: " . $classa->short(). "\n";
-					$sheet = $workbook->setActiveSheet($i-1	, $classa->short(), $classa->short());
-					$sheet->setCellValue('A1', "Room Number: $room->roomNumber, Course: " . $classa->short());
-					$row = 2;
-					foreach ($enrollments as $enrollment) {
-						$student = $enrollment->student;
-						$sheet->getColumnDimension('C')->setAutoSize(true);
-						$sheet->setCellValue('B'.$row, $student->id);
-						$sheet->setCellValue('C'.$row, $student->fullName());
-						//print "$student->id, ". $student->fullName() . "\n";
-						$row++;
-					}
-					//					$workbook->fillData($sheet); // this needs to go in loop
-					$i++;
-				}
-			}
+      }
 				
-			print "\n";
-		}
-		$workbook->SaveWorkbook("/tmp/cultureRoster.xlsx");
-	}
+      print "\n";
+    }
+    $workbook->SaveWorkbook("/tmp/cultureRoster.xlsx");
+  }
 
 
-	// List Students in any department
-	public static function listStudentsDept($facility, $year, $dept) {
-	  self::firstTimeCall ($facility, $year);
-	  $i = 1;
-	  foreach (self::$objArray as  $roomid => $availableClass) {
-	    $room = Rooms::GetItemById($roomid);
-	    foreach ($availableClass as $classid => $enrollments) {
-	      $classa = AvailableClass::GetItemById($classid);
-	      $cc = CourseCatalog::GetItemById($classa->course->id);
+  // List Students in any department
+  public static function listStudentsDept($facility, $year, $dept) {
+    self::firstTimeCall ($facility, $year);
+    $i = 1;
+    foreach (self::$objArray as  $roomid => $availableClass) {
+      $room = Rooms::GetItemById($roomid);
+      foreach ($availableClass as $classid => $enrollments) {
+	$classa = AvailableClass::GetItemById($classid);
+	$cc = CourseCatalog::GetItemById($classa->course->id);
 
-	      if ($cc->department == $dept) {
-		foreach ($enrollments as $enrollment) {
-		  $student = $enrollment->student;
-		  print $i .  ", " .  $student->id . ", " .$student->fullName();
-		  print ",Room: $room->roomNumber, Course: " . $classa->short();
-		  print "\n";
-		  $i++;
-		}
-	      }
-
-	    }
+	if ($cc->department == $dept) {
+	  foreach ($enrollments as $enrollment) {
+	    $student = $enrollment->student;
+	    print $i .  ", " .  $student->id . ", " .$student->fullName();
+	    print ",Room: $room->roomNumber, Course: " . $classa->short();
+	    print "\n";
+	    $i++;
 	  }
 	}
+
+      }
+    }
+  }
 }
 
 
 
 class VidUtil {
-	private function AddEmailArray (&$emailArray, $email, $id) {
-		if (!empty($emailArray[$email])) {
-			print "Error: email $email already assigned to id $emailArray[$email], trying to assign it to $id\n";
-		} else {
-			$emailArray[$email] = $id;
-		}
-	}
+  private function AddEmailArray (&$emailArray, $email, $id) {
+    if (!empty($emailArray[$email])) {
+      print "Error: email $email already assigned to id $emailArray[$email], trying to assign it to $id\n";
+    } else {
+      $emailArray[$email] = $id;
+    }
+  }
 
-	private function HandlePraveenStyleEmail(&$emailArray, $praveenStyle, $id) {
-		foreach (explode(";", $praveenStyle) as $email) {
-			if (!empty($email)) {
-				self::AddEmailArray($emailArray, $email, $id);
-			}
-		}
-	}
+  private function HandlePraveenStyleEmail(&$emailArray, $praveenStyle, $id) {
+    foreach (explode(";", $praveenStyle) as $email) {
+      if (!empty($email)) {
+	self::AddEmailArray($emailArray, $email, $id);
+      }
+    }
+  }
 
-	public static function EmailCheck($email) {
-		$emailArray = array();
+  public static function EmailCheck($email) {
+    $emailArray = array();
 
-		foreach (Family::GetAllFamilies() as $family) {
-			self::HandlePraveenStyleEmail($emailArray, $family->mother->email, $family->id);
-			self::HandlePraveenStyleEmail($emailArray, $family->father->email, $family->id);
+    foreach (Family::GetAllFamilies() as $family) {
+      self::HandlePraveenStyleEmail($emailArray, $family->mother->email, $family->id);
+      self::HandlePraveenStyleEmail($emailArray, $family->father->email, $family->id);
 
-			foreach ($family->Children() as $student) {
-				self::HandlePraveenStyleEmail($emailArray, $student->email, $family->id);
-			}
-		}
+      foreach ($family->Children() as $student) {
+	self::HandlePraveenStyleEmail($emailArray, $student->email, $family->id);
+      }
+    }
 
-		$matchingArray = preg_grep_keys($email, $emailArray);
-		if (empty($matchingArray)) {
-	  //	if (empty($emailArray[$email])) {
-			print "email **$email** does not exist in our database\n";
-		} else {
-	  foreach ($matchingArray as $email => $familyId) {
-	  	print "Family id for **$email** is $familyId\n";
-	  }
-		}
-	}
+    $matchingArray = preg_grep_keys($email, $emailArray);
+    if (empty($matchingArray)) {
+      //	if (empty($emailArray[$email])) {
+      print "email **$email** does not exist in our database\n";
+    } else {
+      foreach ($matchingArray as $email => $familyId) {
+	print "Family id for **$email** is $familyId\n";
+      }
+    }
+  }
 
-	public static function WaitingList() {
-		$waiting = Array(); $i=1;
-		print "#, student, Family, name, gender, age, grade, language\n";
-		foreach (Student::AllStudents() as $student) {
-			if ($student->studentStatus->id != StudentStatus::Waiting) continue;
-			$waiting[]=$student;
-			print "$i, $student->id"
-			. ", " . $student->family->id
-			. ", " . $student->fullName() 
-			. ", " . $student->GenderName() 
-			. ", " . sprintf("%2d", $student->AgeAt(Calendar::RegistrationSession))
-			. ", " . sprintf("%2d", $student->GradeAt(Calendar::RegistrationSession))
-			. ", " . Department::NameFromId($student->languagePreference)
+  public static function WaitingList() {
+    $waiting = Array(); $i=1;
+    print "#, student, Family, name, gender, age, grade, language\n";
+    foreach (Student::AllStudents() as $student) {
+      if ($student->studentStatus->id != StudentStatus::Waiting) continue;
+      $waiting[]=$student;
+      print "$i, $student->id"
+	. ", " . $student->family->id
+	. ", " . $student->fullName() 
+	. ", " . $student->GenderName() 
+	. ", " . sprintf("%2d", $student->AgeAt(Calendar::RegistrationSession))
+	. ", " . sprintf("%2d", $student->GradeAt(Calendar::RegistrationSession))
+	. ", " . Department::NameFromId($student->languagePreference)
 			
-			. "\n";
-			$i++;
-		}
-	}
+	. "\n";
+      $i++;
+    }
+  }
 
-	private static function printParentContact($parent, $family) {
+  private static function printParentContact($parent, $family) {
 
-		if (!empty($parent->email)) {
-			print $parent->firstName . ", " . $parent->lastName . ", " . $parent->email .
-			", \"" . $family->address->OneLineAddress() . "\", " . $parent->cellPhone . "\n";
-		}
-	}
+    if (!empty($parent->email)) {
+      print $parent->firstName . ", " . $parent->lastName . ", " . $parent->email .
+	", \"" . $family->address->OneLineAddress() . "\", " . $parent->cellPhone . "\n";
+    }
+  }
 
-	public static function printMemberList() {
-		print "First Name, Last Name, E-mail Address, Home Address, Mobile Phone\n";
-		foreach (Family::GetAllFamilies() as $family) {
-			self::printParentContact($family->mother, $family);
-			self::printParentContact($family->father, $family);
-		}
-	}
+  public static function printMemberList() {
+    print "First Name, Last Name, E-mail Address, Home Address, Mobile Phone\n";
+    foreach (Family::GetAllFamilies() as $family) {
+      self::printParentContact($family->mother, $family);
+      self::printParentContact($family->father, $family);
+    }
+  }
 
 }
 

@@ -65,6 +65,15 @@ class VidSession {
     return false;
   }
 
+  public static function IsMyFamily($familyId) {
+    if (empty($familyId)) return false;
+    if (self::IsSuperUser()) return true;
+    $email = $_SESSION["loginUsername"];
+    $person = Person::PersonFromEmail($email); 
+    $family=is_null($person) ? null : $person->home;
+    return $familyId == $family->id;
+  }
+
   public static function HomePage() {
     if (!VidSession::IsLoggedIn()) return "/dakhila";
     if (VidSession::IsSuperUser()) return "/dakhila/php/dataViewer2.php?command=home";

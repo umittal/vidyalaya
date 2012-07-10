@@ -995,8 +995,6 @@ class Enrollment{
 	}
 
 	public static function FamilyHistory($familyId) {
-		if ($year >= 2010) $year -= 2010;
-		
 		$query = "select * 
 		from Enrollment
 			inner join AvailableClass on Enrollment.availableClass = AvailableClass.id

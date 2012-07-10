@@ -6,6 +6,7 @@
 
 	<link rel="stylesheet" href="/dakhila/css/blue/style.css" type="text/css" id="" media="print, projection, screen" />
 	<link rel="stylesheet" href="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/site.css" type="text/css" media="screen print" />
+	<link rel="stylesheet" href="http://www.vidyalaya.us/shiksha/assets/components/vidyalaya/css/vidyalaya.css" type="text/css" media="screen print" />
 
 	<title>Vidyalaya - Dakhila</title>
 

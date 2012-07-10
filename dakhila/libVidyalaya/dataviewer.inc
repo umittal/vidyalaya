@@ -4,7 +4,7 @@ require_once "$rootDir/libVidyalaya/db.inc";
 require_once "$rootDir/libVidyalaya/vidyalaya.inc";
 require_once "$rootDir/libVidyalaya/HtmlFactory.inc";
 require_once "$rootDir/libVidyalaya/reports.inc";
-require_once "$rootDir/libVidyalaya/dataviewer.inc";
+require_once "$rootDir/libVidyalaya/FeeCheck.inc";
 
 $htmlDir = "$rootDir/html";
 
@@ -211,6 +211,27 @@ class DataViewer {
       $this->template->addBlockFile('BOTTOM', 'F_BOTTOM', 'LayoutBottom.tpl');
       $this->template->touchBlock('F_BOTTOM');
       
+      print $this->template->get();
+      break;
+
+    // ************************************************************
+    case "FamilyFeeCheck":
+      $url = htmlentities($_SERVER['PHP_SELF']) . "?command=$command";
+      $familyId = isset($_POST['ID']) ?  $_POST['ID'] : null;
+
+      if (VidSession::IsSuperUser()) {
+	$form = file_get_contents("$htmlDir/formLookupFamily.inc");
+	$form=preg_replace("/==FAMILYID==/", $familyId, $form);
+	$form=preg_replace("/==URL==/", $url, $form);
+
+	$this->template->setCurrentBlock('QUERY');
+	$this->template->setVariable('QUERY', $form);
+	$this->template->parseCurrentBlock();
+      }
+
+      if (VidSession::IsMyFamily($familyId)) {
+	Reports::FeeCheckFamily($this->template, FeeCheck::CreateForFamily($familyId));
+      }
       print $this->template->get();
       break;
 

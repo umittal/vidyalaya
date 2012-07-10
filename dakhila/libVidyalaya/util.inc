@@ -227,6 +227,11 @@ Class Calendar {
 		if ($month < 7) $year--;
 		return $year;
 	}
+
+	public static function SessionFromYear($year) {
+	  $next=($year+1) % 100;
+	  return "$year-$next";
+	}
 	
 	public static function NextYear() {
 	  return self::CurrentYear() + 1;

@@ -74,8 +74,11 @@ class FeeCheck {
 
     foreach ($enrollmentArray as $e) {
       $key = $e->student->family->id . ":" . $e->class->year;
-      $obj = $objArray[$key];
-      $obj->students[$e->student->id][]=$e;
+
+      if(array_key_exists($key, $objArray)) {
+	$obj = $objArray[$key];
+	$obj->students[$e->student->id][]=$e;
+      }
     }
 
     foreach( $objArray as $item) {
