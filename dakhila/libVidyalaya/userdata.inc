@@ -304,6 +304,44 @@ RESETFORM;
   }
 
 
+    // ************************************************************
+  public function Volunteers() {
+    global $htmlDir;
+    $this->SetMenu();
+   	$url="$this->thispage?command=Volunteers";
+      $year = isset($_POST['YEAR']) ?  $_POST['YEAR'] : Calendar::CurrentYear();
+
+      $form = <<<EOT
+	<script>
+	dojo.require("dijit.form.Select");
+        </script>
+	<form method="post" action="$url">
+	Year: 
+	<select id="YEAR" dojoType="dijit.form.Select" name="YEAR">
+	<option value=1>2011</option>
+	<option value=2 selected="selected">2012</option>
+	</select>
+   <input type="submit" name="submit" value="GO"><br>
+</form>
+EOT;
+
+      $js = <<< NAMAKOOL
+<script type="text/javascript">
+$(document).ready( function() {
+    \$table = $("#maintable").tablesorter({widthFixed: true, widgets: ['zebra']
+	});
+
+});
+</script>
+NAMAKOOL;
+
+      $this->template->setCurrentBlock('RESULT');
+      $this->template->setVariable('RESULT', $form . $js . Reports::VolunteerListV2($year, true));
+      $this->template->parseCurrentBlock();
+      print $this->template->get();
+  }
+
+
   // ************************************************************
   public function EventCalendarDetail() {
     $this->SetMenu();

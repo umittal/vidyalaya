@@ -297,13 +297,24 @@ class Reports {
   }
 
   public static function VolunteerListV2($year, $carryLinks) {
-    $html = "<p>Vidyalaya appreciates the following volunteers for their service.\n";
+    $html = "<p>Vidyalaya appreciates the following volunteers for their service during " . Calendar::SessionFromYear($year) . " session.\n";
     $html .= '<table id="maintable" cellspacing="0" class="tablesorter" width="600px">' . "\n";
     $html .= "<thead><tr><th>Name</th><th>Home</th><th>CELL</th><th>Role</th><th>Email</th></tr></thead><tbody>\n";
     foreach(Volunteers::GetAllYear($year) as $item) {
+
+      if (VidSession::IsLoggedIn()) {
+	$phone = $item->person->home->phone;
+	$cell = $item->person->cellPhone;
+	$email = $item->person->email;
+      } else {
+	$phone = "";
+	$cell = "";
+	$email = ""; 
+      }
+
       $html .= "<tr><td>" .  $item->person->fullName() . "</td><td>";
-      $html .= $item->person->home->phone . "</td><td>" . $item->person->cellPhone . "</td><td>";
-      $html.=  VolunteerRole::IdToString($item->role) . "</td><td>" . $item->person->email . "</td></tr>\n"; 
+      $html .= $phone . "</td><td>" . $cell . "</td><td>";
+      $html.=  VolunteerRole::IdToString($item->role) . "</td><td>" . $email . "</td></tr>\n"; 
     }
     $html .= "</tbody></table>\n";
     return $html;
@@ -364,9 +375,9 @@ class Reports {
 
 	$html .= "<tr><td rowspan=$rowcount valign='top'>" .  $class->short() . "</td>";
 
-	$classCount = isset($classCount[$class->id]) ? $classCount[$class->id] : 0;
+	$classCount1 = isset($classCount[$class->id]) ? $classCount[$class->id] : 0;
 	$url=$_SERVER['PHP_SELF'] . "?command=ClassRoster&classId=$class->id";
-	$html .= "<td rowspan=$rowcount valign='top'><a href='$url'>" . $classCount  . "</a></td>";
+	$html .= "<td rowspan=$rowcount valign='top'><a href='$url'>" . $classCount1  . "</a></td>";
 
 	$url=$_SERVER['PHP_SELF'] . "?command=Room&id=" . $class->room->id;
 	$html .= "<td rowspan=$rowcount valign='top'><a href='$url'>" . $class->room->roomNumber . "</a></td>";

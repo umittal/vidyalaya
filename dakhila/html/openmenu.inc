@@ -7,6 +7,9 @@
             <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/userdata.php?command=EventCalendar"'>
                 Calendar
             </div>
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/userdata.php?command=Volunteers"'>
+                Volunteers
+            </div>
         </div>
     </div>
 

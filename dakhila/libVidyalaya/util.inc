@@ -229,6 +229,7 @@ Class Calendar {
 	}
 
 	public static function SessionFromYear($year) {
+	  if ($year < 2010) $year+= 2010;
 	  $next=($year+1) % 100;
 	  return "$year-$next";
 	}

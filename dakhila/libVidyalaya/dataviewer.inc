@@ -766,26 +766,6 @@ EOT;
 
 		
     // ************************************************************
-    case "Volunteers":
-      $year=2011;
-      $js = <<< NAMAKOOL
-<script type="text/javascript">
-$(document).ready( function() {
-    \$table = $("#maintable").tablesorter({widthFixed: true, widgets: ['zebra']
-	});
-
-});
-</script>
-NAMAKOOL;
-
-      $this->template->setCurrentBlock('RESULT');
-      $this->template->setVariable('RESULT', $js . Reports::VolunteerListV2($year, true));
-      $this->template->parseCurrentBlock();
-      print $this->template->get();
-      break;
-
-
-    // ************************************************************
     case "VolunteerCodes":
       $this->template->setCurrentBlock('RESULT');
       $this->template->setVariable('RESULT', Reports::VolunteerCodes($this->template));
