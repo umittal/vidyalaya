@@ -647,7 +647,8 @@ class AvailableClass {
 	public function __construct($row) {
 		$this->id = $row["AvailableClass.id"];
 		$this->year= $row["AvailableClass.year"];
-		$this->session = sprintf("%s-%s",  $this->year+2010 , $this->year+11);
+		//		$this->session = sprintf("%s-%s",  $this->year+2010 , $this->year+11);
+		$this->session = Calendar::SessionFromYear($this->year);
 		$this->course = CourseCatalog::GetItemById($row["AvailableClass.course"]);
 		$this->section = $row["AvailableClass.section"];
 		$this->room = Rooms::GetItemById($row["AvailableClass.room"]);

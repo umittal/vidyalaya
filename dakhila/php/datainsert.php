@@ -171,6 +171,10 @@ class DataInsert {
 	if (!empty($value)) $values[] = "portalid = $value";
 	break;
       case "classId":
+	if (!is_int($value)) {
+	  $class = AvailableClass::GetItemByShort($value, Calendar::SessionFromYear(Calendar::CurrentYear()));
+	  $value = empty($class) ? 0 : $class->id;
+	}
 	if (!empty($value)) $values[] = "class = $value";
 	break;
       case "description":
