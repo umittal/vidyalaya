@@ -29,12 +29,13 @@ class FeeCheck {
   private function calcTuition() {
     switch (count($this->students)) {
     case 0: return 0;
-    case 1: return 450;
-    default: return 550; 
+    case 1: return 400;
+    default: return 500; 
     }
   }
 
   private function NewStudentFee() {
+    if (empty($this->students)) return;
     foreach($this->students as $studentId => $es) {
       $first = 2010 +  Enrollment::firstYear($studentId) ;
       //      print "feecheck debug: $studentid, $first\n";

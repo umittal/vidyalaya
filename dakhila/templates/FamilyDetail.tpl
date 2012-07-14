@@ -90,7 +90,12 @@ dojo.require("dijit.form.Button");
 </form>
 <!-- END ADDCHILD -->
 
-<li class="section">Class Assignment (2011-12)</li>
+<li class="section">Class Assignment 
+<!-- BEGIN CURRENTSESSION -->
+({SESSIONSTRING})
+<!-- END CURRENTSESSION -->
+
+</li>
 <table class="vidyalaya">  	  	  
 <thead>
 <tr><th scope="col">Name<th>Class<th>Room<th width='400px' align="left">Teachers</tr>
@@ -108,11 +113,11 @@ dojo.require("dijit.form.Button");
 <tr><td>
 <table>
 <thead>
-<tr><th scope="col">Year<th>Previous<th>Current<th>Tuition</tr>
+<tr><th scope="col">Year<th>Previous<th>Current<th>Tuition</th><th>Date </th></tr>
 </thead>
 <tbody>
 <!-- BEGIN TRACKER -->
-<tr><td>{YEAR}</td><td>{PREVIOUS}</td><td>{CURRENT}</td><td align="right">{TUITION}</td></tr>
+<tr><td>{YEAR}</td><td>{PREVIOUS}</td><td>{CURRENT}</td><td align="right">{TUITION}</td><td>{REGDDATE}</td></tr>
 <!-- END TRACKER -->
 </tbody>
 </table>

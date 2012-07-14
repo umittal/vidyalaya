@@ -235,6 +235,25 @@ class DataViewer {
       print $this->template->get();
       break;
 
+    case "FeeCheckReena":
+      $url = htmlentities($_SERVER['PHP_SELF']) . "?command=$command";
+      $familyId = isset($_POST['ID']) ?  $_POST['ID'] : null;
+
+      /*
+      $form = file_get_contents("$htmlDir/formLookupFamily.inc");
+      $form=preg_replace("/==FAMILYID==/", $familyId, $form);
+      $form=preg_replace("/==URL==/", $url, $form);
+
+      $this->template->setCurrentBlock('QUERY');
+      $this->template->setVariable('QUERY', $form);
+      $this->template->parseCurrentBlock();
+      */
+
+      Reports::FeeCheckReena($this->template, FeeCheck::CreateForYear(2011), FeeCheck::CreateForYear(2012));
+
+      print $this->template->get();
+      break;
+
     // ************************************************************
     case "Family":
       $url = htmlentities($_SERVER['PHP_SELF']) . "?command=Family";

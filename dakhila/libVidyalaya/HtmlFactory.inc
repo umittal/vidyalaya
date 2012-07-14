@@ -263,6 +263,11 @@ function DisplayFamilyTemplateV3 (&$template, $family) {
 	$template->setVariable("ISCONTACTABLE", YesNoMap($family->mother->IsContactable));
 	$template->parseCurrentBlock();
 
+	$templateName="CURRENTSESSION";
+	$template->setCurrentBlock($templateName);
+	$template->setVariable("SESSIONSTRING",Calendar::SessionFromYear(Calendar::CurrentYear()));
+	$template->parseCurrentBlock();
+
 	foreach ($family->Children() as  $student) {
 	  DisplayChildren($template, $student);
 	}
@@ -302,6 +307,7 @@ function DisplayFamilyTemplateV3 (&$template, $family) {
 	  $template->setVariable("PREVIOUS", $previous);
 	  $template->setVariable("CURRENT", EnumFamilyTracker::NameFromId($item->currentYear));
 	  $template->setVariable("TUITION", $item->tuition);
+	  $template->setVariable("REGDDATE", $item->registrationDate);
 	  $template->parseCurrentBlock();
 	}
 
@@ -354,7 +360,7 @@ function DisplayChildren(&$template, $student) {
 	$templateName="REGISTRATION";
 	$template->setCurrentBlock($templateName);
 
-	foreach(Enrollment::GetEnrollmentStudent($student->id, 2011) as $item) {
+	foreach(Enrollment::GetEnrollmentStudent($student->id, Calendar::CurrentYear()) as $item) {
 	  if ($item->class->course->department == Department::Culture ) {
 	    $template->setVariable("CULTURE", $item->class->urlRoster());
 	   $template->setVariable("CROOM", $item->class->room->roomNumber);

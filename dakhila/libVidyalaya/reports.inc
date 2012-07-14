@@ -75,6 +75,50 @@ class Reports {
     }
   }
 	
+  public static function FeeCheckReena($template, $items2011, $items2012) {
+    $template->addBlockFile('RESULT', 'F_RESULT', 'FeeCheckReena.tpl');
+    $template->touchBlock('F_RESULT');
+
+    $familyTotal = array();
+    foreach ($items2011 as $item) {
+      // show only registered families for now. add check box later
+      if ($item->status != EnumFamilyTracker::registered) continue;
+      $familyTotal[$item->family->id] =$item->diff;
+    }
+    foreach ($items2012 as $item) {
+      // show only registered families for now. add check box later
+      if ($item->status != EnumFamilyTracker::registered) continue;
+      if (array_key_exists($item->family->id, $familyTotal)) {
+	$familyTotal[$item->family->id] +=$item->diff;
+      } else {
+	$familyTotal[$item->family->id] =$item->diff;
+      }
+    }
+
+    foreach($familyTotal as $familyId => $diff) {
+      $templateName="BLOCK";
+      $template->setCurrentBlock($templateName);
+      $template->setVariable("FAMILYID", $familyId);
+      $template->setVariable("DIFF", $diff);
+      $key= $familyId . ":" . "1";
+      $foo = array_key_exists($key, $items2011) ? $items2011[$key]->diff : 0;
+      $template->setVariable("YEAR2011", $foo);
+
+      $key= $familyId . ":" . "2";
+      $foo = array_key_exists($key, $items2012) ? $items2012[$key]->diff : 0;
+      $template->setVariable("YEAR2012", $foo);
+
+      //      $template->setVariable("REQUIRED", $item->required);
+      //      $template->setVariable("PAID", $item->paid);
+      //      $template->setVariable("SESSION",Calendar::SessionFromYear($item->year));
+      $template->setVariable("PARENTS", Family::GetItemById($familyId)->parentsName());
+      //      $status = $item->diff == 0 ? "OK" : "NOT OK";
+      //      $template->setVariable("STATUS", $status);
+
+      $template->parseCurrentBlock();
+    }
+  }
+	
   public static function TwoYearSummary($template) {
     $continuing = array(); $leaving=array(); $newstudent=array();
     $t_l = $t_c = $t_n = 0;
