@@ -64,6 +64,7 @@
     <option value="4">Presentation</option>
     <option value="8" selected="selected">Meeting</option>
     <option value="16">Activity</option>
+    <option value="32">Holiday</option>
     </select>
     </td>
 

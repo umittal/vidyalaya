@@ -1,4 +1,4 @@
-<?php
+><?php
 
 $libDir="../../dakhila/libVidyalaya/";
 require_once "$libDir/db.inc";
@@ -11,6 +11,9 @@ require_once "$libDir/Evaluation.inc";
 require_once "$libDir/FeeCheck.inc";
 require_once "../../MPDF53/mpdf.php";
 
+
+EventCalendar::UpdateWeekNumber(2012);exit();
+
 //TwoYearLayout::updateRegistrationDate();exit();
 
 
@@ -21,6 +24,5 @@ exit();
 
 
 //EventCalendar::AddSundays(2012);exit();
-//EventCalendar::UpdateWeekNumber(2012);exit();
 
 ?>

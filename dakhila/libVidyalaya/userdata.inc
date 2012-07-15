@@ -297,9 +297,14 @@ RESETFORM;
     $html = file_get_contents("$htmlDir/queryEventCalendar.inc");
     $this->template->setVariable("QUERY", $html);
     $this->template->parseCurrentBlock();
+    $layout = isset($_POST['Layout']) ?  $_POST['Layout'] : 0;
 
     $params=null;
-    Reports::DisplayEventCalendar($this->template, $params);
+    if ($layout == 1) {
+      Reports::DisplayEventCalendarYear($this->template, $params);
+    } else {
+      Reports::DisplayEventCalendar($this->template, $params);
+    }
     print $this->template->get();
   }
 

@@ -560,6 +560,73 @@ class Reports {
 
   }
 
+  public static function DisplayEventCalendarYear($template, $params) {
+    $start = isset($_POST['startDate']) ?  $_POST['startDate'] : null;
+    if (empty($start)) return;
+
+    $template->addBlockFile('RESULT', 'F_RESULT', 'EventCalendarYear.tpl');
+    $template->touchBlock('F_RESULT');
+
+    $year=2012;
+    $template->setCurrentBlock("SESSIONBLK");
+    $template->setVariable("SESSION", Calendar::SessionFromYear($year));
+    $template->parseCurrentBlock();
+
+    $schoolday=array(); $yoga=array(); $presentation=array(); $activity=array();
+    foreach (EventCalendar::ListScheduledEvents(1, $start, $count) as $event) {
+      list($year, $month, $day) = explode("-", $event->date);
+      $weekno = intval(($day-1)/7);
+      if ($event->eventType & EventCalendarType::SchoolDay) {
+	$schoolday["$year-$month"][$weekno]=$day;
+      }
+      if ($event->eventType & EventCalendarType::Yoga) {
+	$yoga["$year-$month"][$weekno]=$event->class;
+      }
+      if ($event->eventType & EventCalendarType::Presentation) {
+	$presentation["$year-$month"][$weekno]=$event->class;
+      }
+      if ($event->eventType & EventCalendarType::Activity) {
+	$activity["$year-$month"][$weekno]=$event->description;
+      }
+    }
+    $sudo = VidSession::IsSuperUser();
+
+    $totalweeks =0;
+    foreach ($schoolday as $month=>$weeks) {
+      $template->setCurrentBlock("MONTHLY");
+      list($y, $m) = explode("-", $month);
+      $timestamp = mktime(0, 0, 0, $m, 1, 2005);
+      $template->setVariable("MONTH", date("F", $timestamp));
+
+      $monthlytotal=0;
+      for ($i=0; $i<5; $i++) {
+	if (isset($weeks[$i])) {
+	  $totalweeks++;$monthlytotal++;
+	  $template->setVariable("SCHOOLDAY" . $i, $weeks[$i]);
+
+	  if (isset($yoga[$month][$i])) {
+	    $foo = $sudo ? $yoga[$month][$i]->urlRoster() : $yoga[$month][$i]->short();
+	    $template->setVariable("YOGA" . $i, $foo);
+	  }
+
+	  if (isset($presentation[$month][$i])) {
+	    $foo = $sudo ? $presentation[$month][$i]->urlRoster() : $presentation[$month][$i]->short();
+	    $template->setVariable("PRESENTATION" . $i, $foo);
+	  }
+
+	  if (isset($activity[$month][$i])) $template->setVariable("ACTIVITY" . $i, $activity[$month][$i]);
+	}
+      }
+
+      $template->setVariable("MONTHLYTOTAL", $monthlytotal);
+      $template->parseCurrentBlock();
+    }
+
+    $template->setCurrentBlock("TOTALWEEKS");
+    $template->setVariable("TOTAL", $totalweeks);
+    $template->parseCurrentBlock();
+    
+  }
 
   public static function DisplayEventCalendar($template, $params) {
     $start = isset($_POST['startDate']) ?  $_POST['startDate'] : null;
@@ -568,7 +635,7 @@ class Reports {
 
     $template->addBlockFile('RESULT', 'F_RESULT', 'EventCalendar.tpl');
     $template->touchBlock('F_RESULT');
-    
+
     $template->setCurrentBlock("HIDDENFORMS");
     $template->setVariable("EVENTCALENDARFORM", file_get_contents("../html/EventCalendarForm.inc"));
     $template->parseCurrentBlock();
