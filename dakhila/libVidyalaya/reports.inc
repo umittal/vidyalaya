@@ -573,10 +573,11 @@ class Reports {
     $template->setVariable("SESSION", Calendar::SessionFromYear($year));
     $template->parseCurrentBlock();
 
-    $schoolday=array(); $yoga=array(); $presentation=array(); $activity=array();
+    $schoolday=array(); $yoga=array(); $presentation=array(); $activity=array(); $holiday=array(); $sunday=array();
     foreach (EventCalendar::ListScheduledEvents(1, $start, $count) as $event) {
       list($year, $month, $day) = explode("-", $event->date);
       $weekno = intval(($day-1)/7);
+      $sunday["$year-$month"][$weekno]=$day;
       if ($event->eventType & EventCalendarType::SchoolDay) {
 	$schoolday["$year-$month"][$weekno]=$day;
       }
@@ -588,11 +589,15 @@ class Reports {
       }
       if ($event->eventType & EventCalendarType::Activity) {
 	$activity["$year-$month"][$weekno]=$event->description;
+	//	print "adding $event->description <br />\n";
+      }
+      if ($event->eventType & EventCalendarType::Holiday) {
+	$holiday["$year-$month"][$weekno]=$event->description;
       }
     }
     $sudo = VidSession::IsSuperUser();
 
-    $totalweeks =0;
+    $totalweeks =0; $totalWholeDay=0;
     foreach ($schoolday as $month=>$weeks) {
       $template->setCurrentBlock("MONTHLY");
       list($y, $m) = explode("-", $month);
@@ -615,9 +620,35 @@ class Reports {
 	    $template->setVariable("PRESENTATION" . $i, $foo);
 	  }
 
-	  if (isset($activity[$month][$i])) $template->setVariable("ACTIVITY" . $i, $activity[$month][$i]);
+	  if (isset($activity[$month][$i])) {
+	    $template->setVariable("ACTIVITY" . $i, $activity[$month][$i]);
+	    //	    print "going to unset " . $activity[$month][$i] . "<br />\n";
+	    unset ($activity[$month][$i]);
+	  }
 	}
       }
+
+      $missing = array();
+      // put missing pieces here, max capacity 3. assume no overlap between activity and holiday
+      foreach ($activity[$month] as $weekno=>$description) {
+	$missing[$weekno] = $description;
+	//	print "$month, $weekno, $description <br />\n";
+      }
+      foreach ($holiday[$month] as $weekno=>$description) {
+	if (isset($missing[$weekno])) print "Error: weekno occupied at " .  __FUNCTION__." in ".__FILE__." at ".__LINE__."<br \>\n";;
+	$missing[$weekno] = $description;
+	//	print "$month, $weekno, $description <br />\n";
+      }
+
+
+      $count = count($missing);
+      if ($count > 3) print "Error: too many ==$count==  items at " .  __FUNCTION__." in ".__FILE__." at ".__LINE__."<br \>\n";
+      $currentpos=1;
+      foreach($missing as $weekno=>$description) {
+	$template->setVariable("WHOLEDAY" . $currentpos++, $sunday[$month][$weekno] . ": " . $description);
+	$totalWholeDay++;
+      }
+
 
       $template->setVariable("MONTHLYTOTAL", $monthlytotal);
       $template->parseCurrentBlock();
@@ -625,6 +656,7 @@ class Reports {
 
     $template->setCurrentBlock("TOTALWEEKS");
     $template->setVariable("TOTAL", $totalweeks);
+    $template->setVariable("TOTALWHOLEDAY", $totalWholeDay);
     $template->parseCurrentBlock();
     
   }
