@@ -563,6 +563,7 @@ class Reports {
   public static function DisplayEventCalendarYear($template, $params) {
     $start = isset($_POST['startDate']) ?  $_POST['startDate'] : null;
     if (empty($start)) return;
+    $count=0;
 
     $template->addBlockFile('RESULT', 'F_RESULT', 'EventCalendarYear.tpl');
     $template->touchBlock('F_RESULT');

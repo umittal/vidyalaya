@@ -1,12 +1,12 @@
 <style type="text/css">
-td { width:80px; padding: 0px 5px 0px 0px;  border-right:1px;}
+td { width:50px; padding: 0px 5px 0px 0px;  }
 td.heading {text-align:left; padding-left:15px;}
-td.calcol {border-left: 1px solid red; text-align:center;}
+td.calcol {border-left: 1px dotted #8B9FB5; text-align:center;}
 td.grey {width:2em; background-color:grey;vertical-align:middle; text-align:center;}
 
-tr.firstrow {background: blue; color:white; font-weight: bold;}
+tr.firstrow {background: #4040FF; color:white; font-weight: bold;}
 table { border-collapse: collapse;}
-table tbody { border-top: 1px solid red; margin-top: 10px;padding-top: 10px;}
+table tbody { border-top: 3px groove #010191; margin-top: 10px;padding-top: 10px;}
 </style>
 
 <!-- BEGIN SESSIONBLK -->
