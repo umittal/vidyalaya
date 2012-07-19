@@ -217,13 +217,15 @@ Class Calendar {
 	, RegistrationSession = 3
 	;
 	
-	public static function RegistrationYear() {
-		return date("Y", time());
+	public static function RegistrationYear($now=null) {
+	  if (is_null($now)) $now=time();
+		return date("Y", $now);
 	}
 	
-	public static function CurrentYear() {
-		$year = date("Y", time());
-		$month = date("n", time());
+	public static function CurrentYear($now = null) {
+	  if (is_null($now)) $now=time();
+		$year = date("Y", $now);
+		$month = date("n", $now);
 		if ($month < 7) $year--;
 		return $year;
 	}
@@ -242,6 +244,19 @@ Class Calendar {
 	  return self::CurrentYear() - 1;
 	}
 	
+	public static function StartDate($year= null) {
+	  if (is_null($year)) $year=self::CurrentYear();
+	  if ($year < 2010) $year+= 2010;
+	  return "$year-09-01";
+	}
+
+	public static function EndDate($year= null) {
+	  if (is_null($year)) $year=self::CurrentYear();
+	  if ($year < 2010) $year+= 2010;
+	  $nextYear = $year+1;
+	  return "$nextYear-06-30";
+	}
+
 	public static function Years($from, $to) {
 		return ($to - $from)/60/60/24/365;
 	}

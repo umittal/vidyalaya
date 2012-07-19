@@ -1,5 +1,5 @@
 <?php
-
+$htmlDir = realpath(dirname(__FILE__)) . "/../html";
 function GenderMap($gender) {
 	switch ($gender) {
 		case 1:
@@ -394,6 +394,8 @@ function GetChangeUrl($class, $student) {
 	 $url = $class->url();
 	 //	 if (!VidSesssion::IsSuperUser()) return $url;
 	 if (!$class->IsChangeAllowed()) return $url;
+	 if (!VidSession::IsSuperUser()) return $url;
+
 	  $name = $student->fullName();
 	  $short = $class->short();
 	  $change =  <<< BUTTONHERE
@@ -411,6 +413,7 @@ BUTTONHERE;
 }
 
 function DisplayStudentTemplate (&$template, $student) {
+  global $htmlDir;
   $family = $student->family;
 	$templateName="FATHER";
 	$template->setCurrentBlock($templateName);
@@ -436,7 +439,7 @@ function DisplayStudentTemplate (&$template, $student) {
 	    $template->setVariable("NAME",  $contact->name);
 
 	    $address = $contact->addr1;
-	    if ($contact->addr2 != null) $addres .= "<br /> $contact->addr2";
+	    if ($contact->addr2 != null) $address .= "<br /> $contact->addr2";
 	    if ($contact->zip != null) {
 	      $zip = Zipcodes::ObjectFromKey($contact->zip);
 	      $address .= "<br /> $zip->city $zip->state, $zip->zipcodes";
@@ -475,7 +478,7 @@ BUTTONHERE2;
 	
 	$templateName="FORMCONTENT";
 	$template->setCurrentBlock($templateName);
-	$template->setVariable("FORM",  file_get_contents("../html/formContact.html"));
+	$template->setVariable("FORM",  file_get_contents("$htmlDir/formContact.html"));
 	$template->parseCurrentBlock();
 	
 	$templateName="MOTHER";
@@ -544,16 +547,30 @@ BUTTONHERE2;
 	  }
 	  $template->parseCurrentBlock();
 	}
+
+	$templateName="ACTIVITY";
+
+	foreach (EventCalendar::ListStudentActivities($student) as $event) {
+	$template->setCurrentBlock($templateName);
+	$template->setVariable("DATEOFACTIVITY", $event->date);
+	$template->setVariable("CLASSOFACTIVITY", $event->class->short());
+	$template->setVariable("STARTTIME", $event->startTime);
+	$template->setVariable("ENDTIME", $event->endTime);
+	$template->setVariable("ACTIVITYDESCRIPTION", EventCalendarType::StringFromId($event->eventType));
+	$template->parseCurrentBlock();
+	}
+
 }
 
 // ******** Student
 function DisplayStudent(&$template, $student) {
+  global $htmlDir;
   if ($student == null) return;
 	$template->addBlockFile('RESULT', 'F_RESULT', 'StudentDetail.tpl');
 	$template->touchBlock('F_RESULT');
 
   $template->setCurrentBlock("HIDDENFORMS");
-  $template->setVariable("CONTACTFORM", file_get_contents("../html/ContactForm.inc"));
+  $template->setVariable("CONTACTFORM", file_get_contents("$htmlDir/ContactForm.inc"));
   $template->parseCurrentBlock();
   
 	DisplayStudentTemplate($template, $student);
@@ -598,8 +615,8 @@ function DisplayContact(&$template, $contact) {
   $template->touchBlock('F_RESULT');
 
   $template->setCurrentBlock("HIDDENFORMS");
-  $template->setVariable("STUDENTFORM", file_get_contents("../html/StudentForm.inc"));
-  $template->setVariable("EDITFORM", file_get_contents("../html/editContact.inc"));
+  $template->setVariable("STUDENTFORM", file_get_contents("$htmlDir/StudentForm.inc"));
+  $template->setVariable("EDITFORM", file_get_contents("$htmlDir/editContact.inc"));
   $template->parseCurrentBlock();
   
   DisplaySingleContact($template, $contact);
@@ -751,13 +768,14 @@ function DisplayCourseCatalog(&$template) {
 // ****************************
 // Available Class
 function DisplayAvailableClass($template, $year, $facility) {
+  global $htmlDir;
 	$template->addBlockFile('RESULT', 'F_RESULT', 'AvailableClass.tpl');
 	$template->touchBlock('F_RESULT');
 
 	$templateName="HIDDENFORMS";
 	$template->setCurrentBlock($templateName);
-	$template->setVariable("PERSONFORM", file_get_contents("../html/PersonForm.inc"));
-	$template->setVariable("ADDTEACHERDIALOG", file_get_contents("../html/addTeacherDialog.inc"));
+	$template->setVariable("PERSONFORM", file_get_contents("$htmlDir/PersonForm.inc"));
+	$template->setVariable("ADDTEACHERDIALOG", file_get_contents("$htmlDir/addTeacherDialog.inc"));
 	$template->parseCurrentBlock();
 	
 	$classCount = array();
@@ -810,12 +828,13 @@ BUTTONHERE;
 // Class Roster
 
 function DisplayClassRoster($template, $classId) {
+  global $htmlDir;
   $template->addBlockFile('RESULT', 'F_RESULT', 'ClassRoster.tpl');
   $template->touchBlock('F_RESULT');
 
   $templateName="HIDDENFORMS";
   $template->setCurrentBlock($templateName);
-  $template->setVariable("PERSONFORM", file_get_contents("../html/PersonForm.inc"));
+  $template->setVariable("PERSONFORM", file_get_contents("$htmlDir/PersonForm.inc"));
   $template->parseCurrentBlock();
   
   $class = AvailableClass::GetItemById($classId);

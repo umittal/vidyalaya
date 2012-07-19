@@ -43,6 +43,8 @@ table tbody { border-top: 3px groove #010191; margin-top: 10px;padding-top: 10px
 <table>
 <tr><td>Class:</td><td> {TOTAL}</td></tr>
 <tr><td>No Class:</td><td> {TOTALWHOLEDAY}</td></tr>
+<tr><td>Summer:</td><td> {SUMMER}</td></tr>
+<tr><td>Total:</td><td> 52</td></tr>
 </table>
 (Culture classes allocate a week to Yoga)
 <!-- END TOTALWEEKS -->

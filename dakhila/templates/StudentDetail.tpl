@@ -287,6 +287,19 @@ dojo.require("dijit.Tooltip");
 </tbody>
 </table>
 
+<li class="section">Activities</li>
+<table class="tablesorter">
+<thead>
+<tr><th>Date</th><th>Class</th><th>Start</th><th>End</th><th>Description</th></tr>
+</thead>
+<tbody>
+<!-- BEGIN ACTIVITY -->
+<tr><td>{DATEOFACTIVITY}</td><td>{CLASSOFACTIVITY}</td><td>{STARTTIME}</td><td>{ENDTIME}</td><td>{ACTIVITYDESCRIPTION}</td></tr>
+<!-- END ACTIVITY -->
+</tbody>
+</table>
+
+
 
 </ol>
 

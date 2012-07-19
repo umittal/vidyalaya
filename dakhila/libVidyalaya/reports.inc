@@ -630,23 +630,30 @@ class Reports {
 
       $missing = array();
       // put missing pieces here, max capacity 3. assume no overlap between activity and holiday
+      if (isset($activity[$month] )) {
       foreach ($activity[$month] as $weekno=>$description) {
 	$missing[$weekno] = $description;
 	//	print "$month, $weekno, $description <br />\n";
       }
+      }
+
+      if (isset($holiday[$month] )) {
       foreach ($holiday[$month] as $weekno=>$description) {
 	if (isset($missing[$weekno])) print "Error: weekno occupied at " .  __FUNCTION__." in ".__FILE__." at ".__LINE__."<br \>\n";;
 	$missing[$weekno] = $description;
 	//	print "$month, $weekno, $description <br />\n";
+      }
       }
 
 
       $count = count($missing);
       if ($count > 3) print "Error: too many ==$count==  items at " .  __FUNCTION__." in ".__FILE__." at ".__LINE__."<br \>\n";
       $currentpos=1;
+      if (isset($missing)) {
       foreach($missing as $weekno=>$description) {
 	$template->setVariable("WHOLEDAY" . $currentpos++, $sunday[$month][$weekno] . ": " . $description);
 	$totalWholeDay++;
+      }
       }
 
 
@@ -657,6 +664,7 @@ class Reports {
     $template->setCurrentBlock("TOTALWEEKS");
     $template->setVariable("TOTAL", $totalweeks);
     $template->setVariable("TOTALWHOLEDAY", $totalWholeDay);
+    $template->setVariable("SUMMER", 52 - $totalWholeDay - $totalweeks);
     $template->parseCurrentBlock();
     
   }

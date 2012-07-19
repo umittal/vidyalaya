@@ -9,10 +9,14 @@ require_once "$libDir/reports.inc";
 require_once "$libDir/TwoYear.inc";
 require_once "$libDir/Evaluation.inc";
 require_once "$libDir/FeeCheck.inc";
+require_once "$libDir/OpeningDay.inc";
 require_once "../../MPDF53/mpdf.php";
 
 
-EventCalendar::UpdateWeekNumber(2012);exit();
+OpeningDay::PrintDistributionMaterial();exit();
+OpeningDay::PrintDistributionMaterialFamily(Family::GetItemById(30), 2012); exit();
+
+//EventCalendar::UpdateWeekNumber(2012);exit();
 
 //TwoYearLayout::updateRegistrationDate();exit();
 

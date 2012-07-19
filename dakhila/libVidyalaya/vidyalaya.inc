@@ -1676,16 +1676,31 @@ Class EventCalendar {
     return self::ArrayFromQuery($query);
   }
 
+  public static function ListStudentActivities($student, $year=null) {
+    if (is_null($year)) $year=Calendar::CurrentYear();
+    if ($year >= 2010) $year -= 2010;
+    $query = "Select * from EventCalendar 
+              inner join AvailableClass on EventCalendar.class  = AvailableClass.id
+              inner join Enrollment on Enrollment.availableClass = AvailableClass.id
+              and AvailableClass.year = $year
+              and Enrollment.student = $student->id
+              order by EventCalendar.date asc, EventCalendar.starttime asc
+";
+    return self::ArrayFromQuery($query);
+    
+  }
+
+
   private static function AddEvent ($eventType, $date, $portalId, $startTime, $endTime, $class, $description) {
     $query = "insert EventCalendar (eventtype, DATE, weeknumber, portalid, starttime, endtime, class, description) values ($eventType, '$date', null, $portalId, '$startTime', '$endTime', $class, '$description')";
     VidDb::query($query);
   }
 
   public static function UpdateWeekNumber($year) {
-    $startDate = "$year-09-01";
-    $nextYear = $year+1;
-    $endDate = "$nextYear-06-30";
-    $query = "select * from EventCalendar where date > '$startDate' and date < '$endDate' and eventtype = " . EventCalendarType::SchoolDay . " order by date";
+    $query = "select * from EventCalendar where date > '" . Calendar::StartDate($year) 
+      . "' and date < '" . Calendar::EndDate($year) 
+      . "' and eventtype = " . EventCalendarType::SchoolDay 
+      . " order by date";
     print "$query\n";
     $schooldays= self::ArrayFromQuery($query);
 
