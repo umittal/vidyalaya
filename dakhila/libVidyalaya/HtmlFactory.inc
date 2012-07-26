@@ -39,7 +39,7 @@ function Layout(&$template) {
 	$template->touchBlock('F_BOTTOM');
 	
 	$template->setCurrentBlock('FOOTER');
-	$template->setVariable("FOOTER", "Copyright (c) 2011 Vidyalya Inc.");
+	$template->setVariable("FOOTER", "Copyright (c) 2012 Vidyalya Inc.");
 	$template->parseCurrentBlock();
 }
 
@@ -349,6 +349,7 @@ function DisplayChildren(&$template, $student) {
 	$template->setVariable("ID", $student->id);
 	$template->setVariable("NAME", $student->fullName());
 	$template->setVariable("EMAIL", $student->email);
+	$template->setVariable("GRADE", $student->Grade());
 	$template->setVariable("LANGUAGE", $student->LanguageInterest());
 	$template->setVariable("GENDER", GenderMap($student->gender));
 	$dob = empty($student->dateOfBirth) ? "Unknown" : date("Y-m-d", strtotime($student->dateOfBirth));
@@ -370,6 +371,11 @@ function DisplayChildren(&$template, $student) {
 	    $template->setVariable("LANGUAGE", $item->class->urlRoster());
 	    $template->setVariable("LROOM", $item->class->room->roomNumber);
 	    $template->setVariable("LTEACHER", Teachers::TeacherListClassHtml($item->class->id));
+	    $template->parseCurrentBlock();
+
+	    $templateName="ENROLLEDCHILDREN";
+	    $template->setCurrentBlock($templateName);
+	    $template->setVariable("STUDENTNAME", $student->id . ": " . $student->fullName());
 	  }
 	}
 	$template->parseCurrentBlock();
@@ -472,9 +478,11 @@ function DisplayStudentTemplate (&$template, $student) {
 
 BUTTONHERE2;
 	$templateName="CHANGEBUTTON";
+	if (VidSession::IsSuperUser()) {
 	$template->setCurrentBlock($templateName);
 	$template->setVariable("CHANGECONTACT",  $change);
 	$template->parseCurrentBlock();
+	}
 	
 	$templateName="FORMCONTENT";
 	$template->setCurrentBlock($templateName);
@@ -498,6 +506,7 @@ BUTTONHERE2;
 		$template->setVariable("LINE2", ", ". $line2);
 	}
 	$template->setVariable("ID", $student->id);
+	$template->setVariable("FAMILYID", $student->family->id);
 	$template->setVariable("NAME", $student->fullName());
 	$dob = empty($student->dateOfBirth) ? 
 	  "Unknown" : 
@@ -559,6 +568,21 @@ BUTTONHERE2;
 	$template->setVariable("ACTIVITYDESCRIPTION", EventCalendarType::StringFromId($event->eventType));
 	$template->parseCurrentBlock();
 	}
+
+	$templateName="SCHEDULE";
+	foreach (Enrollment::GetEnrollmentStudent($student->id, Calendar::CurrentYear()) as $item) {
+	$template->setCurrentBlock($templateName);
+	$class=$item->class;
+	$template->setVariable("SCHSTART", $class->startTime);
+	$template->setVariable("SCHEND", $class->endTime);
+	$template->setVariable("SCHROOM", $class->room->roomNumber);
+	$template->setVariable("SCHCLASS", $class->short());
+	$template->setVariable("SCHTEACHERS", Teachers::TeacherListClassHtml($class->id));
+	$template->setVariable("SCHDESCRIPTION", $class->course->full);
+	$template->parseCurrentBlock();
+	}
+
+
 
 }
 

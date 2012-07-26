@@ -227,7 +227,7 @@ dojo.require("dijit.Tooltip");
 <table class="tablesorter">
 <!-- BEGIN STUDENT -->
 
-<tr><td>ID</td><td>{ID}</td></tr>
+<tr><td>ID</td><td>{ID} (Family: {FAMILYID})</td></tr>
 <tr><td>Name</td><td>{NAME}</td></tr>
 <tr><td>Date of Birth</td><td>{DOB}</td></tr>
 <tr><td rowspan=2>Address</td><td>{LINE1} {LINE2}</td></tr>
@@ -257,8 +257,6 @@ dojo.require("dijit.Tooltip");
 
 <li class="section">Parents</li>
 
-
-
 <table class="tablesorter">
 
  <thead><tr><th>M/F<th>NAME<th>EMAIL<th>WORK<th>CELL<th>Directory</tr></thead>
@@ -272,8 +270,8 @@ dojo.require("dijit.Tooltip");
 <p>
 
 
-<li class="section">Class Assignment</li>
-<table class="tablesorter">
+<li class="section">Enrollment History</li>
+<table class="tablesorter" width=400px>
 <thead>
 <tr><th>Session</th><th>Language</th><th>Culture</th></tr>
 </thead>
@@ -290,16 +288,30 @@ dojo.require("dijit.Tooltip");
 <li class="section">Activities</li>
 <table class="tablesorter">
 <thead>
-<tr><th>Date</th><th>Class</th><th>Start</th><th>End</th><th>Description</th></tr>
+<tr><th>Date</th><th>Start</th><th>End</th><th>Class</th><th>Description</th></tr>
 </thead>
 <tbody>
 <!-- BEGIN ACTIVITY -->
-<tr><td>{DATEOFACTIVITY}</td><td>{CLASSOFACTIVITY}</td><td>{STARTTIME}</td><td>{ENDTIME}</td><td>{ACTIVITYDESCRIPTION}</td></tr>
+<tr><td>{DATEOFACTIVITY}</td><td>{STARTTIME}</td><td>{ENDTIME}</td><td>{CLASSOFACTIVITY}</td><td>{ACTIVITYDESCRIPTION}</td></tr>
 <!-- END ACTIVITY -->
 </tbody>
 </table>
 
-
+<li class="section">Sunday Schedule</li>
+<table class="tablesorter">
+<thead>
+<tr><th>Start</th><th>End</th><th>Room</th><th>Class</th><th>Description</th><th>Teachers</th></tr>
+</thead>
+<tbody>
+<tr><td>09:25</td><td></td><td colspan=4>Arrival and Seating</td></tr>
+<tr><td>09:30</td><td>10:00</td><td colspan=2>General Assembly</td><td>Recitals/Presentation</td><td>&nbsp;</td></tr>
+<!-- BEGIN SCHEDULE -->
+<tr><td>{SCHSTART}</td><td>{SCHEND}</td><td>{SCHROOM}</td><td>{SCHCLASS}</td><td>{SCHDESCRIPTION}</td><td>{SCHTEACHERS}</td></tr>
+<!-- END SCHEDULE -->
+<tr><td>11:45</td><td></td><td colspan=2>Dismissal</td><td>Recitals/Presentation</td><td>&nbsp;</td></tr>
+<tr><td>12:00</td><td>12:45</td><td colspan=4>Reserved for Additional Activities</tr>
+</tbody>
+</table>
 
 </ol>
 

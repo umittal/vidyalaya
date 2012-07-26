@@ -239,7 +239,7 @@ class Reports {
     $templateDir = realpath(dirname(__FILE__)."/../templates");
     $pageheader = '<a href=""><img src="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/images/Vheader2.jpg" width="700" height="70" alt="php5 logo"/></a>';
     $timestamp = date('d M Y h:i A');
-    $footer = '<div id="footer"> <table><tr><td>Copyright &#169; 2011 Vidyalya Inc., Printed at: ' 
+    $footer = '<div id="footer"> <table><tr><td>Copyright &#169; 2012 Vidyalya Inc., Printed at: ' 
       . $timestamp 
       . '</td><td style="text-align:right;"><div class="page-number"></div></td></tr></table></div>';
 
@@ -560,6 +560,63 @@ class Reports {
 
   }
 
+  public static function DisplayEventCalendarShort($template) {
+    $start = Calendar::StartDate();
+    $schoolday=array(); $yoga=array(); $presentation=array(); $activity=array(); $holiday=array(); $sunday=array();
+    foreach (EventCalendar::ListScheduledEvents(1, $start, $count) as $event) {
+      list($year, $month, $day) = explode("-", $event->date);
+      $weekno = intval(($day-1)/7);
+      $sunday["$year-$month"][$weekno]=$day;
+      if ($event->eventType & EventCalendarType::SchoolDay) {
+	$schoolday["$year-$month"][$weekno]=$day;
+      }
+
+      if ($event->eventType & EventCalendarType::Activity) {
+	$activity[$event->date]=$event->description;
+      }
+      if ($event->eventType & EventCalendarType::Holiday) {
+	$holiday[$event->date]=$event->description;
+      }
+    }
+
+    $missing = array();
+    foreach ($schoolday as $month=>$weeks) {
+      $template->setCurrentBlock("MONTHLY");
+      list($y, $m) = explode("-", $month);
+      $timestamp = mktime(0, 0, 0, $m, 1, 2005);
+      $template->setVariable("MONTH", date("F", $timestamp));
+
+      for ($i=0; $i<5; $i++) {
+	if (isset($weeks[$i])) {
+	  $totalweeks++;$monthlytotal++;
+	  $template->setVariable("SCHOOLDAY" . $i, $weeks[$i]);
+	}
+      }
+      $template->parseCurrentBlock();
+    }
+
+
+    if (isset($holiday)) {
+      foreach($holiday as $date=>$description) {
+      $template->setCurrentBlock("HOLIDAY");
+	$template->setVariable("HOLIDAYDATE", $date);
+	$template->setVariable("HOLIDAYDESC", $description);
+      $template->parseCurrentBlock();
+      }
+    }
+
+    if (isset($activity)) {
+      foreach($activity as $date=>$description) {
+      $template->setCurrentBlock("ACTIVITY");
+	$template->setVariable("ACTIVITYDATE", $date);
+	$template->setVariable("ACTIVITYDESC", $description);
+      $template->parseCurrentBlock();
+      }
+
+    }
+
+  }
+
   public static function DisplayEventCalendarYear($template, $params) {
     $start = isset($_POST['startDate']) ?  $_POST['startDate'] : null;
     if (empty($start)) return;
@@ -568,7 +625,7 @@ class Reports {
     $template->addBlockFile('RESULT', 'F_RESULT', 'EventCalendarYear.tpl');
     $template->touchBlock('F_RESULT');
 
-    $year=2012;
+    $year=Calendar::CurrentYear();
     $template->setCurrentBlock("SESSIONBLK");
     $template->setVariable("SESSION", Calendar::SessionFromYear($year));
     $template->parseCurrentBlock();

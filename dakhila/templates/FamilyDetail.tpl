@@ -53,6 +53,10 @@ dojo.require("dijit.form.Button");
 <tr><td>ID</td><td>{ID} (Home Phone: {HOMEPHONE})</td></tr>
 <tr><td rowspan=2>Home Address</td><td>{LINE1} {LINE2}</td></tr>
 <tr><td>{CITY}, {STATE} {ZIP}</td></tr>
+<!-- BEGIN CURRENTSESSION -->
+<tr><td>Session</td><td>{SESSIONSTRING}</td></tr>
+<!-- END CURRENTSESSION -->
+
 <!-- END HOME -->
 </table>
 
@@ -70,12 +74,13 @@ dojo.require("dijit.form.Button");
 
 <li class="section">Children</li> 
 <table class="vidyalaya">  	  	  
-<thead><tr><th scope="col">ID<th>Gender<th>NAME<th>DOB</th><th>LANGUAGE</th><th>EMAIL<th width=30px>CELL</th></tr></thead>
+<thead><tr><th scope="col">ID<th>Gender<th>NAME<th>DOB</th><th>Grade</th><th>LANGUAGE</th><th>EMAIL<th width=30px>CELL</th></tr></thead>
 <!-- BEGIN CHILDREN -->
 <tr><td class="ou" onclick="showStudentDetails({ID})" onmouseover="this.style.cursor='pointer'">{ID}</td>
   <td>{GENDER}</td>
   <td>{NAME}</td>
   <td nowrap="nowrap">{DOB}</td>
+  <td>{GRADE}</td>
   <td>{LANGUAGE}</td>
   <td>{EMAIL}</td>
   <td>{CELL}</td>
@@ -91,9 +96,6 @@ dojo.require("dijit.form.Button");
 <!-- END ADDCHILD -->
 
 <li class="section">Class Assignment 
-<!-- BEGIN CURRENTSESSION -->
-({SESSIONSTRING})
-<!-- END CURRENTSESSION -->
 
 </li>
 <table class="vidyalaya">  	  	  
@@ -139,6 +141,18 @@ dojo.require("dijit.form.Button");
 <tr><td>{PHONE}</td><td>{NAME}</td><td>{ADDR}</td><td>{EMAIL}</td><td>{URL}</td></tr>
 <!-- END OTHERCONTACT -->
 </table>
+
+<!-- BEGIN PACKINGLIST -->
+<li class="section">Packing List</li>
+<ol style="list-style-type: decimal;list-style-position:inside;padding-left:10px;">
+<li>Family Detail Page</li>
+<li>Handbook</li>
+<li>Photograph Page</li>
+<!-- BEGIN ENROLLEDCHILDREN -->
+<li>Student Folder - {STUDENTNAME}</li>
+<!-- END ENROLLEDCHILDREN -->
+</ol>
+<!-- END PACKINGLIST -->
 
 
 </ol>

@@ -1,4 +1,4 @@
-><?php
+<?php
 
 $libDir="../../dakhila/libVidyalaya/";
 require_once "$libDir/db.inc";
@@ -14,7 +14,7 @@ require_once "../../MPDF53/mpdf.php";
 
 
 OpeningDay::PrintDistributionMaterial();exit();
-OpeningDay::PrintDistributionMaterialFamily(Family::GetItemById(30), 2012); exit();
+OpeningDay::PrintDistributionMaterialFamily(Family::GetItemById(250), 2012); exit();
 
 //EventCalendar::UpdateWeekNumber(2012);exit();
 

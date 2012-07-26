@@ -609,7 +609,8 @@ class AvailableClass {
 		return self::$objArray;
 	}
 
-	public static function GetAllYear($year) {
+	public static function GetAllYear($year = null) {
+	  if (is_null($year)) $year=Calendar::CurrentYear();
 	  $list= array();
 	  if ($year >= 2010) $year -= 2010;
 	  foreach (self::GetAll() as $item) {
@@ -927,6 +928,26 @@ class Enrollment{
 		where availableClass = $classId
 		";
 		return self::ArrayFromQuery($query);
+	}
+
+	public static function GetEnrollmentFamily($familyId, $year=null) {
+	  if (is_null($year)) $year=self::CurrentYear();
+		if ($year >= 2010) $year -= 2010;
+		$query = "
+		select distinct Enrollment.student from Enrollment
+		left join AvailableClass on Enrollment.availableClass = AvailableClass.id
+		left join CourseCatalog on AvailableClass.course = CourseCatalog.id
+                inner join Students2003 on Enrollment.student = Students2003.ID
+		where AvailableClass.year = $year and Students2003.PARENT_ID = $familyId
+		order by AvailableClass.year, CourseCatalog.department
+		";
+
+		$list = array ();
+		$result = VidDb::query($query);
+		while ($row = mysql_fetch_array($result)) {
+		  $list[] = Student::GetItemById($row[0]);
+		}
+		return $list;
 	}
 
 	public static function GetEnrollmentStudent($studentId, $year) {

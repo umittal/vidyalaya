@@ -230,7 +230,8 @@ Class Calendar {
 		return $year;
 	}
 
-	public static function SessionFromYear($year) {
+	public static function SessionFromYear($year=null) {
+	  if (is_null($year)) $year=self::CurrentYear();
 	  if ($year < 2010) $year+= 2010;
 	  $next=($year+1) % 100;
 	  return "$year-$next";

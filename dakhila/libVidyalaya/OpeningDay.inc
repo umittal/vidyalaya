@@ -8,7 +8,7 @@ class OpeningDay {
     $templateDir = realpath(dirname(__FILE__)."/../templates");
     $pageheader = '<a href=""><img src="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/images/Vheader2.jpg" width="700" height="70" alt="php5 logo"/></a>';
     $timestamp = date('d M Y h:i A');
-    $footer = '<div id="footer"> <table><tr><td>Copyright &#169; 2011 Vidyalya Inc., Printed at: ' 
+    $footer = '<div id="footer"> <table><tr><td>Copyright &#169; 2012 Vidyalya Inc., Printed at: ' 
       . $timestamp 
       . '</td><td style="text-align:right;"><div class="page-number"></div></td></tr></table></div>';
 
@@ -43,13 +43,41 @@ class OpeningDay {
       $template->setCurrentBlock('HEADER');
       $template->setVariable("HEADER", $pageheader);
       $template->parseCurrentBlock();
-
       DisplayStudent($template, $student);
-
-
       $html = $html . $template->get();			
       $html = $html . $footer . '<DIV style="page-break-after:always"></DIV>';
-      $html .= "<img src='/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/Layouts/PHHSLayout.jpg' width='632' height='700' alt='layout'>\n";
+
+      $template = new HTML_Template_ITX($templateDir);
+      $template->loadTemplatefile("OpeningDayBackPage.tpl", true, true);
+      $template->setCurrentBlock('SESSION');
+      $template->setVariable("SESSION", Calendar::SessionFromYear());
+      $template->parseCurrentBlock();
+
+      foreach (AvailableClass::GetAllYear() as $class) {
+	$classArray[$class->course->department][] = $class;
+      }
+      foreach ($classArray as $department=>$deptarray){
+	$colcount=1;
+	foreach ($deptarray as $class) {
+	  if ($colcount> 10) {
+	    $colcount=1;
+	    $template->setCurrentBlock('DEPARTMENT');
+	    $template->setVariable("DEPARTMENT", Department::NameFromId($class->course->department));
+	    $template->parseCurrentBlock();
+	  }
+	  $template->setCurrentBlock('ROOM');
+	  $template->setVariable("ROOM", $class->short() . " - " . $class->room->roomNumber . "");
+	  $template->parseCurrentBlock();
+	  $colcount++;
+	}
+	$template->setCurrentBlock('DEPARTMENT');
+	$template->setVariable("DEPARTMENT", Department::NameFromId($class->course->department));
+	$template->parseCurrentBlock();
+      }
+
+      Reports::DisplayEventCalendarShort($template);
+
+      $html = $html . $template->get();			
     }
     $html = $html . $footer ;
     return $html;
