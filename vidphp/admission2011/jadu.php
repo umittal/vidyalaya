@@ -14,7 +14,7 @@ require_once "../../MPDF53/mpdf.php";
 
 
 OpeningDay::PrintDistributionMaterial();exit();
-OpeningDay::PrintDistributionMaterialFamily(Family::GetItemById(250), 2012); exit();
+OpeningDay::PrintDistributionMaterialFamily(Family::GetItemById(83), 2012); exit();
 
 //EventCalendar::UpdateWeekNumber(2012);exit();
 

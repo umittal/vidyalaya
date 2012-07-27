@@ -308,7 +308,7 @@ dojo.require("dijit.Tooltip");
 <!-- BEGIN SCHEDULE -->
 <tr><td>{SCHSTART}</td><td>{SCHEND}</td><td>{SCHROOM}</td><td>{SCHCLASS}</td><td>{SCHDESCRIPTION}</td><td>{SCHTEACHERS}</td></tr>
 <!-- END SCHEDULE -->
-<tr><td>11:45</td><td></td><td colspan=2>Dismissal</td><td>Recitals/Presentation</td><td>&nbsp;</td></tr>
+<tr><td>11:45</td><td></td><td colspan=2>Dismissal</td><td>Snack Distribution</td><td>&nbsp;</td></tr>
 <tr><td>12:00</td><td>12:45</td><td colspan=4>Reserved for Additional Activities</tr>
 </tbody>
 </table>

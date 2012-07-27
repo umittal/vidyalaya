@@ -34,7 +34,7 @@ class OpeningDay {
     DisplayFamilyTemplateV3($template, $family);
     $html = $html . $template->get();	
 
-    foreach ($family->EligibleChildren() as $student) {
+    foreach (Enrollment::GetEnrollmentFamily($family->id) as $student) {
       $html = $html . $footer . '<DIV style="page-break-after:always"></DIV>';
       $template = new HTML_Template_ITX($templateDir);
       $template->loadTemplatefile("Layout.tpl", true, true);

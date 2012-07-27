@@ -375,7 +375,11 @@ function DisplayChildren(&$template, $student) {
 
 	    $templateName="ENROLLEDCHILDREN";
 	    $template->setCurrentBlock($templateName);
-	    $template->setVariable("STUDENTNAME", $student->id . ": " . $student->fullName());
+	    $namestring = $student->id . ": " . $student->fullName();
+	    $first = 2010 +  Enrollment::firstYear($student->id) ;
+	    print "first year is $first\n";
+	    if (Calendar::CurrentYear() <= $first)  $namestring = "<b> $namestring **NEW STUDENT PACK**</b>";
+	    $template->setVariable("STUDENTNAME", $namestring);
 	  }
 	}
 	$template->parseCurrentBlock();

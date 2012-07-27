@@ -931,7 +931,7 @@ class Enrollment{
 	}
 
 	public static function GetEnrollmentFamily($familyId, $year=null) {
-	  if (is_null($year)) $year=self::CurrentYear();
+	  if (is_null($year)) $year=Calendar::CurrentYear();
 		if ($year >= 2010) $year -= 2010;
 		$query = "
 		select distinct Enrollment.student from Enrollment
