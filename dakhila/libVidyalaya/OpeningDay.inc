@@ -34,6 +34,11 @@ class OpeningDay {
     DisplayFamilyTemplateV3($template, $family);
     $html = $html . $template->get();	
 
+    $classArray=array();
+    foreach (AvailableClass::GetAllYear() as $class) {
+      $classArray[$class->course->department][] = $class;
+    }
+
     foreach (Enrollment::GetEnrollmentFamily($family->id) as $student) {
       $html = $html . $footer . '<DIV style="page-break-after:always"></DIV>';
       $template = new HTML_Template_ITX($templateDir);
@@ -53,9 +58,12 @@ class OpeningDay {
       $template->setVariable("SESSION", Calendar::SessionFromYear());
       $template->parseCurrentBlock();
 
-      foreach (AvailableClass::GetAllYear() as $class) {
-	$classArray[$class->course->department][] = $class;
+      $interestingClass=array();
+      foreach (EventCalendar::ListStudentActivities($student) as $event) {
+	$interestingClass[$event->class->id]=1;
       }
+
+
       foreach ($classArray as $department=>$deptarray){
 	$colcount=1;
 	foreach ($deptarray as $class) {
@@ -66,7 +74,9 @@ class OpeningDay {
 	    $template->parseCurrentBlock();
 	  }
 	  $template->setCurrentBlock('ROOM');
-	  $template->setVariable("ROOM", $class->short() . " - " . $class->room->roomNumber . "");
+	  $classstring = $class->short() . " - " . $class->room->roomNumber;
+	  if (array_key_exists($class->id, $interestingClass)) $classstring = "<b>$classstring </b>";
+	  $template->setVariable("ROOM",  $classstring);
 	  $template->parseCurrentBlock();
 	  $colcount++;
 	}
