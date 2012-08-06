@@ -90,6 +90,8 @@ var deferred = dojo.xhrPost(xhrArgs);
 	<option value="24 "> T2    - Telugu Novice Mid                               </option>
 	<option value="13 "> T3    - Telugu Novice High                              </option>
 	<option value="25 "> T4    - Telugu Intermediate Low                         </option>
+	<option value="27 "> HC    - Hindi Conversation                         </option>
+	<option value="28 "> GC    - Gujarati Conversation                         </option>
     </select>
   </tr>
 	

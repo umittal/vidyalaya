@@ -112,6 +112,13 @@ function formatTime($timestring) {
   return sprintf("%02d:%02d $ampm", $hh, $m);
 }
 
+// change from yyyy-mm-dd to mm/dd/yyyy
+function formatDate($datestring) {
+  if (empty($datestring)) return "";
+  list ($y, $m, $d) = explode("-", $datestring);
+  return sprintf("%02d/%02d/%04d", $m, $d, $y);
+}
+
 
 function formatPhone($num) 
 { 

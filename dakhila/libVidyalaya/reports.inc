@@ -560,7 +560,8 @@ class Reports {
 
   }
 
-  public static function DisplayEventCalendarShort($template) {
+  public static function DisplayEventCalendarShort($template, $interestingDates = array("foo" => "bar")) {
+    //    foreach($interestingDates as $key => $value) print "interesting dates are $key\n";
     $start = Calendar::StartDate();
     $schoolday=array(); $yoga=array(); $presentation=array(); $activity=array(); $holiday=array(); $sunday=array();
     foreach (EventCalendar::ListScheduledEvents(1, $start, $count) as $event) {
@@ -589,7 +590,10 @@ class Reports {
       for ($i=0; $i<5; $i++) {
 	if (isset($weeks[$i])) {
 	  $totalweeks++;$monthlytotal++;
-	  $template->setVariable("SCHOOLDAY" . $i, $weeks[$i]);
+	  $checkdate=$month . "-" . $weeks[$i];
+          $datestring = $weeks[$i];
+	  if (array_key_exists($checkdate, $interestingDates)) $datestring = "<b>$datestring</b>";
+	  $template->setVariable("SCHOOLDAY" . $i, $datestring);
 	}
       }
       $template->parseCurrentBlock();
@@ -599,7 +603,7 @@ class Reports {
     if (isset($holiday)) {
       foreach($holiday as $date=>$description) {
       $template->setCurrentBlock("HOLIDAY");
-	$template->setVariable("HOLIDAYDATE", $date);
+      $template->setVariable("HOLIDAYDATE", formatDate($date));
 	$template->setVariable("HOLIDAYDESC", $description);
       $template->parseCurrentBlock();
       }
@@ -608,7 +612,7 @@ class Reports {
     if (isset($activity)) {
       foreach($activity as $date=>$description) {
       $template->setCurrentBlock("ACTIVITY");
-	$template->setVariable("ACTIVITYDATE", $date);
+      $template->setVariable("ACTIVITYDATE", formatDate($date));
 	$template->setVariable("ACTIVITYDESC", $description);
       $template->parseCurrentBlock();
       }
@@ -762,7 +766,7 @@ class Reports {
 
   public static function lcmatrix($year) {
     $language = array(); $culture=array();
-    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year) as $item) {
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, $year) as $item) {
       //      $done[$item->student->id] = $item->student;
       if ($item->class->course->department != Department::Culture) {
 	if (array_key_exists($item->student->id, $language) )

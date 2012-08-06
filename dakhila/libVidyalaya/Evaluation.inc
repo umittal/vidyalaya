@@ -205,7 +205,7 @@ EOT;
     $i = 1; $grandTotal = 0;
 
     $enrolledStudent = array();
-    foreach(Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, Calendar::CurrentYear()) as $item) {
+    foreach(Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, Calendar::CurrentYear()) as $item) {
       if (Department::IsLanguage($item->class->course->department)) {
 	$enrolledStudent[$item->student->id] = $item->class->id;
       }

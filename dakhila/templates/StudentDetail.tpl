@@ -229,12 +229,12 @@ dojo.require("dijit.Tooltip");
 
 <tr><td>ID</td><td>{ID} (Family: {FAMILYID})</td></tr>
 <tr><td>Name</td><td>{NAME}</td></tr>
-<tr><td>Date of Birth</td><td>{DOB}</td></tr>
 <tr><td rowspan=2>Address</td><td>{LINE1} {LINE2}</td></tr>
 <tr><td>{CITY}, {STATE} {ZIP}</td></tr>
 <tr><td>Phone</td><td>{HOMEPHONE}</td></tr>
 <tr><td>Cell</td><td>{CELL}</td></tr>
 <tr><td>Email</td><td>{EMAIL}</td></tr>
+<tr><td>GRADE</td><td>{GRADE} (Age: {AGE})</td></tr>
 <!-- END STUDENT -->
 </table>
 
@@ -298,6 +298,10 @@ dojo.require("dijit.Tooltip");
 </table>
 
 <li class="section">Sunday Schedule</li>
+Brooklawn Middle School<br />
+250 Beachwood Rd., Parsippany NJ 07054<br />
+http://www.pthsd.k12.nj.us/sch/bms/bmsHome.htm <br />
+<br />
 <table class="tablesorter">
 <thead>
 <tr><th>Start</th><th>End</th><th>Room</th><th>Class</th><th>Description</th><th>Teachers</th></tr>

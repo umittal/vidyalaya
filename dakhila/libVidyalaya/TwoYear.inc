@@ -123,7 +123,7 @@ class TwoYearLayout {
   }
 	
   private static function currentYearFromDatabase () {
-    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS,2012) as $enrollment) {
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn,2012) as $enrollment) {
       if (empty(self::$objArray[$enrollment->student->id])) self::$objArray[$enrollment->student->id] = new TwoYearLayout();
       $twoyear = self::GetItemById($enrollment->student->id);
       //print "setting this year value for $enrollment->student->id\n";

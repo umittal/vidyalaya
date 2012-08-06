@@ -313,7 +313,7 @@ CLOSING;
   }
 
   public static function admissionConfirmationEmail($year) {
-    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year);
+    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, $year);
     $i=1;
     $fp = fopen("/tmp/familylist.csv", "w");
     foreach (FamilyTracker::RegisteredFamilies() as $item) {
@@ -333,7 +333,7 @@ CLOSING;
 
   // if a family wants to receive email regarding class assignment
   public static function FamilyClassAssignment($year) {
-    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year);
+    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, $year);
     $families = array();
     if (($fp=fopen("/tmp/mayank.csv", "r"))!=FALSE) {
       while (($data = fgetcsv($fp, 1000, ",")) != FALSE) {
@@ -565,7 +565,7 @@ VOLUNTEEREMAIL;
     print "1. Validate Registered Parents between enrollment and familytracker\n";
     // get list of families from enrollment
     $enrolledFamily = array();
-    foreach(Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year) as $item) {
+    foreach(Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, $year) as $item) {
       $enrolledStudent[$item->student->id] = 1;
       $enrolledFamily[$item->student->family->id] = 1;
     }
@@ -693,7 +693,7 @@ AGREEMENT;
     }
 
     $students = array(); $done = array();
-    foreach(Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year) as $item) {
+    foreach(Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, $year) as $item) {
       if (array_key_exists($item->student->id, $done)) continue;
       $familyid= $item->student->family->id;
       if (!array_key_exists($familyid, $familyarray)) die ("family id $familyid in enrollment is not registered");
@@ -823,12 +823,12 @@ AGREEMENT;
   }
 
   private static function AdultLanguageMail($family) {
-    //    if ($family->id != 43) return;
+    if ($family->id != 162 ) return;
     $footer="<p>Regards,<p>Language Curriculum Team<br />(sent on behalf of : Asmita Mistry)</p>";
     $production=1;
-    $subject = "Survey: Language Class for Adults";
-    print "Trying to send email to id " . $family->id . "\n";
-    $body = file_get_contents("adult.inc");
+    $subject = "New Language Class - Conversation";
+    //    $body = file_get_contents("adult.inc");
+    $body = file_get_contents("conversation.inc");
     if ($production == 0) $subject = "[Test] $subject";
     $mail = Mail::SetupMailSpaReplyAsmita();
     Mail::SetFamilyAddress($mail, $family, $production);
@@ -837,7 +837,6 @@ AGREEMENT;
     $mail->Body = $salutation . $body . $footer;
     $mail->AltBody = "This is the body when user views in plain text format, opening day $family->id"; //Text Body
     
-
     if(!$mail->Send()) {
       echo "Mailer Error: Family: $family->id: " . $mail->ErrorInfo . "\n";
     }  else {
@@ -846,20 +845,29 @@ AGREEMENT;
 
     sleep(2);
 
-    //die ("only one");
+  }
 
+  private static function islanglevelabove3($e) {
+    if (!Department::IsLanguage($e->class->course->department)) return false;
+    if ($e->class->course->level < 3) return false;
+    return true;
   }
 
   public static function AdultLanguage() {
     $status = array();
     // registered families
-    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, 2011) as $enrollment) { 
+    $i=1;
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, 2012) as $enrollment) { 
+      if (!self::islanglevelabove3($enrollment)) continue;
       $familyId = $enrollment->student->family->id;
+      
       if (!array_key_exists($familyId, $status)) {
 	$status[$familyId] = 0;
+	//	print "$i. Trying to send email to id " . $familyId . "\n"; $i++;
 	self::AdultLanguageMail($enrollment->student->family);
       }
     }
+    return;
 
     foreach (Volunteers::GetAllYear(2011) as $item) { // volunteers
       $familyId = $item->person->home->id;

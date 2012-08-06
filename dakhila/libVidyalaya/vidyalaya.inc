@@ -536,8 +536,8 @@ class AvailableClass {
 	}
 
 	public function urlRoster() {
-	  return "<a href=\"/dakhila/php/dataViewer2.php?command=ClassRoster&classId=$this->id\">" . 
-	    $this->short() . "</a>";
+	  return VidSession::IsLoggedIn() ?  "<a href=\"/dakhila/php/dataViewer2.php?command=ClassRoster&classId=$this->id\">" . 
+	    $this->short() . "</a>" : $this->short()<;
 	}
 
 	public function urlRoom() {
@@ -726,6 +726,7 @@ class Facility{
 	
 	const Eastlake = 1;
 	const PHHS = 2;
+	const Brooklawn = 3;
 
 	private static function firstTimeCall() {
 		if (!empty(self::$objArray)) return;

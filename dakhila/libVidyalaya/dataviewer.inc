@@ -673,7 +673,7 @@ EOT;
       if ($year == null) $year=Calendar::CurrentYear();
       //      $facility = isset($_GET['facility']) ?  $_GET['facility'] : null;
       $facility = isset($_POST['facility']) ?  $_POST['facility'] : null;
-      if ($facility =="") $facility=Facility::PHHS;
+      if ($facility =="") $facility=Facility::Brooklawn;
 
       $url = htmlentities($_SERVER['PHP_SELF']) . "?command=AvailableCourse";
 
@@ -707,12 +707,14 @@ EOT;
         forceValidOption="true"
 			      >
 		<option value="1">Eastlake Elementary School</option>
-		<option selected  value="2">Parsippany Hills High School</option>
+		<option value="2">Parsippany Hills High School</option>
+		<option selected  value="3">Brooklawn Middle School</option>
       </select>
 -->
 	  <select id="facility" title="facility" name="facility">
 		<option value="1">Eastlake Elementary School</option>
-		<option selected="selected"  value="2">Parsippany Hills High School</option>
+		<option value="2">Parsippany Hills High School</option>
+		<option selected  value="3">Brooklawn Middle School</option>
       </select>
    <input type="submit" name="submit" value="GO"><br>
     </div>
@@ -746,7 +748,7 @@ EOT;
       $year = isset($_GET['year']) ?  $_GET['year'] : null;
       if ($year == null) $year=Calendar::CurrentYear();
       $facility = isset($_GET['facility']) ?  $_GET['facility'] : null;
-      if ($facility =="") $facility=Facility::PHHS;
+      if ($facility =="") $facility=Facility::Brooklawn;
 
       $url = htmlentities($_SERVER['PHP_SELF']) . "?command=$command";
 

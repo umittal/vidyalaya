@@ -113,7 +113,7 @@ class Publications {
     //$table->addCell(500, $styleCellBTLR)->addText('Row 5', $fontStyle);
 
     $families = self::InvolvedFamilies($year);
-    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year);
+    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, $year);
 
     foreach ($families as $family) {
       $table->addRow();
@@ -150,7 +150,7 @@ class Publications {
     if (!$fh) die ("could not open temporary file for writing");
     fwrite ($fh, "ID, mother, father, kid1, kid2, kid3\n");
     
-    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year);
+    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, $year);
     foreach (self::InvolvedFamilies($year) as $family) {
       $csv=array();
       $csv[] = $family->id;
@@ -413,7 +413,7 @@ class Publications {
     $fh = fopen("$filename", "w");
 
     $list = array(); $language= array(); $culture= array();
-    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year) as $item) {
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, $year) as $item) {
       $list[$item->student->id] = $item->student;
       if ($item->class->course->department == Department::Culture ) {
 	$culture[$item->student->id] = $item->class;
@@ -531,7 +531,7 @@ class Publications {
 
 
     $language = array(); $culture=array();
-    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, $year) as $item) {
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, $year) as $item) {
       $done[$item->student->id] = $item->student;
       //      print "Printing Student " . $item->student->fullName() . "\n";
       if ($item->class->course->department != Department::Culture) {
@@ -612,7 +612,7 @@ class Publications {
     if (!$fh) die ("could not open temporary file for writing");
 
     fwrite ($fh, "ID, MFS, First, Last, Description\n");
-    foreach (Enrollment::GetEnrolledFamilesForFacilitySession(Facility::PHHS, $year) as $item) {
+    foreach (Enrollment::GetEnrolledFamilesForFacilitySession(Facility::Brooklawn, $year) as $item) {
       $csv = array();
       $csv[] = $item->id;
       $csv[] = "Mother";
@@ -1134,7 +1134,7 @@ BODY;
 
   private static function UnknownReminder($status) {
     // create unknown list
-    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, 2011) as $enrollment) { // registered students
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, 2011) as $enrollment) { // registered students
       $familyId = $enrollment->student->family->id;
       if (!array_key_exists($familyId, $status)) {
 	$status[$familyId] = 0;
@@ -1164,7 +1164,7 @@ BODY;
     }
 
     // store enrollment data
-    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::PHHS, 2011);
+    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, 2011);
     $done=array(); 
     foreach($enrollment as $e) {
       if (array_key_exists($e->student->family->id, $familyReg)) continue;

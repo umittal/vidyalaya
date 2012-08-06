@@ -352,7 +352,7 @@ function DisplayChildren(&$template, $student) {
 	$template->setVariable("GRADE", $student->Grade());
 	$template->setVariable("LANGUAGE", $student->LanguageInterest());
 	$template->setVariable("GENDER", GenderMap($student->gender));
-	$dob = empty($student->dateOfBirth) ? "Unknown" : date("Y-m-d", strtotime($student->dateOfBirth));
+	$dob = empty($student->dateOfBirth) ? "Unknown" : date("m/d/Y", strtotime($student->dateOfBirth));
 	$template->setVariable("DOB",$dob);
 	//	$template->setVariable("ENROLLED", YesNoMap($student->IsEnrolled));
 	$template->parseCurrentBlock();
@@ -441,7 +441,7 @@ function DisplayStudentTemplate (&$template, $student) {
 	foreach ($student->contacts as $key => $phone) {
 	  $template->setCurrentBlock($templateName);
 	  $template->setVariable("TYPE",  $key);
-	  if ($phone == null) {
+	  if ($phone == null && VidSession::IsLoggedIn()) {
 	    $template->setVariable("PHONE",  "Add me");
 	  } else {
 	    $contact = OtherContacts::ObjectFromKey($phone);
@@ -515,7 +515,7 @@ BUTTONHERE2;
 	$dob = empty($student->dateOfBirth) ? 
 	  "Unknown" : 
 	  date("Y-m-d", strtotime($student->dateOfBirth));
-	$template->setVariable("DOB", $dob);
+	//	$template->setVariable("DOB", $dob);
 	$template->setVariable("CELL", $student->cellPhone);
 	$template->setVariable("EMAIL", $student->email);
 	$template->setVariable("LINE1", $family->address->addr1);
@@ -523,6 +523,8 @@ BUTTONHERE2;
 	$template->setVariable("STATE", $family->address->state);
 	$template->setVariable("ZIP", $family->address->zipcode);
 	$template->setVariable("HOMEPHONE", $family->phone);
+	$template->setVariable("GRADE", $student->Grade());
+	$template->setVariable("AGE", intval($student->AgeAt(Calendar::CurrentSession)));
 	$template->parseCurrentBlock();
 
 	$sessionRows = array(); 
@@ -565,7 +567,7 @@ BUTTONHERE2;
 
 	foreach (EventCalendar::ListStudentActivities($student) as $event) {
 	$template->setCurrentBlock($templateName);
-	$template->setVariable("DATEOFACTIVITY", $event->date);
+	$template->setVariable("DATEOFACTIVITY", formatDate($event->date));
 	$template->setVariable("CLASSOFACTIVITY", $event->class->short());
 	$template->setVariable("STARTTIME", $event->startTime);
 	$template->setVariable("ENDTIME", $event->endTime);

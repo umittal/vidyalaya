@@ -6,13 +6,14 @@ padding-left: 5px;
 </style>
 <div class="compact">
 <!-- BEGIN SESSION -->
-<h3>Vidyalaya {SESSION}</h3>
+ID: {STUDENTID} (Family: {FAMILYID}) {SESSION} - {STUDENTNAME}
 <!-- END SESSION -->
 
-<h4>Physical Layout</h4>
+
 <img style="border:1px; margin:0; padding:0;" src='/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/Layouts/umesh.jpg' width='552' height='600' alt='layout'>
 
 <table>
+<caption>Room Assignment</caption>
 <!-- BEGIN DEPARTMENT -->
 <tr>
 
@@ -26,7 +27,6 @@ padding-left: 5px;
 <!-- END DEPARTMENT -->
 </table>
 
-<h4>School Calendar</h4>
 <table>
 <tr><td>
 <!-- school day goes here -->
@@ -65,8 +65,8 @@ padding-left: 5px;
 <td style="border-left: 1px solid;">
 <table>
 <caption>Publications</caption>
-<tr><td>2012-12-15</td><td>Newsletter </td></tr>
-<tr><td>2013-04-01</td><td>Yearbook</td></tr>
+<tr><td>12/15/2012</td><td>Newsletter </td></tr>
+<tr><td>04/01/2013</td><td>Yearbook</td></tr>
 </table>
 <p style="margin:0; padding:0 0 0 5px;">Topic - Two Cultures</p>
 </td>

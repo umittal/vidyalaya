@@ -151,6 +151,7 @@ dojo.require("dijit.form.Button");
 <!-- BEGIN ENROLLEDCHILDREN -->
 <li>Student Folder - {STUDENTNAME}</li>
 <!-- END ENROLLEDCHILDREN -->
+<li>Calendar</li>
 </ol>
 <!-- END PACKINGLIST -->
 
@@ -158,5 +159,5 @@ dojo.require("dijit.form.Button");
 </ol>
 <p></p>
 <div class="explanation">
-Note: Please email any changes to admission2012@vidyalaya.us and we will send you an updated package. 
+Note: Please email corrections to admission2012@vidyalaya.us
 </div>

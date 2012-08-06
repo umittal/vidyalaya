@@ -56,11 +56,15 @@ class OpeningDay {
       $template->loadTemplatefile("OpeningDayBackPage.tpl", true, true);
       $template->setCurrentBlock('SESSION');
       $template->setVariable("SESSION", Calendar::SessionFromYear());
+      $template->setVariable("STUDENTID", $student->id);
+      $template->setVariable("FAMILYID", $student->family->id);
+      $template->setVariable("STUDENTNAME", $student->fullName());
       $template->parseCurrentBlock();
 
-      $interestingClass=array();
+      $interestingClass=array();$interestingDates=array();
       foreach (EventCalendar::ListStudentActivities($student) as $event) {
 	$interestingClass[$event->class->id]=1;
+	$interestingDates[$event->date]=1;
       }
 
 
@@ -85,7 +89,7 @@ class OpeningDay {
 	$template->parseCurrentBlock();
       }
 
-      Reports::DisplayEventCalendarShort($template);
+      Reports::DisplayEventCalendarShort($template, $interestingDates);
 
       $html = $html . $template->get();			
     }
