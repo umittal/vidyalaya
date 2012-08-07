@@ -34,6 +34,27 @@ class OpeningDay {
     DisplayFamilyTemplateV3($template, $family);
     $html = $html . $template->get();	
 
+    $html = $html . $footer . '<DIV style="page-break-after:always"></DIV>';
+    $template = new HTML_Template_ITX($templateDir);
+    $template->loadTemplatefile("Layout.tpl", true, true);
+    $template->addBlockFile('CONTENT', 'F_CONTENT', 'LayoutContent.tpl');
+    $template->touchBlock('F_CONTENT');
+    $template->setCurrentBlock('HEADER');
+    $template->setVariable("HEADER", $pageheader);
+    $template->addBlockFile('RESULT', 'F_RESULT', 'photo.tpl');
+    $template->touchBlock('F_RESULT');
+    $template->setCurrentBlock('PHOTO');
+    $template->setVariable("FAMILYID", $family->id);
+    $template->setVariable("MOTHER", $family->mother->firstName);
+    $template->setVariable("FATHER", $family->father->firstName);
+    $i=1;
+    foreach (Enrollment::GetEnrollmentFamily($family->id) as $student) {
+      $template->setVariable("STUDENT" . $i++, "$student->id " . "-" . "$student->firstName");
+    }
+    $template->parseCurrentBlock();
+    $html = $html . $template->get();			
+        
+
     $classArray=array();
     foreach (AvailableClass::GetAllYear() as $class) {
       $classArray[$class->course->department][] = $class;
@@ -71,7 +92,7 @@ class OpeningDay {
       foreach ($classArray as $department=>$deptarray){
 	$colcount=1;
 	foreach ($deptarray as $class) {
-	  if ($colcount> 10) {
+	  if ($colcount> 8) {
 	    $colcount=1;
 	    $template->setCurrentBlock('DEPARTMENT');
 	    $template->setVariable("DEPARTMENT", Department::NameFromId($class->course->department));

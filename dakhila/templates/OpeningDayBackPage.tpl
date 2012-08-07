@@ -2,6 +2,7 @@
 div.compact td {
 margin:0; 
 padding-left: 5px;
+white-space: nowrap;
 }
 </style>
 <div class="compact">
@@ -10,7 +11,7 @@ ID: {STUDENTID} (Family: {FAMILYID}) {SESSION} - {STUDENTNAME}
 <!-- END SESSION -->
 
 
-<img style="border:1px; margin:0; padding:0;" src='/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/Layouts/umesh.jpg' width='552' height='600' alt='layout'>
+<img style="border:1px; margin:0; padding:0;" src='/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/Layout/umesh.jpg' width='683' height='461' alt='layout'>
 
 <table>
 <caption>Room Assignment</caption>
@@ -66,7 +67,7 @@ ID: {STUDENTID} (Family: {FAMILYID}) {SESSION} - {STUDENTNAME}
 <table>
 <caption>Publications</caption>
 <tr><td>12/15/2012</td><td>Newsletter </td></tr>
-<tr><td>04/01/2013</td><td>Yearbook</td></tr>
+<tr><td>03/02/2013</td><td>Yearbook</td></tr>
 </table>
 <p style="margin:0; padding:0 0 0 5px;">Topic - Two Cultures</p>
 </td>

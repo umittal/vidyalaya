@@ -537,7 +537,7 @@ class AvailableClass {
 
 	public function urlRoster() {
 	  return VidSession::IsLoggedIn() ?  "<a href=\"/dakhila/php/dataViewer2.php?command=ClassRoster&classId=$this->id\">" . 
-	    $this->short() . "</a>" : $this->short()<;
+	    $this->short() . "</a>" : $this->short();
 	}
 
 	public function urlRoom() {
@@ -1638,6 +1638,8 @@ final Class EventCalendarType {
     , Meeting = 8
     , Activity = 16
     , Holiday = 32
+    , Calendar = 64
+    , Prayer = 128
     ;
 
   public static function StringFromId($id) {
@@ -1653,7 +1655,11 @@ final Class EventCalendarType {
     case EventCalendarType::Activity:
       return "Activity";
     case EventCalendarType::Holiday:
-      return "Holiday";
+      return "No School";
+    case EventCalendarType::Calendar:
+      return "Calendar";
+    case EventCalendarType::Prayer:
+      return "Prayer";
     default: 
       return "?";
     }
