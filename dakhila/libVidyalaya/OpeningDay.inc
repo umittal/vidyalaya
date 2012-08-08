@@ -150,7 +150,30 @@ class OpeningDay {
     }
   }
 
-  public static function RunAll() {
+  public static function DisplayBoard() {
+    $session=Calendar::SessionFromYear($year);
+    $templateDir = realpath(dirname(__FILE__)."/../templates");
+    $template = new HTML_Template_ITX($templateDir);
+    $template->loadTemplatefile("CalendarBoard.tpl", true, true);
+    print "Debug: going to reports\n";
+    Reports::DisplayEventCalendarYear($template, null);
+    print "Debug: out of reports\n";
+    $html = $template->get();
+    
+    $printDir = "/home/umesh/Dropbox/Vidyalaya-Roster/$session/OpeningDay";
+
+    $fileName = $printDir . "/html/CalendarBoard" . ".html";
+    file_put_contents("$fileName", $html);
+    echo "printed $fileName\n";
+
+    $pdf = PrintFactory::HtmlToPdf($html);
+    echo "done with htmltopdf\n";
+    $fileName = $printDir . "/pdf/CalendarBoard"  . ".pdf";
+    file_put_contents("$fileName", $pdf);
+    echo "printed $fileName\n";
+
+    return;
+
   }
 
 }

@@ -622,8 +622,6 @@ class Reports {
   }
 
   public static function DisplayEventCalendarYear($template, $params) {
-    $start = isset($_POST['startDate']) ?  $_POST['startDate'] : null;
-    if (empty($start)) return;
     $count=0;
 
     $template->addBlockFile('RESULT', 'F_RESULT', 'EventCalendarYear.tpl');
@@ -731,8 +729,6 @@ class Reports {
   }
 
   public static function DisplayEventCalendar($template, $params) {
-    $start = isset($_POST['startDate']) ?  $_POST['startDate'] : null;
-    if (empty($start)) return;
     $count=0;
 
     $template->addBlockFile('RESULT', 'F_RESULT', 'EventCalendar.tpl');

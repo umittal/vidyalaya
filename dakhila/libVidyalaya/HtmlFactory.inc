@@ -904,6 +904,7 @@ function DisplayClassRoster($template, $classId) {
     $template->setVariable("PFIRST", $parent->firstName);
     $template->setVariable("PLAST", $parent->lastName);
     $template->setVariable("PEMAIL", $parent->email);
+    $template->setVariable("PHONE", $student->LanguageInterest());
 				
     $template->parseCurrentBlock();
     $template->setCurrentBlock("ROSTERROW");

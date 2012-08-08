@@ -299,6 +299,9 @@ RESETFORM;
     $this->template->parseCurrentBlock();
     $layout = isset($_POST['Layout']) ?  $_POST['Layout'] : 0;
 
+    $start = isset($_POST['startDate']) ?  $_POST['startDate'] : null;
+    if (empty($start)) return;
+
     $params=null;
     if ($layout == 1) {
       Reports::DisplayEventCalendarYear($this->template, $params);
