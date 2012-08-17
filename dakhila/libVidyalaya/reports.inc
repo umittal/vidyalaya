@@ -632,6 +632,7 @@ class Reports {
     $template->setVariable("SESSION", Calendar::SessionFromYear($year));
     $template->parseCurrentBlock();
 
+    $start = isset($_POST['startDate']) ?  $_POST['startDate'] : null;
     $schoolday=array(); $yoga=array(); $presentation=array(); $activity=array(); $holiday=array(); $sunday=array();
     foreach (EventCalendar::ListScheduledEvents(1, $start, $count) as $event) {
       list($year, $month, $day) = explode("-", $event->date);
@@ -731,6 +732,7 @@ class Reports {
   public static function DisplayEventCalendar($template, $params) {
     $count=0;
 
+    $start = isset($_POST['startDate']) ?  $_POST['startDate'] : null;
     $template->addBlockFile('RESULT', 'F_RESULT', 'EventCalendar.tpl');
     $template->touchBlock('F_RESULT');
 

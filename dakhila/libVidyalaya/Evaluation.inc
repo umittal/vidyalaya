@@ -189,7 +189,10 @@ EOT;
 	$sql = sprintf("update Enrollment set availableClass = %s where student = %s and availableClass = %s",
 		       $nextId, $studentId,$enrolledStudent[$studentId] );
 
-	print "$change $sql\n";
+	if ($nextId != $enrolledStudent[$studentId] 
+	    && $enrolledStudent[$studentId] != 135
+	    && $enrolledStudent[$studentId] != 136
+	    ) print "$change $sql\n";
 
 	//	print "$studentId, $previousShort, $nextShort, $change, $rowIndex \n";
 	$rowcount++;
@@ -230,6 +233,7 @@ EOT;
     if ($handle = opendir($directory)) {
       while (false !== ($file = readdir($handle))) {
 	if ($file != "." && $file != ".." && preg_match("/xls/i", $file)) {
+	  echo "$file\n";
 	  $grandTotal += self::ProcessOneExcelFile("$directory/$file", $enrolledStudent, $previousClassMap, $classMap, $previousEnrollment);
 	  //	  print ", $i \n"; $i++;
 	}

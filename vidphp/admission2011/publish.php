@@ -61,8 +61,8 @@ class WordTable {
 
 class Publications {
   const BaseDir = "/home/umesh/Dropbox/Vidyalaya-Roster";
-  const MAILINGLISTDIR="/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/mailinglist/";
-  const rosterDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/roster/";
+  const MAILINGLISTDIR="/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/mailinglist/";
+  const rosterDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/roster/";
 
   private static function InvolvedFamilies($year) {
     // Enrolled Families + Volunteers
@@ -140,8 +140,8 @@ class Publications {
 
     } // All Registered Familes
 
-    $directory="/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/roster/word";
-    $document->filename = "$directory/2011.docx";
+    $directory="/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/roster/word";
+    $document->filename = "$directory/2012.docx";
     $document->SaveDocument();
   }
 
@@ -222,7 +222,7 @@ class Publications {
   }
 
   public static function ClassDirectory($year) {
-    $directory = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/roster/word/";
+    $directory = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/roster/word/";
 
     foreach (AvailableClass::GetAllYear($year) as $class) {
       $short= $class->short();
@@ -234,7 +234,7 @@ class Publications {
       self::ClassDirectoryTable($table, $class, true);
       $text = "Teachers: " . Teachers::TeacherListClassCsv($class->id);
       $document->SetFooter($text);
-      $text = "Vidyalaya Inc. 2011-12 $short Roster";
+      $text = "Vidyalaya Inc. 2012-13 $short Roster";
       $document->SetHeader($text);
       $document->filename = "$directory/ClassWide/$short.docx";
       $document->SaveDocument();
@@ -244,7 +244,7 @@ class Publications {
       self::ClassDirectoryTable($table, $class, false);
       $text = "Teachers: " . Teachers::TeacherListClassCsv($class->id);
       $document->SetFooter($text);
-      $text = "Vidyalaya Inc. 2011-12 $short Directory";
+      $text = "Vidyalaya Inc. 2012-13 $short Directory";
       $document->SetHeader($text);
       $document->filename = "$directory/ClassShort/$short.docx";
       $document->SaveDocument();
@@ -294,7 +294,7 @@ class Publications {
 
     $fp=popen("sort -u --output=$filename", "w");
     if (!$fp) die ("could not open $filename for writing\n");
-    foreach(Volunteers::GetAllYear(2011) as $item) {
+    foreach(Volunteers::GetAllYear(2012) as $item) {
       switch ($item->MFS) {
       case MFS::Mother:
 	$family =  Family::GetItemById($item->mfsId);
@@ -469,7 +469,7 @@ class Publications {
   }
 	
   private static function RosterClass($class) {
-    $filename = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/roster/txt/" .  $class->short() . ".txt";
+    $filename = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/roster/txt/" .  $class->short() . ".txt";
     self::$rosterfh = fopen($filename, "w");
     echo "$filename\n";
     //fwrite(self::$rosterfh,  "\n**********************\n");
@@ -493,9 +493,9 @@ class Publications {
   }
 
   private static function printOneStudent($student, $lc, $cc) {
-    $printDir = "/home/umesh/student2011";
+    $printDir = "/home/umesh/student2012";
     $html = "<html><head><style type='text/css'>td {padding-left:10px;}</style></head><body>\n";
-    $html .= "<img src='/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/Layouts/PHHSLayout.jpg' width='632' height='700' alt='layout'>\n";
+    $html .= "<img src='/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/Layouts/PHHSLayout.jpg' width='632' height='700' alt='layout'>\n";
 
     //    $html .= "<h3>Student</h3>";
     $html .=  "<table>\n";
@@ -572,7 +572,7 @@ class Publications {
       $csv[] = $student->family->parentsName();
       
       fputcsv($fh, $csv);
-      self::printOneStudent($student, $lc, $cc);
+      //      self::printOneStudent($student, $lc, $cc);
     }
 
     $filename = self::rosterDir . "StudentsSpa.csv";
@@ -584,11 +584,11 @@ class Publications {
   private static function RosterSpaTeachers($year) {
 
     // todo: if somoene teaches multiple classes, it will print multiple pages. it should be fixed
-    $printDir = "/home/umesh/student2011";
+    $printDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/OpeningDay/pdf";
     foreach (Teachers::TeacherListYear($year) as $item) {
       print "Printing Teacher " .$item->person->fullName() . "\n";
       $html = "<html><head><style type='text/css'>td {padding-left:10px;}</style></head><body>\n";
-      $html .= "<img src='/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/Layouts/PHHSLayout.jpg' width='632' height='700' alt='layout'>\n";
+      $html .= "<img src='/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/Layout/umesh.jpg' width='683' height='461' alt='layout'>\n";
 
       $html .=  "<table>\n";
       $mfskey=MFS::CodeFromId($item->MFS) . $item->mfsId;
@@ -717,7 +717,7 @@ class Publications {
     }
     $text = "Teacher Directory";
     $document->SetFooter($text);
-    $text = "Vidyalaya Inc. 2011-12";
+    $text = "Vidyalaya Inc. 2012-13";
     $document->SetHeader($text);
     $document->filename = self::rosterDir ."teachers.docx";
     $document->SaveDocument();
@@ -756,7 +756,7 @@ class Publications {
     }
     $text = "Volunteer Directory";
     $document->SetFooter($text);
-    $text = "Vidyalaya Inc. 2011-12";
+    $text = "Vidyalaya Inc. 2012-13";
     $document->SetHeader($text);
     $document->filename = self::rosterDir ."volunteers.docx";
     $document->SaveDocument();
@@ -764,7 +764,7 @@ class Publications {
 
 
   private static function AttendanceSheetFill($class) {
-    $inputFileName = "/home/umesh/Dropbox/Vidyalaya-Management/Admission/attendance2011.xlsx";
+    $inputFileName = "/home/umesh/Dropbox/Vidyalaya-Management/Admission/attendance2012.xlsx";
     $activeSheetIndex=0;
     $row =4;
 
@@ -818,7 +818,8 @@ class Publications {
     $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setVisible(TRUE);
     $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setVisible(TRUE);
 
-    $objPHPExcel->getActiveSheet()->getHeaderFooter()->setOddFooter ("Teachers: " . Teachers::TeacherListClassCsv($class->id) . ", Count: " . $count);
+    $timestamp = date('d M Y h:i A');
+    $objPHPExcel->getActiveSheet()->getHeaderFooter()->setOddFooter ("&L$timestamp&CTeachers: " . Teachers::TeacherListClassCsv($class->id) . ", Count: " . $count);
 
 
     return $objPHPExcel;
@@ -839,6 +840,10 @@ class Publications {
       
       $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
       $objWriter->save($excelFile);
+      return;
+      $objWriter = new PHPExcel_Writer_PDF($objPHPExcel);
+      $objWriter->save("/tmp/umesh.pdf"); // did not look good
+      die("check /tmp/umesh.pdf\n");
 
       //      echo date('H:i:s') . " Peak memory usage: " . (memory_get_peak_usage(true) / 1024 / 1024) . " MBrn\no";
     }
@@ -890,8 +895,8 @@ class Publications {
     $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setVisible(TRUE);
     $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setVisible(TRUE);
 
-    $objPHPExcel->getActiveSheet()->getHeaderFooter()->setOddFooter ("Teachers: " . Teachers::TeacherListClassCsv($class->id) . ", Count: " . $count);
-
+    $timestamp = date('d M Y h:i A');
+    $objPHPExcel->getActiveSheet()->getHeaderFooter()->setOddFooter ("&L$timestamp&CTeachers: " . Teachers::TeacherListClassCsv($class->id) . ", Count: " . $count);
 
     return $objPHPExcel;
 
@@ -921,7 +926,7 @@ class Publications {
 
 class NewsletterHtml {
   public static function Publish() {
-    $year="2011"; // todo: get year from date
+    $year="2012"; // todo: get year from date
     $fh = tmpfile();
     if (!$fh) die ("could not open temporary file for writing");
 
@@ -935,7 +940,7 @@ class NewsletterHtml {
     $week = $previous->weekNumber;
 
 
-    $directory= "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/Newsletter/$date/";
+    $directory= "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/Newsletter/$date/";
 
     fwrite($fh, "<div id='newsletter'>\n");
 
@@ -1065,7 +1070,7 @@ class EventManager {
     print "\nFamily: " . $person->home->id . "\n\n";
 
     $body = <<<BODY
-<p>Thank you for registration for <a href="http://www.vidyalaya.us/shiksha/avg2011.html"
+<p>Thank you for registration for <a href="http://www.vidyalaya.us/shiksha/avg2012.html"
 target="_blank">AVG Visit</a> event on Sunday November 13, 2011. This email is your confirmation that we have received \$$registration->amountPaid from you.
 
 BODY;
@@ -1134,7 +1139,7 @@ BODY;
 
   private static function UnknownReminder($status) {
     // create unknown list
-    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, 2011) as $enrollment) { // registered students
+    foreach (Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, 2012) as $enrollment) { // registered students
       $familyId = $enrollment->student->family->id;
       if (!array_key_exists($familyId, $status)) {
 	$status[$familyId] = 0;
@@ -1143,7 +1148,7 @@ BODY;
       }
     }
 
-    foreach (Volunteers::GetAllYear(2011) as $item) { // volunteers
+    foreach (Volunteers::GetAllYear(2012) as $item) { // volunteers
       $familyId = $item->person->home->id;
       if (!array_key_exists($familyId, $status)) {
 	$status[$familyId] = 0;
@@ -1164,7 +1169,7 @@ BODY;
     }
 
     // store enrollment data
-    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, 2011);
+    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, 2012);
     $done=array(); 
     foreach($enrollment as $e) {
       if (array_key_exists($e->student->family->id, $familyReg)) continue;
@@ -1227,7 +1232,7 @@ BODY;
   public static function PostPaymentFile() {
     if (($handle = fopen("/tmp/nov6.csv", "r")) != FALSE) {
       while (($data=fgetcsv($handle, 1000, ",")) != FALSE) {
-	self::PostPayment(1, $data[1], '2011-11-06', $data[0]);
+	self::PostPayment(1, $data[1], '2012-11-06', $data[0]);
       }
     }
   }
@@ -1237,27 +1242,26 @@ BODY;
 //print Codes::VolunteerCodeHtml();  exit(); // print volunteer codes for shiksha portal
 //EventManager::ReportParticipation(1); exit();
 //EventManager::PostPaymentFile(); exit();
-//Publications::LanguageAssessment(2011); exit();
+//Publications::LanguageAssessment(2012); exit();
 //NewsletterHtml::Publish();
-//Publications::FamilyListForHandbookDistribution(2011); exit();
-//Publications::AttendanceSheet(2011); exit();
+//Publications::FamilyListForHandbookDistribution(2012); exit();
+//Publications::AttendanceSheet(2012); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
-//Publications::Roster(2011); exit();
+//Publications::Roster(2012); exit();
 
-//Publications::RosterSpa(2011); exit();
+Publications::RosterSpa(2012); exit();
 
-Publications::FullDumpFamilies();
+//Publications::FullDumpFamilies();
 
-//Publications::BadgeFile(2011); exit();
-//Publications::CreateMailingLists(2011);exit();
+//Publications::BadgeFile(2012); exit();
+Publications::CreateMailingLists(2012);exit();
+//Publications::VolunteerListForHandbook(2012); exit();
+//Publications::TeacherListForHandbook(2012);exit();
 
-//Publications::VolunteerListForHandbook(2011); exit();
-//Publications::TeacherListForHandbook(2011);exit();
-
-//Publications::SchoolDirectory(2011); exit();
-//Publications::TeacherDirectory(2011); exit (); // Directory of all Teachers
-//Publications::VolunteerDirectory(2011); exit (); // Directory of all Volunteers
-//Publications::ClassDirectory(2011); exit (); // Directory of all classes, with and without email
+//Publications::SchoolDirectory(2012); exit();
+//Publications::TeacherDirectory(2012); exit (); // Directory of all Teachers
+//Publications::VolunteerDirectory(2012); exit (); // Directory of all Volunteers
+//Publications::ClassDirectory(2012); exit (); // Directory of all classes, with and without email
 
 
 ?>

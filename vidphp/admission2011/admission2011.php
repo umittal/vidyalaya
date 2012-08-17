@@ -281,7 +281,7 @@ BODY_WAITING;
 //Admission::Mela2012(); exit();
 //Admission::InviteNew(); exit();
 //Admission::ExistingFamilies(); exit();
-Admission::AdultLanguage(); exit();
+//Admission::AdultLanguage(); exit();
 
 //Teachers::AddTeacher(79, "hetalapurva@gmail.com", 0) ; exit();
 //Admission::VolunteerEmail(2011);exit();
@@ -297,7 +297,7 @@ Admission::AdultLanguage(); exit();
 //Admission::itemDelivery(); exit();
 
 
-//Evaluation::ProcessAllExcelFiles(); exit();
+Evaluation::ProcessAllExcelFiles(); exit();
 
 //FamilyTracker::loadPayments();exit();
 //FamilyTracker::UpdateFamilyTracker(); exit();

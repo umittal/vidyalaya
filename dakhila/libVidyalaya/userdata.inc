@@ -300,13 +300,15 @@ RESETFORM;
     $layout = isset($_POST['Layout']) ?  $_POST['Layout'] : 0;
 
     $start = isset($_POST['startDate']) ?  $_POST['startDate'] : null;
-    if (empty($start)) return;
+    if (!empty($start)) {
 
+      print "start is ==$start==<br />";
     $params=null;
     if ($layout == 1) {
       Reports::DisplayEventCalendarYear($this->template, $params);
     } else {
       Reports::DisplayEventCalendar($this->template, $params);
+    }
     }
     print $this->template->get();
   }
