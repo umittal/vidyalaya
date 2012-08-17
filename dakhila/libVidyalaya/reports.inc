@@ -635,6 +635,7 @@ class Reports {
     $start = isset($_POST['startDate']) ?  $_POST['startDate'] : null;
     $schoolday=array(); $yoga=array(); $presentation=array(); $activity=array(); $holiday=array(); $sunday=array();
     foreach (EventCalendar::ListScheduledEvents(1, $start, $count) as $event) {
+      if ($event->eventType & EventCalendarType::Calendar) continue;
       list($year, $month, $day) = explode("-", $event->date);
       $weekno = intval(($day-1)/7);
       $sunday["$year-$month"][$weekno]=$day;

@@ -13,9 +13,9 @@ require_once "$libDir/OpeningDay.inc";
 require_once "../../MPDF53/mpdf.php";
 
 
-//EventCalendar::UpdateWeekNumber(2012);exit();
+EventCalendar::UpdateWeekNumber(2012);exit();
 
-OpeningDay::DisplayBoard();exit();
+//OpeningDay::DisplayBoard();exit();
 //OpeningDay::PrintDistributionMaterial();exit();
 //OpeningDay::PrintDistributionMaterialFamily(Family::GetItemById(9), 2012); exit();
 

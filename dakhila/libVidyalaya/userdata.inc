@@ -302,7 +302,6 @@ RESETFORM;
     $start = isset($_POST['startDate']) ?  $_POST['startDate'] : null;
     if (!empty($start)) {
 
-      print "start is ==$start==<br />";
     $params=null;
     if ($layout == 1) {
       Reports::DisplayEventCalendarYear($this->template, $params);
