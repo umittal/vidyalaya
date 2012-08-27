@@ -47,12 +47,14 @@ dojo.require("dijit.Tooltip");
 
 <h3>Class Rooms</h3>
 
-<table id="maintable" cellspacing="0" class="tablesorter" width="400px">
+<table id="maintable" cellspacing="0" class="tablesorter" width="600px">
 
 
 <thead>
 <tr><th  id="tooltipField" class="ou">ID</th><th>Facility</th>
 <th>Room Number</th><th>Capacity</th>
+<th>Hint</th>
+<th>Usage</th>
 </tr>
 </thead>
 
@@ -64,6 +66,8 @@ dojo.require("dijit.Tooltip");
 <td>{FACILITY}</td>
 	<td align="right">{ROOMNUMNBER}</td>
 	<td align="right">{CAPACITY}</td>
+	<td>{HINT}</td>
+	<td>{USAGE}</td>
 </tr>
 <!-- END ROOM -->
 </tbody>

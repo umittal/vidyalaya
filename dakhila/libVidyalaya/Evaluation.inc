@@ -24,7 +24,7 @@ class Evaluation {
     file_put_contents("$htmlName", self::$html);
 		
     $pdfName = self::WriteDir . "/pdf/$id" . ".pdf";
-    file_put_contents("$pdfName", HtmlToPdf(self::$html));
+    file_put_contents("$pdfName", PrintFactory::HtmlToPdf(self::$html));
   }
 	
   private static function shortToLong($short) {
@@ -98,7 +98,7 @@ EOT;
     $closeTable = 0;
 		
     // Evaluation Display
-    self::$html .= "<div class=section>Language Evaluation (2010-11)</div>\n";
+    self::$html .= "<div class=section>Language Evaluation (2011-12)</div>\n";
     self::$html .= "<table class=evaluation>\n";
     for ($i=3; $i < $count; $i++) {
       if (empty($header[$i])) continue;
@@ -107,11 +107,11 @@ EOT;
 	self::$html .= "<tr><td colspan=2 class=category><b>$category[$i]</b></li></td></tr>\n";
       }
       $evaluation = self::shortToLong($row[$i]);
-      if (preg_match("/suggested level for 2011/i", $header[$i])) {
+      if (preg_match("/Recommended Language Level for 2012-13/i", $header[$i])) {
 	print "$studentId, $row[$i]\n"; // Dispaly it once, to move to file
       } else {
 	self::$txt .= "\n" . $header[$i] . "," . $evaluation  . "\n";
-	Self::$html .= "<tr><td class=left> $header[$i] </td><td> <i>$evaluation</i>   </td></tr>\n";
+	self::$html .= "<tr><td class=left> $header[$i] </td><td> <i>$evaluation</i>   </td></tr>\n";
       }
     }
 		
@@ -162,12 +162,15 @@ EOT;
 	  if ($s == $a) $nextYear=$cellno;
 	}
 	if ($nextYear == 0) print "Error: next year column missing, row is $rowIndex\n";
+	print implode( ",", $header ) . "\n";
       } else if ($rowIndex>2){
 	foreach ($cellIterator as $cellno => $cell) { 
 	  $cells[] = $cell->getValue();
 	}
 	$studentId = intval($cells[1]);
 	if (empty($studentId)) continue;
+	print implode( ",", $cells ) . "\n";
+	self::WriteStudentAssessment(array(), $header, $cells);
 	$student = Student::GetItemById($studentId);
 	if (empty($student)) print "Error: no student found for $studentId\n";
 	if (!array_key_exists($studentId, $enrolledStudent)) continue;
@@ -199,8 +202,8 @@ EOT;
       }
     } 
     //    print " $filename, row count = $rowcount";
+#    print_r($array_data);
     return $rowcount;
-    print_r($array_data);
   }
 
   public  static function ProcessAllExcelFiles() {

@@ -817,6 +817,34 @@ class Rooms{
 	  return $list;
 	}
 	
+	public static function GetHeatMap($facility, $year=null) {
+	  if (is_null($year)) $year=Calendar::CurrentYear();
+	  if ($year >= 2010) $year -= 2010;
+	  
+	  $list = Enrollment::GetAllEnrollmentForFacilitySession($facility, $year);
+       	  uasort ($list, "Enrollment::CompareSessionDepartment") ;
+
+	  print "list count is " . count($list) .  "<br />";
+	  foreach ($list as $item) {
+	    $room = $item->class->room->id;
+	    $class = $item->class->id;
+	    if (!isset($count[$room][$class])) $count[$room][$class]=0;
+	    $count[$room][$class]++;
+	    //	    print "$room, $class <br />";
+	  }
+
+	  $heatMap=array();
+	  // transform array
+	  foreach ($count as $room => $classes) {
+	    $heatMap{$room}  = "";
+	    foreach ($classes as $classId => $count) {
+	      $class = AvailableClass::GetItemById($classId);
+	      $heatMap{$room} .= $class->urlRoster() . "($count) ";
+	    }
+	  }
+	  return $heatMap;
+	}
+
 	public static function findEastlakeRoomFromCourse($course) {
 		self::firstTimeCall();
 		foreach (self::$objArray as $room) {

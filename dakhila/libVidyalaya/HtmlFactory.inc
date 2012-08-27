@@ -377,7 +377,7 @@ function DisplayChildren(&$template, $student) {
 	    $template->setCurrentBlock($templateName);
 	    $namestring = $student->id . ": " . $student->fullName();
 	    $first = 2010 +  Enrollment::firstYear($student->id) ;
-	    print "first year is $first\n";
+	    //	    print "first year is $first\n";
 	    if (Calendar::CurrentYear() <= $first)  $namestring = "<b> $namestring **NEW STUDENT PACK**</b>";
 	    $template->setVariable("STUDENTNAME", $namestring);
 	  }
@@ -920,12 +920,16 @@ function DisplayRooms($template, $year, $facilityId) {
   foreach (Rooms::GetRoomsFacility($facilityId) as $item) {
     $templateName="ROOM";
     $template->setCurrentBlock($templateName);
+
+    $heatMap = Rooms::GetHeatMap($facilityId);
     
     $template->setVariable("ROOMID", $item->id);
     $template->setVariable("ID", $item->id);
     $template->setVariable("FACILITY", $item->facility->name );
     $template->setVariable("ROOMNUMNBER", $item->roomNumber);
     $template->setVariable("CAPACITY", $item->capacity);
+    $template->setVariable("HINT", $item->hint);
+    $template->setVariable("USAGE", $heatMap{$item->id});
     $template->parseCurrentBlock();
   }
 }

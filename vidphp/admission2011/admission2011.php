@@ -292,16 +292,16 @@ BODY_WAITING;
 //Admission::OpeningDay(2011); exit();
 //Admission::PrintVolunteers(2011); exit();
 
-//Admission::admissionConfirmationEmail(2011);exit(); // has thing in there to decide which email to send
+Admission::admissionConfirmationEmail(2012);exit(); // has thing in there to decide which email to send
 //Admission::FamilyClassAssignment(2011); exit(); //to resend class assignment email to parents
 //Admission::itemDelivery(); exit();
 
 
-Evaluation::ProcessAllExcelFiles(); exit();
+//Evaluation::ProcessAllExcelFiles(); exit();
 
 //FamilyTracker::loadPayments();exit();
 //FamilyTracker::UpdateFamilyTracker(); exit();
-//TwoYearLayout::assignClass(); exit();
+TwoYearLayout::assignClass(); exit();
 ///TwoYearLayout::checkFeePaid(); exit();
 TwoYearLayout::twoYearCsv(); exit();
 //Admission::Validation(2011); exit();

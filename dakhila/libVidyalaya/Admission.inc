@@ -203,56 +203,32 @@ ITEMEMAIL;
 
   // ***********************
 
-  private static function FamilyOpeningDay($familyId, $enrollment) {
-    $family = Family::GetItemById($familyId);
+  private static function FamilyOpeningDay($tracker) {
+    $family = Family::GetItemById($tracker->family);
 
-    $body = <<<FAMILYOPENINGDAY
-      <p> (Please print the attachments in this email and bring it with you tomorrow)
-<p>
-It gives us immense pleasure to inform you that we are on track to have another great school year. First day of school is Sunday, September 18, 2011 at Parsippany Hills High School, 20 Rita Drive, Parsippany. (attached map)
-<p>
-ALL parents must come on this day for a mandatory meeting (auditorium). New parents please arrive at 8:30 AM (cafeteria, we will hand out material - print attachment) and continuing families please arrive at 9:00 AM (auditorium). Attached also you will find your room assignment. Your timeliness and patience will be greatly appreciated.
-<p>
-ALL students must come prepared to school with the following:
-<ul>
-<li> Prayer books (new kids will receive their free copy)
-<li> One inch 3-ring binder
-<li> Pencils with erasers
-</ul>
-
-<p>
-Next week, parents of KG and 1st Grade students will be getting a separate e-mail from their respective teachers about the additional arts/crafts supplies needed. All other course materials are provided to the students throughout the year.
-<p>
-ALL parents, We will send you a weekly Newsletter every Tuesday night, this will have messages from your language and culture teachers and will help you get prepared for any upcoming events. Also, please check our website www.vidyalaya.us for the latest calendar of events, newsletter, policies, curriculum, contact names, etc
-<p>
-Safe and Supporting environment: For our kids safety - we strongly recommend that no cars be parked for drop off or pickup in front of the school. Drive very carefully when around the school. As a volunteer organization we support eachother and make it a fun learning experience for our kids. We welcome new volunteers and have a variety of teams to choose from, contact us at SPA@vidyalaya.us and also bring the completed participation agreement.
-<p>
-Regards,
-<p>
-
-SPA (Student and Parent Affairs management team)<br />(sent by: Vasudha Sharma)
-
-FAMILYOPENINGDAY;
-
+    $body = str_replace("==AMOUNT==", $tracker->tuition, file_get_contents("openingday2012.inc"));
     $footer="";
-      $production=1;
-      $subject = "Vidyalaya Opening Day, Family- $family->id";
+      $production=0;
+      $subject = "Vidyalaya Opening Day 2012-13, Family- $family->id";
 
       print "Trying to send email to id " . $family->id . "\n";
       //      if ($family->id != 436) return;
       if ($production == 0) $subject = "[Test] $subject";
-      $mail = Mail::SetupMailSpa();
+      $mail = Mail::SetupMailAdmissions();
       Mail::SetFamilyAddress($mail, $family, $production);
       $mail->Subject = $subject;
       $salutation = "<p>Dear " . $family->parentsName() . ",";
       $mail->Body = $salutation . $body . $footer;
       $mail->AltBody = "This is the body when user views in plain text format, opening day $family->id"; //Text Body
 
-      $filename="/home/umesh/student2011/Family-" . $family->id . ".pdf";
-      $mail->AddAttachment($filename); // attachment
+      //      $filename="/home/umesh/student2011/Family-" . $family->id . ".pdf";
+      //      $mail->AddAttachment($filename); // attachment
 
+      $map = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/Layout/BrooklawnBig.jpg";
+      $mail->AddAttachment($map); // attachment
 
     $list = null; $done=array();
+    /*
     foreach($enrollment as $item) {
       if (array_key_exists($item->student->id, $done)) continue;
       if ($item->student->family->id == $familyId) {
@@ -262,12 +238,15 @@ FAMILYOPENINGDAY;
 	$done[$item->student->id] = 1;
       }
     }
+    */
 
     if(!$mail->Send()) {
       echo "Mailer Error: Family: $family->id: " . $mail->ErrorInfo . "\n";
     }  else {
       echo "Message has been sent, Family: $family->id:\n";
     }
+
+    die ("dying");
   }
 
 
@@ -313,7 +292,7 @@ CLOSING;
   }
 
   public static function admissionConfirmationEmail($year) {
-    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, $year);
+    //    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, $year);
     $i=1;
     $fp = fopen("/tmp/familylist.csv", "w");
     foreach (FamilyTracker::RegisteredFamilies() as $item) {
@@ -327,7 +306,7 @@ CLOSING;
       $csv[]=$family->address->OneLineAddress();
       fputcsv($fp, $csv);
       //      self::admissionConfirmationEmailFamily($item->family, $item->tuition, $enrollment);
-      //      self::FamilyOpeningDay($item->family, $enrollment);
+      self::FamilyOpeningDay($item);
     }
   }
 

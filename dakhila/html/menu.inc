@@ -25,8 +25,8 @@
             <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=TwoYearSummary"'>
                 Two Year
             </div>
-            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=Room"'>
-                Room
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=Rooms&facility=3"'>
+                Room List
             </div>
    </div>
    </div>
@@ -73,6 +73,9 @@
             </div>
             <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/userdata.php?command=EventCalendar" '>
                 Calendar
+            </div>
+            <div dojoType="dijit.MenuItem" onClick='window.location="/dakhila/php/dataViewer2.php?command=Room"'>
+                Room
             </div>
         </div>
     </div>

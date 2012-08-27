@@ -507,8 +507,9 @@ class Mail {
     $student = Student::GetItemById($studentId);
     $family = $student->family;
     
+    $production=0;
     $footer = "<p>Asmita Mistry<br>On behalf of the Language Curriculum Team</p>";	
-    $subject = "Language Evaluation 2010-11: " . $student->fullName();
+    $subject = "Language Evaluation 2011-12: " . $student->fullName();
     if ($production == 0) $subject = "[Test] $subject";
     
     $mail = self::SetupMailSPA();
@@ -520,7 +521,7 @@ class Mail {
     
     $body = <<<EOT
 		
-		<p>Attached please find the language evaluation report for $name for the 2010-11 school year. 
+		<p>Attached please find the language evaluation report for $name for the 2011-12 school year. 
 		Also please find the class assignment for the upcoming school year if you have already registered. 
 		We also want to take this opportunity to thank the teachers for their voluntary contribution.
 
@@ -538,11 +539,12 @@ EOT;
     
     
     $filename = "/tmp/evalution-" . $studentId. ".pdf";
-    file_put_contents($filename, HtmlToPdf($html));
+    file_put_contents($filename, PrintFactory::HtmlToPdf($html));
     $mail->AddAttachment($filename); // attachment
     
     $mail->AltBody = "This is the body when user views in plain text format"; //Text Body
     
+    return;
     if(!$mail->Send()) {
       echo "Mailer Error: Family: $family->id: " . $mail->ErrorInfo . "\n";
     }  else {
