@@ -31,6 +31,7 @@ class TwoYearEnrollment {
 	}
 
 	public function updateFromStudent($student) {
+	  //	  print "DEBUG: student id is $student->id, " . __LINE__ . "," .  __FILE__ . "\n";
 		$this->language = $student->languagePreference;
 		$this->cultureLevel = $student->GradeAt(Calendar::RegistrationSession);
 		if ($this->cultureLevel > 9) $this->cultureLevel = 9;
@@ -134,7 +135,7 @@ class TwoYearLayout {
 
   private static function updateNewStudent($studentId) {
     $student = Student::GetItemById($studentId);
-    if (empty($student)) print "student not found for id ==$studentId==";
+    if (empty($student)) print "student not found for id ==$studentId==, ". __LINE__ . "\n";
     if (empty(self::$objArray[$studentId])) {
       //      print "I am here for student $studentId, found in current year from file\n";
       self::$objArray[$studentId] = new TwoYearLayout();
@@ -157,6 +158,7 @@ class TwoYearLayout {
       while ((list($familyId,$Check , $base, $new , $adj , $CD , $PB , $Bag , $date , $total ,$foo, $ch1 , $ch2 , $ch3 )
 	      = fgetcsv($handle, 0, ",")) !== FALSE) {
 	if (!empty($familyId)) {
+	  //	  print "DEBUG: looking up students for family $familyId\n";
 	  if (!empty($ch1)) self::updateNewStudent($ch1);
 	  if (!empty($ch2)) self::updateNewStudent($ch2);
 	  if (!empty($ch3)) self::updateNewStudent($ch3);
@@ -175,7 +177,7 @@ class TwoYearLayout {
       $totalTuition=0;
       $done=array();
       $fileTuition = array();
-      print "debug, i was here\n";
+      //      print "debug, i was here\n";
       while ((list($familyId,$Check , $base, $new , $adj , $CD , $PB , $Bag , $date , $total ,$foo, $ch1 , $ch2 , $ch3 )
 	      = fgetcsv($handle, 0, ",")) !== FALSE) {
 	if (!(empty($familyId) || empty($date))) {
@@ -252,6 +254,7 @@ class TwoYearLayout {
     self::firstTimeCall();
     $count = 0;
     foreach (self::$objArray as $studentid => $twoYear) {
+      //      print "DEBUG: student id is $studentid\n";
       $student = Student::GetItemById($studentid);
 				
       if ($twoYear->thisYear->languageLevel != null) continue;
@@ -333,7 +336,7 @@ class TwoYearLayout {
     }
 		
   }
-	
+
   private function __construct() { 
     $this->previousYear = new TwoYearEnrollment();
     $this->thisYear = new TwoYearEnrollment();

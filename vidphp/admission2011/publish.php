@@ -64,6 +64,18 @@ class Publications {
   const MAILINGLISTDIR="/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/mailinglist/";
   const rosterDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/roster/";
 
+  public static function NewStudents($year=null) {
+    if (is_null($year)) $year=Calendar::CurrentYear();
+    if ($year >= 2010) $year -= 2010;
+
+    foreach (Enrollment::GetStudents($year) as $studentId => $value) {
+      if (!Student::WasEverEnrolledId($studentId)) {
+	$s = Student::GetItemById($studentId);
+	print "$studentId, $s->firstName, $s->lastName\n";
+      }
+    }
+  }
+
   private static function InvolvedFamilies($year) {
     // Enrolled Families + Volunteers
     $families = array();
@@ -142,6 +154,7 @@ class Publications {
 
     $directory="/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/roster/word";
     $document->filename = "$directory/2012.docx";
+    print "saving file $directory/2012.docx\n";
     $document->SaveDocument();
   }
 
@@ -422,7 +435,7 @@ class Publications {
       }
     }
 
-    fwrite($fh, "first, last, lc, lr, cc, cr,id,lang \n");
+    fwrite($fh, "first, last, lc, lr, cc, cr,id,lang, family \n");
     foreach ($list as $item) {
       $csv = array();
       $csv[] = $item->firstName;
@@ -432,9 +445,13 @@ class Publications {
       if (array_key_exists($item->id, $culture)) {
 	$csv[] = $culture[$item->id]->short();
 	$csv[] = $culture[$item->id]->room->roomNumber;
+      } else {
+	$csv[]="";
+	$csv[]="";
       }
       $csv[] = $item->id;
       $csv[] = Department::NameFromId($item->languagePreference);
+      $csv[] = $item->family->id;
       fputcsv($fh, $csv);
     }
     fclose($fh);
@@ -527,7 +544,7 @@ class Publications {
   private static function RosterSpaStudents($year) {
     $fh = tmpfile();
     if (!$fh) die ("could not open temporary file for writing");
-    fwrite ($fh, "ID, First, Last, Language, , Culture, ,Parents,\n");
+    fwrite ($fh, "ID, Family, First, Last, Language, , Culture, ,Parents,\n");
 
 
     $language = array(); $culture=array();
@@ -548,6 +565,7 @@ class Publications {
     foreach ($done as $student) {
       $csv = array();
       $csv[] =  $student->id;
+      $csv[] =  $student->family->id;
       $csv[] =  $student->firstName;
       $csv[] =  $student->lastName;
       $lc = null; $cc = null; 
@@ -840,10 +858,10 @@ class Publications {
       
       $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
       $objWriter->save($excelFile);
-      return;
-      $objWriter = new PHPExcel_Writer_PDF($objPHPExcel);
-      $objWriter->save("/tmp/umesh.pdf"); // did not look good
-      die("check /tmp/umesh.pdf\n");
+      //      return;
+      //      $objWriter = new PHPExcel_Writer_PDF($objPHPExcel);
+      //      $objWriter->save("/tmp/umesh.pdf"); // did not look good
+      //      die("check /tmp/umesh.pdf\n");
 
       //      echo date('H:i:s') . " Peak memory usage: " . (memory_get_peak_usage(true) / 1024 / 1024) . " MBrn\no";
     }
@@ -1237,6 +1255,7 @@ BODY;
     }
   }
 
+
 }
 
 //print Codes::VolunteerCodeHtml();  exit(); // print volunteer codes for shiksha portal
@@ -1245,11 +1264,12 @@ BODY;
 //Publications::LanguageAssessment(2012); exit();
 //NewsletterHtml::Publish();
 //Publications::FamilyListForHandbookDistribution(2012); exit();
-//Publications::AttendanceSheet(2012); exit();
+Publications::AttendanceSheet(2012); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
 //Publications::Roster(2012); exit();
 
-Publications::RosterSpa(2012); exit();
+//Publications::RosterSpa(2012); exit();
+//Publications::NewStudents(2012); exit();
 
 //Publications::FullDumpFamilies();
 
@@ -1261,7 +1281,7 @@ Publications::CreateMailingLists(2012);exit();
 //Publications::SchoolDirectory(2012); exit();
 //Publications::TeacherDirectory(2012); exit (); // Directory of all Teachers
 //Publications::VolunteerDirectory(2012); exit (); // Directory of all Volunteers
-//Publications::ClassDirectory(2012); exit (); // Directory of all classes, with and without email
+Publications::ClassDirectory(2012); exit (); // Directory of all classes, with and without email
 
 
 ?>

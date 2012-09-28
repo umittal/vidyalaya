@@ -69,7 +69,6 @@ ID: {STUDENTID} (Family: {FAMILYID}) {SESSION} - {STUDENTNAME}
 <tr><td>12/15/2012</td><td>Newsletter </td></tr>
 <tr><td>03/02/2013</td><td>Yearbook</td></tr>
 </table>
-<p style="margin:0; padding:0 0 0 5px;">Topic - Two Cultures</p>
 </td>
 </tr>
 </table>

@@ -206,13 +206,15 @@ ITEMEMAIL;
   private static function FamilyOpeningDay($tracker) {
     $family = Family::GetItemById($tracker->family);
 
+    //    if ($family->id != 47) return;
+
     $body = str_replace("==AMOUNT==", $tracker->tuition, file_get_contents("openingday2012.inc"));
+    $body = str_replace("==FAMILYID==", $tracker->family, $body);
     $footer="";
-      $production=0;
+      $production=1;
       $subject = "Vidyalaya Opening Day 2012-13, Family- $family->id";
 
       print "Trying to send email to id " . $family->id . "\n";
-      //      if ($family->id != 436) return;
       if ($production == 0) $subject = "[Test] $subject";
       $mail = Mail::SetupMailAdmissions();
       Mail::SetFamilyAddress($mail, $family, $production);
@@ -221,8 +223,107 @@ ITEMEMAIL;
       $mail->Body = $salutation . $body . $footer;
       $mail->AltBody = "This is the body when user views in plain text format, opening day $family->id"; //Text Body
 
-      //      $filename="/home/umesh/student2011/Family-" . $family->id . ".pdf";
-      //      $mail->AddAttachment($filename); // attachment
+      $filename="/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/OpeningDay/pdf/Family-" . $family->id . ".pdf";
+      $mail->AddAttachment($filename); // attachment
+      $calendar="/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/OpeningDay/Calendar.pdf";
+      $mail->AddAttachment($calendar); // attachment
+
+      //      $map = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/Layout/BrooklawnBig.jpg";
+      //      $mail->AddAttachment($map); // attachment
+
+    $list = null; $done=array();
+    /*
+    foreach($enrollment as $item) {
+      if (array_key_exists($item->student->id, $done)) continue;
+      if ($item->student->family->id == $familyId) {
+	$filename="/home/umesh/student2011/Student-" . $item->student->id . ".pdf";
+	$mail->AddAttachment($filename); // attachment
+
+	$done[$item->student->id] = 1;
+      }
+    }
+    */
+
+    //    return;
+    if(!$mail->Send()) {
+      echo "Mailer Error: Family: $family->id: " . $mail->ErrorInfo . "\n";
+    }  else {
+      echo "Message has been sent, Family: $family->id:\n";
+    }
+
+    //    die ("dying");
+    sleep (5);
+  }
+
+
+  private static function BackToSchool($tracker) {
+    $family = Family::GetItemById($tracker->family);
+
+    if ($family->id != 26) return;
+
+    $body1 = <<<FOO
+<style>
+      td {padding-left:20px;}
+</style>
+      <p>The Trustees of Vidyalaya invite you to back to school day on 30 September 2012. Please be seated in the cafetorium by 9:25am. The details of the event are available at http://www.vidyalaya.us/shiksha/bts2012.html. Additional information for Teachers is available in the Teachers tab.</p>
+    <p>Attached please find the updated Family Information sheets that were distributed on the Opening Day. In some cases, parents may want to reprint it and update the sheets on student folders distributed on the opening day. The map of the facility is also attached.</p>
+
+<p>Your family id is $family->id. Your class visits are listed below.</p>
+FOO;
+
+    $body = <<<FOO1
+
+<p>Vidyalaya is hosting its annual Back To School event on Sunday, September 30th, 2012. All parents are invited to attend.  It will be a wonderful opportunity to learn about your child's language and culture classes as well as meet his/her teachers.  The teachers will share important information about classroom policies and expectations.</p>
+<p>Attached please find the updated Family Information sheets that were distributed on the Opening Day. In some cases, parents may want to reprint it and update the sheets on student folders distributed on the opening day. The map of the facility is also attached.</p>
+
+<p>Please arrive promptly at 9:25 am along with your children.  Follow all driving rules; the driving lanes in the front parking lot are one-way and there is no parking in fire lane (yellow line means no parking).  The teachers and students will follow the regular school schedule, whereas the parents’ meeting will start in the cafetorium immediately following the prayer session.</p>
+
+<p>Your class visits are as follows:</p>
+
+<table>
+<thead>
+<tr><th>Name</th><th>Class</th><th>Room</th><th>Visit Time</th><th>Teachers</th><th>Level</th></tr>
+</thead>
+<tbody>
+FOO1;
+
+    foreach (Enrollment::GetEnrollmentForFamily($tracker->family, $tracker->year) as $item) {
+      switch ($item->class->course->department) {
+      case Department::Culture:
+	$visittime="11:05 - 11:20";
+	break;
+      case Department::Kindergarten:
+	$visittime="11:30 - 11:45";
+	break;
+      default:
+	$visittime="10:45 - 11:00";
+      }
+      $body .=  sprintf("<tr><td>%s</td><td>%s</td><td> %s </td><td>%s</td><td>%s</td><td>%s</td></tr>\n", 
+			$item->student->firstName, $item->class->short(), 
+			$item->class->room->roomNumber, $visittime, 
+			Teachers::TeacherListClassHtml($item->class->id), $item->class->room->hint
+			);
+    }
+    $body .= "</tbody></table>";
+
+    //    $footer="<p>Regards</p><p>Praveen, Asmita, Reena, Kiron</p>";
+    $footer ="";
+      $production=1;
+      $subject = "Vidyalaya Back to School Day 2012-13, Family- $family->id";
+
+      print "Trying to send email to id " . $family->id . "\n";
+      if ($production == 0) $subject = "[Test] $subject";
+      $mail = Mail::SetupMailSpa();
+      Mail::SetFamilyAddress($mail, $family, $production);
+      $mail->Subject = $subject;
+      $salutation = "<p>Dear " . $family->parentsName() . ",";
+      $mail->Body = $salutation . $body . $footer;
+      $mail->AltBody = "This is the body when user views in plain text format, opening day $family->id"; //Text Body
+
+      $filename="/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/OpeningDay/pdf/Family-" . $family->id . ".pdf";
+      $mail->AddAttachment($filename); // attachment
+      //      $calendar="/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/OpeningDay/Calendar.pdf";
+      //      $mail->AddAttachment($calendar); // attachment
 
       $map = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/Layout/BrooklawnBig.jpg";
       $mail->AddAttachment($map); // attachment
@@ -240,56 +341,17 @@ ITEMEMAIL;
     }
     */
 
+    //    return;
     if(!$mail->Send()) {
       echo "Mailer Error: Family: $family->id: " . $mail->ErrorInfo . "\n";
     }  else {
       echo "Message has been sent, Family: $family->id:\n";
     }
 
-    die ("dying");
+//    die ("dying");
+    sleep (5);
   }
 
-
-  private static function admissionConfirmationEmailFamily($familyId, $tuition, $enrollment) {
-		
-    $family = Family::GetItemById($familyId);
-
-    $body = <<<ADMISSIONEMAIL
-<p>
-We are writing this email to let you know that the start of Vidyalaya 2011-12 session has been delayed by one week. Our first day now will be September 18, 2011.
-<p>
-We were planning to start the school at Eastlake Elementary School.  However, earlier this week, concerned authorities advised us that because of the size of our enrollment, we were at serious risk of violations not only for parking but also for crowding in the hallways and gym.  In order to not jeopardize the safety of our families and to minimize the disruption that a potential fire code violation would have on Vidyalaya, we decided to find an alternate venue for the school. 
-
-<p>
-We are pleased to inform you that pending some contractual paperwork, we will be moving to Parsippany Hills High School for the current session.
-<p>
-We apologize for the late notice due to events out of our control and look forward to seeing you all on Sunday September 18, 2011. More emails will be coming with further details. For the record, following students are enrolled from your family
-
-<ol>
-
-ADMISSIONEMAIL;
-
-    $list = null; $done=array();
-    foreach($enrollment as $item) {
-      if (array_key_exists($item->student->id, $done)) continue;
-      if ($item->student->family->id == $familyId) {
-	$list .= "<li> " . $item->student->fullName() . "</li>\n";
-	$done[$item->student->id] = 1;
-      }
-    }
-    if (is_null($list)) die ("Houston, we have a problem, $familyId\n");
-
-    $closing = <<<CLOSING
-      </ol>
-
-      <p>Regards,<p>
-
-CLOSING;
-    $subject = "Opening Day 2011-12 notification, Family- $family->id";
-
-    if ($familyId > 472)
-      Mail::mailFamilyFromAdmission($family, $subject, $body . $list . $closing, 1);
-  }
 
   public static function admissionConfirmationEmail($year) {
     //    $enrollment = Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, $year);
@@ -305,8 +367,8 @@ CLOSING;
       $csv[]=$family->father->fullName();
       $csv[]=$family->address->OneLineAddress();
       fputcsv($fp, $csv);
-      //      self::admissionConfirmationEmailFamily($item->family, $item->tuition, $enrollment);
-      self::FamilyOpeningDay($item);
+      //      self::FamilyOpeningDay($item);
+      self::BackToSchool($item);
     }
   }
 
@@ -434,42 +496,26 @@ TEACHEREMAILATTENDANCEASSESSMENT;
       $classshort=$item->class->short();
       $room=$item->class->room->roomNumber;
       $body = <<<TEACHEREMAIL
-<p>(please print attachments as you consider necessary)
-<p>Thank you for volunteering to teach  $classshort class in room number $room at Parsippany Hills High School, 20 Rita Drive, Morris Plains (<a href="http://maps.google.com/maps?daddr=Parsippany-Troy+Hills+Township,+New+Jersey+(Parsippany+Hills+High+School)&hl=en&ll=40.861323,-74.456422&spn=0.002836,0.005681&sll=40.861371,-74.456422&sspn=0.002739,0.005681&geocode=CYyExFx_jj4jFXV_bwIdj-GP-yEx9DwpNb5Kzg&vpsrc=0&mra=mift&t=h&z=18">Directions</a>) starting September 18, 2011.  
+<p>Thank you for teaching at Vidyalaya 2012-13. The school starts tomorrow Sunday 9 September 2012. Please come early and familiarize yourself with the facilities. Please read the  opening day announcement posted at <a href="http://www.vidyalaya.us/shiksha/2012w1.html">http://www.vidyalaya.us/shiksha/2012w1.html</a>, it should answer most question you may have.
 
-Please print attached  layout of school with your class information and bring it with you Sunday. Please be advised that the schedule for tomorrow will be as follows:  
-<ul>
-<li>8:30 New Parents Arrive
-<li>9:00 All Continuing Parents/Teachers Arrive
-<li>9:25 Prayer/Assembly Session
-<li>10:00 Language Class
-<li>11:00 Culture Class
-<li>11:30 KG Dismissal
-<li>11:45 All Other Classes Dismissal
-</ul>
-
+<p>Language teachers: At the conclusion of General Assembly, please escort your students from the Cafeteria to your classroom.  At the end of the language class, please stay in your room until the Culture teacher arrives.  Students should never be left unattended in the classroom at any time.</p>
 <p>
-Please arrive at school as early as possible so you have the opportunity to find your classroom and become familiar with the school layout prior to the Prayer/Assembly session.  New parents will arrive at 8:30 and Prayer/Assembly will start at 9:25am sharp.
-<ul>
-<li>Language teachers:</li> At the conclusion of Assembly/Prayer class, please escort your students from the Auditorium to your classroom.  At the end of the language class, please stay in your room until the Culture teacher arrives.  Students should never be left unattended in the classroom at any time.
+Culture teachers:Please reach your designated classroom 5 minutes before the class begins to monitor the students, and stay in the classroom until all students have vacated at the end of class. </p>
 <p>
-<li>Culture teachers:</li> Please reach your designated classroom 5 minutes before the class begins to monitor the students, and stay in the classroom until all students have vacated at the end of class. 
-</ul>
-<p>
-The coordinators for specific teams may send additional communications as needed. We have attached the attendance sheet and a roster of students for your class. Please print these attachments and bring them with you.  
+			    We have attached the details of your class, attendance sheet and a roster of students for your class. The roster can be reformatted using Microsoft Word for printing.  Please print these attachments and bring them with you.  </p>
 <p>Looking forward to another great year,
 
-<p>(The above  message is sent by Umesh Mittal  on behalf of various team leaders for Teaching Volunteers.)
+<p>(The above  message is sent by Umesh Mittal  on behalf of various team leaders.)
 
 
 TEACHEREMAIL;
 
       $footer = "";
-      $subject="Welcome to Vidyalaya 2011";
+      $subject="Welcome to Vidyalaya 2012-13";
       $production=1;
 
      print "Trying to send email to id " . $person->id() . "\n";
-      if ($person->id() != "F227") continue;
+     //      if ($person->id() != "F227") continue;
       if ($production == 0) $subject = "[Test] $subject";
       $mail = Mail::SetupMailUmesh();
       Mail::SetPersonAddress($mail, $person, $production);
@@ -478,13 +524,13 @@ TEACHEREMAIL;
       $mail->Body = $salutation . $body . $footer;
       $mail->AltBody = "This is the body when user views in plain text format"; //Text Body
 
-      $filename="/home/umesh/student2011/Teacher-" . $person->id() . ".pdf";
+      $filename="/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/OpeningDay/pdf/Teacher-" . $person->id() . ".pdf";
       $mail->AddAttachment($filename); // attachment
 
       $department=Department::NameFromId($item->class->course->department);
-      $filename="/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/attendance/$department/excel/$classshort.xlsx";
+      $filename="/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/attendance/$department/excel/$classshort.xlsx";
       $mail->AddAttachment($filename); // attachment
-      $filename="/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/roster/word/ClassWide/$classshort.docx";
+      $filename="/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/roster/word/ClassWide/$classshort.docx";
       $mail->AddAttachment($filename); // attachment
 
       if(!$mail->Send()) {
@@ -492,6 +538,8 @@ TEACHEREMAIL;
       }  else {
 	echo "Message has been sent, Person: " .$person->id() . ":\n";
       }
+      sleep(5);
+      //      die("i die");
     }
   }
 
@@ -539,6 +587,57 @@ VOLUNTEEREMAIL;
     }
   }
 	
+	
+  private static function checkStudent($ch1, &$enrolled, &$done) {
+    //    print "I am here for $ch1\n";
+    if (array_key_exists($ch1, $done)) {
+      print "Error: $ch1 was already processed before\n";
+      return;
+    }
+    $done[$ch1] = 1;
+    if (!array_key_exists($ch1, $enrolled)) {
+      print "Error: $ch1 is not enrolled yet, enroll it\n";
+      return;
+    }
+
+  }
+
+  private static function validateStudentsFileDatabase($year=null) {
+    if (is_null($year)) $year=Calendar::CurrentYear();
+    if ($year >= 2010) $year -= 2010;
+    $enrolled = Enrollment::GetStudents($year);
+    $done=array();
+
+
+    $filename = Admission::DataFile;
+    if (is_readable($filename)) {
+      $handle = fopen($filename, "r");
+      $header = fgetcsv($handle, 0, ",");
+      $header = fgetcsv($handle, 0, ",");
+      $i=1;
+      $totalTuition=0;
+      $done=array();
+      $fileTuition = array();
+      while ((list($familyId,$Check , $base, $new , $adj , $CD , $PB , $Bag , $date , $total ,$foo, $ch1 , $ch2 , $ch3 )
+	      = fgetcsv($handle, 0, ",")) !== FALSE) {
+	if (!empty($familyId)) {
+	  //	  print "DEBUG: looking up students for family $familyId\n";
+	  if (!empty($ch1)) self::checkStudent($ch1, $enrolled, $done);
+	  if (!empty($ch2)) self::checkStudent($ch2, $enrolled, $done);
+	  if (!empty($ch3)) self::checkStudent($ch3, $enrolled, $done);
+	}
+      }
+    }
+
+    foreach ($enrolled as $ch => $value) {
+      if (!array_key_exists($ch, $done)) {
+	print "Error: Student $ch is enrolled but does not exists in raw file\n";
+      }
+    }
+
+    print "Counts: Enroll = " . count($enrolled) . ", done = " . count($done) . "\n";
+  }
+
 	
   public static function Validation($year) {
     print "1. Validate Registered Parents between enrollment and familytracker\n";
@@ -628,7 +727,10 @@ VOLUNTEEREMAIL;
 	print "Error: key $key is setup as teacher in volunteer but not found in teacher list\n";
     }
 
-    print "todo 5. validate student language preference and language assignment are aligned\n";
+    print "5. check students in database vs. csv file";
+    self::validateStudentsFileDatabase($year);
+
+    print "todo 6. validate student language preference and language assignment are aligned\n";
   }
 
   public static function PrintVolunteers($year) {

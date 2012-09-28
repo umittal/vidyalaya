@@ -309,6 +309,15 @@ function DisplayFamilyTemplateV3 (&$template, $family) {
 	  $template->setVariable("TUITION", $item->tuition);
 	  $template->setVariable("REGDDATE", $item->registrationDate);
 	  $template->parseCurrentBlock();
+
+	  if (Calendar::CurrentYear() == $item->year+2010 && $item->previousYear == EnumFamilyTracker::registered) {
+	    $templateName="DVD2011";
+	    print "debug: print DVD thing\n";
+	    $template->setCurrentBlock($templateName);
+	    $template->setVariable("DVDYEAR", "2011");
+	    $template->parseCurrentBlock();
+	  }
+
 	}
 
 	foreach($family->allContacts() as $contact) {
@@ -377,9 +386,14 @@ function DisplayChildren(&$template, $student) {
 	    $template->setCurrentBlock($templateName);
 	    $namestring = $student->id . ": " . $student->fullName();
 	    $first = 2010 +  Enrollment::firstYear($student->id) ;
-	    //	    print "first year is $first\n";
 	    if (Calendar::CurrentYear() <= $first)  $namestring = "<b> $namestring **NEW STUDENT PACK**</b>";
-	    $template->setVariable("STUDENTNAME", $namestring);
+	    $template->setVariable("STUDENTNAME", "Student Folder -" . $namestring);
+
+	    if ($item->class->course->department == Department::Kindergarten) {
+	      $template->parseCurrentBlock();
+	      $template->setCurrentBlock($templateName);
+	      $template->setVariable("STUDENTNAME", "KG Note");
+	    }
 	  }
 	}
 	$template->parseCurrentBlock();
@@ -917,19 +931,19 @@ function DisplayClassRoster($template, $classId) {
 function DisplayRooms($template, $year, $facilityId) {
   $template->addBlockFile('RESULT', 'F_RESULT', 'Rooms.tpl');
   $template->touchBlock('F_RESULT');
+  $heatMap = Rooms::GetHeatMap($facilityId);
+
   foreach (Rooms::GetRoomsFacility($facilityId) as $item) {
     $templateName="ROOM";
     $template->setCurrentBlock($templateName);
 
-    $heatMap = Rooms::GetHeatMap($facilityId);
-    
     $template->setVariable("ROOMID", $item->id);
     $template->setVariable("ID", $item->id);
     $template->setVariable("FACILITY", $item->facility->name );
     $template->setVariable("ROOMNUMNBER", $item->roomNumber);
     $template->setVariable("CAPACITY", $item->capacity);
     $template->setVariable("HINT", $item->hint);
-    $template->setVariable("USAGE", $heatMap{$item->id});
+    if (isset($heatMap{$item->id})) $template->setVariable("USAGE", $heatMap{$item->id});
     $template->parseCurrentBlock();
   }
 }

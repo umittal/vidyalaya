@@ -283,9 +283,9 @@ BODY_WAITING;
 //Admission::ExistingFamilies(); exit();
 //Admission::AdultLanguage(); exit();
 
-//Teachers::AddTeacher(79, "hetalapurva@gmail.com", 0) ; exit();
+//Teachers::AddTeacher(79, "hetalapurva@gmail.com", 0) ; exit(); // remove this code.
 //Admission::VolunteerEmail(2011);exit();
-//Admission::TeacherEmail(2011);exit();
+//Admission::TeacherEmail(2012);exit();
 //Admission::TeacherEmailAttendanceAssessment(2011);exit();
 
 
@@ -302,9 +302,9 @@ Admission::admissionConfirmationEmail(2012);exit(); // has thing in there to dec
 //FamilyTracker::loadPayments();exit();
 //FamilyTracker::UpdateFamilyTracker(); exit();
 TwoYearLayout::assignClass(); exit();
-///TwoYearLayout::checkFeePaid(); exit();
-TwoYearLayout::twoYearCsv(); exit();
-//Admission::Validation(2011); exit();
+//TwoYearLayout::checkFeePaid(); exit(); do not use this, use the feecheck in jadu
+//TwoYearLayout::twoYearCsv(); exit();
+Admission::Validation(2012); exit();
 
 
 

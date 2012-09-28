@@ -824,7 +824,7 @@ class Rooms{
 	  $list = Enrollment::GetAllEnrollmentForFacilitySession($facility, $year);
        	  uasort ($list, "Enrollment::CompareSessionDepartment") ;
 
-	  print "list count is " . count($list) .  "<br />";
+	  //	  print "list count is " . count($list) .  "<br />";
 	  foreach ($list as $item) {
 	    $room = $item->class->room->id;
 	    $class = $item->class->id;
@@ -906,6 +906,19 @@ class Enrollment{
 	  return 0;
 	}
 
+	public static function CompareDepartmentName($a, $b) {
+	  $adept = Department::IsLanguage($a->class->course->department) ? 1 : $a->class->course->department;
+	  $bdept = Department::IsLanguage($b->class->course->department) ? 1 : $b->class->course->department;
+	  if (( $a->student->firstName == $b->student->firstName )
+	      && ($adept == $bdept ) )return 0;
+
+	  if ($adept < $bdept) return -1;
+	  if ($adept > $bdept) return 1;
+	  if ($a->student->firstName < $b->student->firstName) return -1;
+	  if ($a->student->firstName > $b->student->firstName) return 1;
+	  return 0;
+	}
+
   private static $firstYearArray = Array ();
 
   public static function firstYear($studentId) {
@@ -939,16 +952,21 @@ class Enrollment{
 	  return $families;
 	}
 	
-	private static function ArrayFromQuery($query) {
+	private static function ArrayFromQueryUnsorted($query) {
 		$enrollmentArray = Array();
 		
 		$result = VidDb::query($query);
 		while ($row = mysql_fetch_alias_array($result)) {
-			$enrollmentArray[] = new self($row);
+		  $foo = new self($row);
+		  $enrollmentArray[] = $foo;
 		}
-		
-	        usort ($enrollmentArray, "Enrollment::CompareStudentName");
 		return $enrollmentArray;
+	}
+
+	private static function ArrayFromQuery($query) {
+	  $enrollmentArray = self::ArrayFromQueryUnsorted($query);
+	  uasort ($enrollmentArray, "Enrollment::CompareStudentName");
+	  return $enrollmentArray;
 	}
 	
 	public static function GetEnrollmentForClass ($classId) {
@@ -957,6 +975,28 @@ class Enrollment{
 		where availableClass = $classId
 		";
 		return self::ArrayFromQuery($query);
+	}
+
+	public function __toString() {
+	  return $this->student->fullName() . ", " . $this->class->short();
+	}
+
+	public static function GetEnrollmentForFamily ($familyId, $year=null ) {
+	  if (is_null($year)) $year=Calendar::CurrentYear();
+	  if ($year >= 2010) $year -= 2010;
+	  $query = "select * 
+		from Enrollment
+		left join AvailableClass on Enrollment.availableClass = AvailableClass.id
+		left join CourseCatalog on AvailableClass.course = CourseCatalog.id
+                inner join Students2003 on Enrollment.student = Students2003.ID
+		where AvailableClass.year = $year and Students2003.PARENT_ID = $familyId
+		order by  Students2003.ID, CourseCatalog.department
+
+		";
+
+	  $foo = self::ArrayFromQueryUnsorted($query);
+	  uasort ($foo, "Enrollment::CompareDepartmentName");
+	  return $foo;
 	}
 
 	public static function GetEnrollmentFamily($familyId, $year=null) {
@@ -1093,6 +1133,21 @@ class Enrollment{
 		return self::ArrayFromQuery($query);	
 	}
 
+	public static function GetStudents($year=null) {
+	  if (is_null($year)) $year=Calendar::CurrentYear();
+	  if ($year >= 2010) $year -= 2010;
+	  $enrolled = array(); 
+	  $query = "select distinct student from Enrollment 
+              left join AvailableClass on Enrollment.availableClass = AvailableClass.id
+	      where AvailableClass.year = $year
+             ";
+	  $result = VidDb::query($query);
+	  while ($row = mysql_fetch_array($result)) {
+	    $enrolled[$row[0]] = 1;
+	  }
+
+	  return $enrolled;
+	}
 	
 	public function __construct($row) {
 		$this->student = Student::GetItemById($row["Enrollment.student"]);

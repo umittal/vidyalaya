@@ -34,6 +34,7 @@ class OpeningDay {
     DisplayFamilyTemplateV3($template, $family);
     $html = $html . $template->get();	
 
+    /*
     $html = $html . $footer . '<DIV style="page-break-after:always"></DIV>';
     $template = new HTML_Template_ITX($templateDir);
     $template->loadTemplatefile("Layout.tpl", true, true);
@@ -53,7 +54,7 @@ class OpeningDay {
     }
     $template->parseCurrentBlock();
     $html = $html . $template->get();			
-        
+*/        
 
     $classArray=array();
     foreach (AvailableClass::GetAllYear() as $class) {

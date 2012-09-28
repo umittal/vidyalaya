@@ -142,18 +142,21 @@ dojo.require("dijit.form.Button");
 <!-- END OTHERCONTACT -->
 </table>
 
-<!-- BEGIN PACKINGLIST -->
+<!-- BEGIN oPACKINGLIST -->
 <li class="section">Packing List</li>
 <ol style="list-style-type: decimal;list-style-position:inside;padding-left:10px;">
 <li>Family Detail Page</li>
 <li>Handbook</li>
-<li>Photograph Page</li>
+
 <!-- BEGIN ENROLLEDCHILDREN -->
-<li>Student Folder - {STUDENTNAME}</li>
+<li>{STUDENTNAME}</li>
 <!-- END ENROLLEDCHILDREN -->
 <li>Calendar</li>
+<!-- BEGIN DVD2011 -->
+<li>Mela {DVDYEAR}  DVD </li>
+<!-- END DVD2011 -->
 </ol>
-<!-- END PACKINGLIST -->
+<!-- END oPACKINGLIST -->
 
 
 </ol>

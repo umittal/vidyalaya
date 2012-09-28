@@ -28,15 +28,15 @@ class Evaluation {
   }
 	
   private static function shortToLong($short) {
-    switch (strtoupper($short)) {
+    switch (strtoupper(trim($short))) {
     case "N": return "Needs Improvement";
       break;
     case "S": return "Satisfactory";
       break;
     case "E": return "Excellent";
-    case "N/A": case "NA": return "Not Evaluated";
+    case "N/A": case "NA":  case "-": return "Not Evaluated";
 			
-    default: return $short;			;
+    default: print "Debug: short code ==$short== in evaluation unknown"; return $short;			;
       break;
     }
   }
@@ -75,7 +75,6 @@ EOT;
     self::$html .= "<tr><td>ID</td><td>$studentId</td></tr>\n";
     self::$html .= "<tr><td>Name</td><td></td><td>$name</td></tr>\n";
     self::$html .= "<tr><td>Parents</td><td></td><td>" . $student->parentsName() . "</td></tr>\n";
-    self::$html .= "<tr><td>Teachers</td><td></td><td>" . $student->registration->language->teachers . "</td></tr>\n";
     // Get Enrollemnet details
     $history = Enrollment::GetLanguageHistory($studentId);
     usort ($history, "Enrollment::CompareSessionDepartment");
@@ -86,13 +85,15 @@ EOT;
       self::$txt .=  $item->class->session . "	"	. $item->class->short() . "\n";
       self::$html .= "<tr><td>" . $item->class->session . "</td><td>" . $item->class->shortWithoutSection() . "</td>";
       self::$html .= "<td>" . $item->class->course->full . "</td></tr>\n";
+      if ($year == 2011) $evaluatingTeachers  = Teachers::TeacherListClassCsv($item->class->id);
     }
-    if ($year != 2011) {
-      self::$txt .=  "2011-12	Not Enrolled\n";
-      self::$html .= "<tr><td>" . "2011-12" . "</td><td>" . "<i>Not Enrolled</i>" . "</td></tr>\n";
+    if ($year != 2012) {
+      self::$txt .=  "2012-13	Not Enrolled\n";
+      self::$html .= "<tr><td>" . "2012-13" . "</td><td>" . "<i>Not Enrolled</i>" . "</td></tr>\n";
     }
 		
     if (empty($year)) die ("No history found for student id $studentId\n");
+    self::$html .= "<tr><td>Evaluated By</td><td></td><td>" . $evaluatingTeachers . "</td></tr>\n";
     self::$html .= "</table>\n";
 		
     $closeTable = 0;
@@ -109,10 +110,11 @@ EOT;
       $evaluation = self::shortToLong($row[$i]);
       if (preg_match("/Recommended Language Level for 2012-13/i", $header[$i])) {
 	print "$studentId, $row[$i]\n"; // Dispaly it once, to move to file
-      } else {
+      } 
+      //      else {
 	self::$txt .= "\n" . $header[$i] . "," . $evaluation  . "\n";
 	self::$html .= "<tr><td class=left> $header[$i] </td><td> <i>$evaluation</i>   </td></tr>\n";
-      }
+	//      }
     }
 		
     self::$html .= "</table>\n";
@@ -134,7 +136,7 @@ EOT;
     $objPHPExcel = $objReader->load($filename);
     $worksheet=$objPHPExcel->getSheet(0);
     $a = "Recommended Language Level for 2012-13";
-    $header = array(); $nextYear=0; $current="unknown";
+    $header = array(); $nextYear=0; $current="unknown";$category=array();
 
 
     foreach ($worksheet->getRowIterator() as $row) {
@@ -145,6 +147,7 @@ EOT;
       if ($rowIndex==1) {
 	foreach ($cellIterator as $cellno => $cell) { 
 	  $s = $cell->getValue();
+	  $category[] = $s;
 	  if ($cellno == 1) {
 	    $previousShort=preg_replace('/\s+/', '', $s);
 	    if (array_key_exists($previousShort, $previous)) {
@@ -155,6 +158,7 @@ EOT;
 	    }
 	  }
 	}
+	//	foreach ($category as $key=>$value) print "category, key=$key, value=$value\n";
       } else if ($rowIndex==2) {
 	foreach ($cellIterator as $cellno => $cell) { 
 	  $s = $cell->getValue();
@@ -170,7 +174,7 @@ EOT;
 	$studentId = intval($cells[1]);
 	if (empty($studentId)) continue;
 	print implode( ",", $cells ) . "\n";
-	self::WriteStudentAssessment(array(), $header, $cells);
+	self::WriteStudentAssessment($category, $header, $cells);
 	$student = Student::GetItemById($studentId);
 	if (empty($student)) print "Error: no student found for $studentId\n";
 	if (!array_key_exists($studentId, $enrolledStudent)) continue;

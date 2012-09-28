@@ -8,7 +8,7 @@ $(document).ready(function() {
         .tablesorter({
 	widthFixed: true, 
 	widgets: ['zebra'], 
-	sortList:[ [2,0] ],
+	sortList:[ [0,0] ],
 	headers : { 1:{sorter: false}}
 	});
 

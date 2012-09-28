@@ -507,7 +507,7 @@ class Mail {
     $student = Student::GetItemById($studentId);
     $family = $student->family;
     
-    $production=0;
+    $production=1;
     $footer = "<p>Asmita Mistry<br>On behalf of the Language Curriculum Team</p>";	
     $subject = "Language Evaluation 2011-12: " . $student->fullName();
     if ($production == 0) $subject = "[Test] $subject";
@@ -521,37 +521,34 @@ class Mail {
     
     $body = <<<EOT
 		
-		<p>Attached please find the language evaluation report for $name for the 2011-12 school year. 
-		Also please find the class assignment for the upcoming school year if you have already registered. 
-		We also want to take this opportunity to thank the teachers for their voluntary contribution.
+<p>Hope you are enjoying your summer! </p>
 
-		<p>Should you have any questions or concerns, please respond to this email at the 
-		earliest. 
-		Please forward any questions or comments to spa@vidyalaya.us.  The SPA team will 
-		coordinate with the Language Curriculum Team to address your concerns.
+<p>Attached please find the progress report for $name from the 2011-2012 school year at Vidyalaya. Returning students can also see the new language class assignment for 2012-13 here. We also want to take this opportunity to thank the teachers for their voluntary contribution. We value their time, expertise and commitment to helping our children learn.
+</p>
 
-<p>Have a great summer!
+<p>Please forward any questions or concerns to spa@vidyalaya.us.</p>
 
-<p>Regards,
+<p>Regards,</p>
 EOT;
 		
     $mail->Body = $salutation . $body . $footer;
     
     
-    $filename = "/tmp/evalution-" . $studentId. ".pdf";
-    file_put_contents($filename, PrintFactory::HtmlToPdf($html));
+    $filename = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/evaluation/report/pdf/" . $studentId. ".pdf";
+    //    file_put_contents($filename, PrintFactory::HtmlToPdf($html));
     $mail->AddAttachment($filename); // attachment
     
     $mail->AltBody = "This is the body when user views in plain text format"; //Text Body
     
-    return;
+
     if(!$mail->Send()) {
       echo "Mailer Error: Family: $family->id: " . $mail->ErrorInfo . "\n";
     }  else {
       echo "Message has been sent, Family: $family->id:\n";
     }
-    
-    unlink($filename);
+    sleep (5);
+    //    die ("i die");
+    //    unlink($filename);
   }
 }
 
