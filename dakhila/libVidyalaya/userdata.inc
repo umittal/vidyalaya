@@ -305,6 +305,8 @@ RESETFORM;
     $params=null;
     if ($layout == 1) {
       Reports::DisplayEventCalendarYear($this->template, $params);
+    } else if ($layout == 2) {
+      Reports::DisplayYogaEvents($this->template, $params);
     } else {
       Reports::DisplayEventCalendar($this->template, $params);
     }

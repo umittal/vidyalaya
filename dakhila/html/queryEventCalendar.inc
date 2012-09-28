@@ -18,6 +18,7 @@
     <select id="Layout" dojoType="dijit.form.Select" name="Layout">
     <option value=0 selected="selected">Events</option>
     <option value=1>SchoolDays</option>
+    <option value=2>Yoga</option>
     </select>
 
 <button dojoType="dijit.form.Button" type="submit" id="submit"   >Go</button>

@@ -730,6 +730,37 @@ class Reports {
     
   }
 
+  public static function DisplayYogaEvents($template, $params) {
+    $count=0;
+
+    $start = isset($_POST['startDate']) ?  $_POST['startDate'] : null;
+    $template->addBlockFile('RESULT', 'F_RESULT', 'YogaEvent.tpl');
+    $template->touchBlock('F_RESULT');
+
+    $template->setCurrentBlock("HIDDENFORMS");
+    $template->setVariable("EVENTCALENDARFORM", file_get_contents("../html/EventCalendarForm.inc"));
+    $template->parseCurrentBlock();
+    
+    if (VidSession::IsSuperUser()) {
+      $templateName="AUTHORIZED";
+      $template->setCurrentBlock($templateName);
+      $template->setVariable("EVENTID", "");
+      $template->parseCurrentBlock();
+    }
+
+    $templateName="EVENTS";
+    foreach (EventCalendar::ListYogaEvents(1, $start, $count) as $event) {
+      $template->setCurrentBlock($templateName);
+      $template->setVariable("DATE", $event->date);
+      $template->setVariable("START", $event->startTime);
+      $template->setVariable("END", $event->endTime);
+      $template->setVariable("CLASS", $event->class->short());
+      $room = isset($event->class) ? $event->class->room->roomNumber : "";
+      $template->setVariable("ROOM", $room);
+      $template->parseCurrentBlock();
+    }
+  }
+
   public static function DisplayEventCalendar($template, $params) {
     $count=0;
 

@@ -1787,6 +1787,12 @@ Class EventCalendar {
     return self::ArrayFromQuery($query);
   }
 
+  public static function ListYogaEvents($session, $start, $count) {
+    $query = "Select * from EventCalendar where date >= '$start' and  eventType = " . 
+      EventCalendarType::Yoga . " order by date asc, starttime asc";
+    return self::ArrayFromQuery($query);
+  }
+
   public static function ListStudentActivities($student, $year=null) {
     if (is_null($year)) $year=Calendar::CurrentYear();
     if ($year >= 2010) $year -= 2010;
