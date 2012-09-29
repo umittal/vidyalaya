@@ -312,7 +312,7 @@ function DisplayFamilyTemplateV3 (&$template, $family) {
 
 	  if (Calendar::CurrentYear() == $item->year+2010 && $item->previousYear == EnumFamilyTracker::registered) {
 	    $templateName="DVD2011";
-	    print "debug: print DVD thing\n";
+	    //	    print "debug: print DVD thing\n";
 	    $template->setCurrentBlock($templateName);
 	    $template->setVariable("DVDYEAR", "2011");
 	    $template->parseCurrentBlock();

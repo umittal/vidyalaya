@@ -13,7 +13,7 @@ class Admission {
   const OrientationFile = "/home/umesh/workspace/vidphp/admission2011/orientation1.txt";
   //  const assesssmentFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/data/assessment.csv";
   const assesssmentFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission/assessment.csv";
-  const rosterDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-12/roster/";
+  const rosterDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/roster/";
   public static $students = Array ();
 
   private static function sendItemEmail($familyId, $cd, $pb, $bag) {
@@ -259,7 +259,7 @@ ITEMEMAIL;
   private static function BackToSchool($tracker) {
     $family = Family::GetItemById($tracker->family);
 
-    if ($family->id != 26) return;
+    if ($family->id != 543) return;
 
     $body1 = <<<FOO
 <style>
@@ -308,7 +308,7 @@ FOO1;
 
     //    $footer="<p>Regards</p><p>Praveen, Asmita, Reena, Kiron</p>";
     $footer ="";
-      $production=1;
+      $production=0;
       $subject = "Vidyalaya Back to School Day 2012-13, Family- $family->id";
 
       print "Trying to send email to id " . $family->id . "\n";
@@ -495,7 +495,7 @@ TEACHEREMAILATTENDANCEASSESSMENT;
       $person=$item->person;
       $classshort=$item->class->short();
       $room=$item->class->room->roomNumber;
-      $body = <<<TEACHEREMAIL
+      $body1 = <<<TEACHEREMAIL
 <p>Thank you for teaching at Vidyalaya 2012-13. The school starts tomorrow Sunday 9 September 2012. Please come early and familiarize yourself with the facilities. Please read the  opening day announcement posted at <a href="http://www.vidyalaya.us/shiksha/2012w1.html">http://www.vidyalaya.us/shiksha/2012w1.html</a>, it should answer most question you may have.
 
 <p>Language teachers: At the conclusion of General Assembly, please escort your students from the Cafeteria to your classroom.  At the end of the language class, please stay in your room until the Culture teacher arrives.  Students should never be left unattended in the classroom at any time.</p>
@@ -510,9 +510,15 @@ Culture teachers:Please reach your designated classroom 5 minutes before the cla
 
 TEACHEREMAIL;
 
-      $footer = "";
+      $body = <<<TEACHERUPDATE
+<p>Attached please find updated attendance sheet and student list for your class. Please take a moment to ensure that only students listed here are sitting in your class.There are more than 100 teachers teaching more than 275 students. The placement process will close now. If there are any discrepencies, please let us know.</p>
+
+
+TEACHERUPDATE;
+
+      $footer = "Regards, <p>Administration Team<br />(sent by: Umesh Mittal)</p>";
       $subject="Welcome to Vidyalaya 2012-13";
-      $production=1;
+      $production=0;
 
      print "Trying to send email to id " . $person->id() . "\n";
      //      if ($person->id() != "F227") continue;
@@ -539,7 +545,7 @@ TEACHEREMAIL;
 	echo "Message has been sent, Person: " .$person->id() . ":\n";
       }
       sleep(5);
-      //      die("i die");
+//      die("i die");
     }
   }
 
@@ -773,6 +779,8 @@ AGREEMENT;
       $familyarray[$item->family] = $item->family;
     }
 
+print "Registered family count is " . count($familyarray) . "\n";
+
     $students = array(); $done = array();
     foreach(Enrollment::GetAllEnrollmentForFacilitySession(Facility::Brooklawn, $year) as $item) {
       if (array_key_exists($item->student->id, $done)) continue;
@@ -798,19 +806,22 @@ AGREEMENT;
       }
     }
 
-    $cashfile="/home/umesh/Dropbox/Vidyalaya-Management/Administration/2011.csv";
-    if (($handle = fopen($cashfile, "r")) !== FALSE) {
+//    $cashfile="/home/umesh/Dropbox/Vidyalaya-Management/Administration/2011.csv";
+//    if (($handle = fopen($cashfile, "r")) !== FALSE) {
+    if (($handle = fopen(self::DataFile, "r")) !== FALSE) {
       $header = fgetcsv($handle, 0, ",");
       $header = fgetcsv($handle, 0, ",");
       $i=1;
       $totalTuition=0;
 
-      while ((list($family,$Check , $base, $new , $DVD , $CD , $PB , $Bag , $Ann , $Total ,$foo, $ch1 , $ch2 , $ch3 )
+//      while ((list($family,$Check , $base, $new , $DVD , $CD , $PB , $Bag , $Ann , $Total ,$foo, $ch1 , $ch2 , $ch3 )
+//	      = fgetcsv($handle, 0, ",")) !== FALSE) {
+      while ((list($family,$Check , $base, $new , $adj , $CD , $PB , $Bag , $date , $Total ,$foo, $ch1 , $ch2 , $ch3 )
 	      = fgetcsv($handle, 0, ",")) !== FALSE) {
 	if (!empty($family)) {
 
 	  $new = str_replace('$', "",$new);
-	  $DVD = str_replace('$', "",$DVD);
+	  $adj = str_replace('$', "",$adj);
 	  $CD = str_replace('$', "",$CD);
 	  $PB = str_replace('$', "",$PB);
 	  $Bag = str_replace('$', "",$Bag);
@@ -819,21 +830,21 @@ AGREEMENT;
 	  if (empty($totalFamily[$family])) {
 	    $totalFamily[$family] =0;
 	    $totalnew[$family] = 0;
-	    $totalDVD[$family] = 0;
+	    $totalAdj[$family] = 0;
 	    $totalCD[$family] = 0;
 	    $totalPB[$family] = 0;
 	    $totalBag[$family] = 0;
 	  }
-	  $totalFamily[$family] +=$new+$DVD+$CD+$PB+$Bag;
+	  $totalFamily[$family] +=$new+$adj+$CD+$PB+$Bag;
 	  $totalnew[$family] += $new/50;
-	  $totalDVD[$family] += $DVD/10;
+//	  $totalAdj[$family] += $adj/10;
 	  $totalCD[$family] += $CD/10;
 	  $totalPB[$family] += $PB/10;
 	  $totalBag[$family] += $Bag/10;
-
 	}
       }
     }
+
     foreach ($totalFamily as $familyid => $value){
       if ($value == 0) continue; // no money
       if (!array_key_exists($familyid, $familyarray)) die ("family id $familyid paid money but not registered");
@@ -841,7 +852,7 @@ AGREEMENT;
 
 
 
-    fwrite($fp, "Fam, #, Stud, Teach, New, DVD, CD, PB, Bag, Parents\n");
+    fwrite($fp, "Fam, #, Stud, Teach, New, Adj, CD, PB, Bag, Parents\n");
 
     foreach ($familyarray as $item) {
       $csv = array();
@@ -868,9 +879,9 @@ AGREEMENT;
       $extraValue=$totalnew[$item] == 0 ? "" : "<span style='font-size:50%'>(Please tell us the T-shirt size(s))</span>";
       $openingHtml .= "<tr><td>New Student Packages</td><td>$value $extraValue</td></tr>\n";
 
-      $value=$totalDVD[$item] == 0 ?  "": $totalDVD[$item];
-      $csv[]=$value;
-      $openingHtml .= "<tr><td>DVD</td><td>$value</td></tr>\n";
+//      $value=$totalDVD[$item] == 0 ?  "": $totalDVD[$item];
+//      $csv[]=$value;
+//      $openingHtml .= "<tr><td>DVD</td><td>$value</td></tr>\n";
 
       $value=$totalCD[$item] == 0 ?  "": $totalCD[$item];
       $csv[]=$value;
@@ -890,8 +901,8 @@ AGREEMENT;
 
       fputcsv($fp, $csv);
 
-            $pdf = PrintFactory::HtmlToPdf(PrintFactory::GetHtmlForFamilyDetail($familyobj) . $openingHtml);
-            file_put_contents("$fileName", $pdf);
+//            $pdf = PrintFactory::HtmlToPdf(PrintFactory::GetHtmlForFamilyDetail($familyobj) . $openingHtml);
+//            file_put_contents("$fileName", $pdf);
     }
     
     fflush($fp);

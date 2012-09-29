@@ -68,12 +68,18 @@ class Publications {
     if (is_null($year)) $year=Calendar::CurrentYear();
     if ($year >= 2010) $year -= 2010;
 
+    $i=0; $j=0;
     foreach (Enrollment::GetStudents($year) as $studentId => $value) {
       if (!Student::WasEverEnrolledId($studentId)) {
 	$s = Student::GetItemById($studentId);
-	print "$studentId, $s->firstName, $s->lastName\n";
+	print "$studentId, $s->firstName, $s->lastName, " . intval($s->Age()) .   "\n";
+	$i++;
+      } else {
+	$j++;
       }
     }
+
+    print "new = $i, old=$j\n";
   }
 
   private static function InvolvedFamilies($year) {
@@ -104,6 +110,7 @@ class Publications {
     usort ($families, "Family::CompareFatherLast");
     return $families;
   }
+
 
   public static function SchoolDirectory($year) {
     $document = new WordTable();
@@ -1264,7 +1271,7 @@ BODY;
 //Publications::LanguageAssessment(2012); exit();
 //NewsletterHtml::Publish();
 //Publications::FamilyListForHandbookDistribution(2012); exit();
-Publications::AttendanceSheet(2012); exit();
+//Publications::AttendanceSheet(2012); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
 //Publications::Roster(2012); exit();
 
@@ -1274,10 +1281,10 @@ Publications::AttendanceSheet(2012); exit();
 //Publications::FullDumpFamilies();
 
 //Publications::BadgeFile(2012); exit();
-Publications::CreateMailingLists(2012);exit();
+//Publications::CreateMailingLists(2012);exit();
 //Publications::VolunteerListForHandbook(2012); exit();
 //Publications::TeacherListForHandbook(2012);exit();
-
+<
 //Publications::SchoolDirectory(2012); exit();
 //Publications::TeacherDirectory(2012); exit (); // Directory of all Teachers
 //Publications::VolunteerDirectory(2012); exit (); // Directory of all Volunteers
@@ -1285,5 +1292,3 @@ Publications::ClassDirectory(2012); exit (); // Directory of all classes, with a
 
 
 ?>
-
-

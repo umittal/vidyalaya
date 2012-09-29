@@ -289,7 +289,7 @@ BODY_WAITING;
 //Admission::TeacherEmailAttendanceAssessment(2011);exit();
 
 
-//Admission::OpeningDay(2011); exit();
+Admission::OpeningDay(2012); exit();
 //Admission::PrintVolunteers(2011); exit();
 
 Admission::admissionConfirmationEmail(2012);exit(); // has thing in there to decide which email to send
