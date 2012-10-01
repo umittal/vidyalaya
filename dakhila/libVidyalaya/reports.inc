@@ -528,6 +528,41 @@ class Reports {
     return $html;
   }
 
+  public static function DisplayStudentLookup($template, $list) {
+    global $htmlDir;
+    if (empty($list)) return;
+
+    $template->addBlockFile('RESULT', 'F_RESULT', 'StudentLookup.tpl');
+    $template->touchBlock('F_RESULT');
+    
+    $template->setCurrentBlock("HIDDENFORMS");
+    $template->setVariable("STUDENTFORM", file_get_contents("$htmlDir/StudentForm.inc"));
+    $template->parseCurrentBlock();
+
+    $count = count($list);
+    $maxDisplay = 20;
+    if ($count > $maxDisplay) {
+      $templateName="MORETHAN20";
+      $template->setCurrentBlock($templateName);
+      $template->setVariable("COUNT", $count);
+      $template->setVariable("MAXDISPLAY", $maxDisplay);
+      $template->parseCurrentBlock();
+    }
+
+    $templateName="STUDENTLOOKUP";
+    $i=0;
+    foreach ($list as $s) {
+      $template->setCurrentBlock($templateName);
+      $template->setVariable("ID", $s->id);
+      $template->setVariable("FIRST", $s->firstName);
+      $template->setVariable("LAST", $s->lastName);
+      $template->setVariable("PARENT", $s->parentsName());
+      $template->parseCurrentBlock();
+      $i++;
+      if ($i == $maxDisplay) break;
+    }
+  }
+
   public static function DisplayEventCalendarDetail($template, $params) {
     $id = isset($_POST['EventCalendarId']) ?  $_POST['EventCalendarId'] : null;
     if (empty($id)) return;

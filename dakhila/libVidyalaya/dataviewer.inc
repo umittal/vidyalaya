@@ -402,6 +402,47 @@ EOT;
 
     // ************************************************************
     case "Student":
+      //    case "StudentLookup":
+
+      //      print "ID is " . $_POST['ID'] . ", studentId is " . $_POST['studentId']. " <br />";
+      if (isset($_POST['studentId'])) {
+	$studentId =  $_POST['studentId'];
+	  } else {
+	$studentId = isset($_POST['ID']) ?  $_POST['ID'] : null;
+      }
+
+      $first = isset($_POST['First']) ?  $_POST['First'] : null;
+      $last = isset($_POST['Last']) ?  $_POST['Last'] : null;
+
+      $html = file_get_contents("$htmlDir/queryStudent.inc");
+      $html = str_replace("0000", $studentId, $html);
+      $html = str_replace("==FIRST==", $first, $html);
+      $html = str_replace("==LAST==", $last, $html);
+      $html = str_replace("==URL==", $this->thispage . "?command=$command", $html);
+
+      $this->template->setCurrentBlock('QUERY');
+      $this->template->setVariable("QUERY", $html);
+      $this->template->parseCurrentBlock();
+
+      if (!(empty($studentId) && empty($first) && empty($last) )) {
+	$result = Student::Lookup($studentId, $first, $last);
+	if (empty($result)) {
+	  $html = "no student found matching the criterion";
+	  $this->template->setCurrentBlock('QUERY');
+	  $this->template->setVariable("QUERY", $html);
+	  $this->template->parseCurrentBlock();
+	} else if (count($result) == 1) {
+	    DisplayStudent($this->template, $result[0]);
+	} else {
+	  Reports::DisplayStudentLookup($this->template, $result);
+	}
+
+      }
+      print $this->template->get();
+      break;
+      
+    // ************************************************************
+    case "Student2":
       $url = htmlentities($_SERVER['PHP_SELF']) . "?command=Student";
       $studentId = isset($_POST['ID']) ?  $_POST['ID'] : null;
 

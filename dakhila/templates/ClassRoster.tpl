@@ -84,5 +84,4 @@ dojo.require("dijit.Tooltip");
 <!-- END ROSTERROW -->
 </table>
 
-<script>
 

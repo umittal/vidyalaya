@@ -174,6 +174,24 @@ class Student {
     return self::$objArray[$key];
   }
 
+  public static function Lookup($id, $first, $last) {
+    $join=array(); $where = array();
+
+    if (!empty($id)) $where[] = "Students2003.ID = $id";
+    if (!empty($first)) $where[] = "Students2003.FIRST_NAME  = '$first'";
+    if (!empty($last)) $where[] = "Students2003.LAST_NAME  = '$last'";
+
+    $sql = "select * from Students2003 ";
+    if (!empty($join)) {
+      print "DEBUG: need to work on join <br />";
+    }
+
+    if (!empty($where)) $sql .= "where " . implode (" and ", $where);
+
+    //    print "$sql";
+    return self::ArrayFromQuery($sql);
+  }
+
   private static function ArrayFromQuery($query) {
     $students = Array();
     
