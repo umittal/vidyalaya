@@ -17,7 +17,7 @@ require_once "../../MPDF53/mpdf.php";
 
 //OpeningDay::DisplayBoard();exit();
 //OpeningDay::PrintDistributionMaterial();exit();
-OpeningDay::PrintDistributionMaterialFamily(Family::GetItemById(543), 2012); exit();
+OpeningDay::PrintDistributionMaterialFamily(Family::GetItemById(238), 2012); exit();
 
 
 //TwoYearLayout::updateRegistrationDate();exit();

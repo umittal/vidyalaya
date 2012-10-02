@@ -64,22 +64,65 @@ class Publications {
   const MAILINGLISTDIR="/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/mailinglist/";
   const rosterDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/roster/";
 
+  public static function NotComingBack($year=null) {
+    if (is_null($year)) $year=Calendar::CurrentYear();
+    if ($year >= 2010) $year -= 2010;
+
+    $fh = tmpfile();
+    if (!$fh) die ("could not open temporary file for writing");
+    fwrite ($fh, "ID, First, Last, Address, City, Fee Check\n");
+    foreach (FamilyTracker::NotComingBack($year) as $tracker) {
+      $csv=array();
+      $family = Family::GetItemById($tracker->family);
+      $csv[] = $family->id;
+      $csv[] = $family->mother->firstName;
+      $csv[] = $family->mother->lastName;
+      $csv[] = $family->address->addr1;
+      $csv[] = $family->address->city . ", " . $family->address->state . " " . $family->address->zipcode;
+      $csv[] = 0;
+    
+      fputcsv($fh, $csv);
+     }
+    $filename = self::rosterDir . "notcomingback.csv";
+    fseek($fh, 0);
+    file_put_contents("$filename", stream_get_contents($fh));
+    print "saved $filename\n";
+    fclose($fh);
+   
+  }
   public static function NewStudents($year=null) {
     if (is_null($year)) $year=Calendar::CurrentYear();
     if ($year >= 2010) $year -= 2010;
 
+    $fh = tmpfile();
+    if (!$fh) die ("could not open temporary file for writing");
+    fwrite ($fh, "ID, First, Last, Age, Class 1, room 1, class 2, room2\n");
+    
     $i=0; $j=0;
     foreach (Enrollment::GetStudents($year) as $studentId => $value) {
+      $csv=array();
       if (!Student::WasEverEnrolledId($studentId)) {
 	$s = Student::GetItemById($studentId);
-	print "$studentId, $s->firstName, $s->lastName, " . intval($s->Age()) .   "\n";
+	$csv[] = $studentId;
+	$csv[] = $s->firstName;
+	$csv[] = $s->lastName;
+	$csv[] = intval($s->Age()); 
+	foreach (Enrollment::GetEnrollmentStudent($s->id, $year) as $e) {
+	  $csv[] = $e->class->short();
+	  $csv[] = $e->class->room->roomNumber;
+	}
 	$i++;
+	fputcsv($fh, $csv);
       } else {
 	$j++;
       }
     }
 
     print "new = $i, old=$j\n";
+    $filename = self::rosterDir . "newstudents.csv";
+    fseek($fh, 0);
+    file_put_contents("$filename", stream_get_contents($fh));
+    fclose($fh);
   }
 
   private static function InvolvedFamilies($year) {
@@ -1276,7 +1319,8 @@ BODY;
 //Publications::Roster(2012); exit();
 
 //Publications::RosterSpa(2012); exit();
-//Publications::NewStudents(2012); exit();
+Publications::NotComingBack(2012); exit();
+Publications::NewStudents(2012); exit();
 
 //Publications::FullDumpFamilies();
 
@@ -1284,7 +1328,7 @@ BODY;
 //Publications::CreateMailingLists(2012);exit();
 //Publications::VolunteerListForHandbook(2012); exit();
 //Publications::TeacherListForHandbook(2012);exit();
-<
+
 //Publications::SchoolDirectory(2012); exit();
 //Publications::TeacherDirectory(2012); exit (); // Directory of all Teachers
 //Publications::VolunteerDirectory(2012); exit (); // Directory of all Volunteers

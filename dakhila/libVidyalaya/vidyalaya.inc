@@ -178,8 +178,8 @@ class Student {
     $join=array(); $where = array();
 
     if (!empty($id)) $where[] = "Students2003.ID = $id";
-    if (!empty($first)) $where[] = "Students2003.FIRST_NAME  = '$first'";
-    if (!empty($last)) $where[] = "Students2003.LAST_NAME  = '$last'";
+    if (!empty($first)) $where[] = "Students2003.FIRST_NAME  like '$first'";
+    if (!empty($last)) $where[] = "Students2003.LAST_NAME  like '$last'";
 
     $sql = "select * from Students2003 ";
     if (!empty($join)) {
@@ -1037,8 +1037,9 @@ class Enrollment{
 		return $list;
 	}
 
-	public static function GetEnrollmentStudent($studentId, $year) {
-		if ($year >= 2010) $year -= 2010;
+	public static function GetEnrollmentStudent($studentId, $year = null) {
+	  if (is_null($year)) $year=Calendar::CurrentYear();
+	  if ($year >= 2010) $year -= 2010;
 		$query = "
 		select * from Enrollment
 		left join AvailableClass on Enrollment.availableClass = AvailableClass.id
@@ -2661,6 +2662,14 @@ class FamilyTracker {
 	public static function GetRegisteredFamiliesYear($year) {
 	  if ($year >= 2010) $year -= 2010;
 	  $query = "select * from FamilyTracker where year=$year and currentYear=" . EnumFamilyTracker::registered ;
+	  return self::ArrayFromQuery($query);
+	}
+
+	public static function NotComingBack($year) {
+	  if ($year >= 2010) $year -= 2010;
+	  $query = "select * from FamilyTracker where year=$year ";
+	  $query .= " and currentYear <> " . EnumFamilyTracker::registered ;
+	  $query .= " and previousYear = " . EnumFamilyTracker::registered ;
 	  return self::ArrayFromQuery($query);
 	}
 
