@@ -1319,13 +1319,13 @@ BODY;
 //Publications::Roster(2012); exit();
 
 //Publications::RosterSpa(2012); exit();
-Publications::NotComingBack(2012); exit();
-Publications::NewStudents(2012); exit();
+//Publications::NotComingBack(2012); exit();
+//Publications::NewStudents(2012); exit();
 
 //Publications::FullDumpFamilies();
 
 //Publications::BadgeFile(2012); exit();
-//Publications::CreateMailingLists(2012);exit();
+Publications::CreateMailingLists(2012);exit();
 //Publications::VolunteerListForHandbook(2012); exit();
 //Publications::TeacherListForHandbook(2012);exit();
 

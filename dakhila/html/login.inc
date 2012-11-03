@@ -41,7 +41,7 @@ dojo.require("dijit.form.Form");
 
 <p>
 <a href="/dakhila/php/userdata.php?command=register">New User Registration</a>
-<a href="/dakhila/php/userdata.php?command=EventCalendar">Calendar</a>
+<a href="/shiksha/dakhila.html">Help</a>
 
 </form>
 </div>

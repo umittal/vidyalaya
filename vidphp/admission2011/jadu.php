@@ -15,9 +15,12 @@ require_once "../../MPDF53/mpdf.php";
 
 //EventCalendar::UpdateWeekNumber(2012);exit();
 
+FeeCheck::email1112(); exit ();
+
+
 //OpeningDay::DisplayBoard();exit();
 //OpeningDay::PrintDistributionMaterial();exit();
-OpeningDay::PrintDistributionMaterialFamily(Family::GetItemById(238), 2012); exit();
+//OpeningDay::PrintDistributionMaterialFamily(Family::GetItemById(546), 2012); exit();
 
 
 //TwoYearLayout::updateRegistrationDate();exit();

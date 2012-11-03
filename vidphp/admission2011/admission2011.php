@@ -279,7 +279,7 @@ BODY_WAITING;
 
 //Admission::Payment2012(); exit();
 //Admission::Mela2012(); exit();
-Admission::InviteNew(); exit();
+//Admission::InviteNew(); exit();
 //Admission::ExistingFamilies(); exit();
 //Admission::AdultLanguage(); exit();
 
@@ -289,10 +289,10 @@ Admission::InviteNew(); exit();
 //Admission::TeacherEmailAttendanceAssessment(2011);exit();
 
 
-Admission::OpeningDay(2012); exit();
+//Admission::OpeningDay(2012); exit();
 //Admission::PrintVolunteers(2011); exit();
 
-Admission::admissionConfirmationEmail(2012);exit(); // has thing in there to decide which email to send
+//Admission::admissionConfirmationEmail(2012);exit(); // has thing in there to decide which email to send
 //Admission::FamilyClassAssignment(2011); exit(); //to resend class assignment email to parents
 //Admission::itemDelivery(); exit();
 

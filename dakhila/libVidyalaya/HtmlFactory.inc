@@ -654,6 +654,7 @@ function DisplaySingleContact (&$template, $contact) {
   $template->parseCurrentBlock();
 }
 function DisplayContact(&$template, $contact) {
+    global $htmlDir;
   if ($contact == null) return;
   $template->addBlockFile('RESULT', 'F_RESULT', 'OtherContact.tpl');
   $template->touchBlock('F_RESULT');
