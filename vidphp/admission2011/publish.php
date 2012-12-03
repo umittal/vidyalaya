@@ -1112,7 +1112,7 @@ class EventManager {
     print "Trying to send email to id " . $family->id . "\n";
     if ($production == 0) $subject = "[Test] $subject";
     $mail = Mail::SetupMailSpa();
-    Mail::SetFamilyAddress(&$mail, $family, $production);
+    //    Mail::SetFamilyAddress(&$mail, $family, $production);
     $mail->Subject = $subject;
     $salutation = "<p>Dear " . $family->parentsName() . ",";
     $mail->Body = $salutation . $body . $footer;
@@ -1311,7 +1311,7 @@ BODY;
 //print Codes::VolunteerCodeHtml();  exit(); // print volunteer codes for shiksha portal
 //EventManager::ReportParticipation(1); exit();
 //EventManager::PostPaymentFile(); exit();
-//Publications::LanguageAssessment(2012); exit();
+Publications::LanguageAssessment(2012); exit();
 //NewsletterHtml::Publish();
 //Publications::FamilyListForHandbookDistribution(2012); exit();
 //Publications::AttendanceSheet(2012); exit();
@@ -1325,14 +1325,14 @@ BODY;
 //Publications::FullDumpFamilies();
 
 //Publications::BadgeFile(2012); exit();
-Publications::CreateMailingLists(2012);exit();
+//Publications::CreateMailingLists(2012);exit();
 //Publications::VolunteerListForHandbook(2012); exit();
 //Publications::TeacherListForHandbook(2012);exit();
 
 //Publications::SchoolDirectory(2012); exit();
 //Publications::TeacherDirectory(2012); exit (); // Directory of all Teachers
 //Publications::VolunteerDirectory(2012); exit (); // Directory of all Volunteers
-Publications::ClassDirectory(2012); exit (); // Directory of all classes, with and without email
+//Publications::ClassDirectory(2012); exit (); // Directory of all classes, with and without email
 
 
 ?>

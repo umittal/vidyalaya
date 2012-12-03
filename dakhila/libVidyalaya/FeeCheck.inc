@@ -115,6 +115,8 @@ class FeeCheck {
     $csv[] = 	    sprintf ("'%s", $family->address->zipcode);
     $csv[] = 	    $amt1;
     $csv[] = 	    $amt2;
+    $csv[] = 	    formatPhone($family->phone);
+    $csv[] = 	    formatPhone($family->mother->cellPhone);
     fputcsv($fh, $csv);
     return $body;
   }
@@ -165,7 +167,7 @@ class FeeCheck {
 
     $fh = tmpfile();
     if (!$fh) die ("could not open temporary file for writing");
-    fwrite ($fh, "ID, Amount, Name, Address, City, State, Zip, 2011, 2012\n");
+    fwrite ($fh, "ID, Amount, Name, Address, City, State, Zip, 2011, 2012, Home Phone, Mother Cell\n");
 
     foreach($total as $familyId => $diff) {
       $s = "$subject $familyId";
