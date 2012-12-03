@@ -977,41 +977,38 @@ LCMATRIXFORM;
     // ************************************************************
     case "person":
       $email = isset($_POST['email']) ?  $_POST['email'] : null;
-      $form = <<<EOT
-    <script>
-      dojo.require("dojo.parser");  
-       dojo.require("dijit.form.Button"); 
-dojo.require("dijit.form.Form");
-      dojo.require("dijit.form.ValidationTextBox");    
-    </script>
-<div class="formContainer">
-      <form method="POST" action="$this->thispage?command=person" dojoType="dijit.form.Form" >
-      <div class="formRow">
-      <label for="email">Email Address:</label>
-<input type="text" size="35" name="email" id="email"  value="$email"
-           dojoType="dijit.form.ValidationTextBox" 
-           required="true"  
-	regExp="\b[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}\b"
-           promptMessage="Enter email address."
-           invalidMessage="Invalid Email Address." 
-           trim="true"
-/>
-	      <button dojoType="dijit.form.Button" type="submit" >
-	Go
-	      </button>
-	</div>
-</div>
-</form>
-EOT;
+      $first = isset($_POST['First']) ?  $_POST['First'] : null;
+      $last = isset($_POST['Last']) ?  $_POST['Last'] : null;
+
+      $html = file_get_contents("$htmlDir/queryPerson.inc");
+      $html = str_replace("0000", $email, $html);
+      $html = str_replace("==FIRST==", $first, $html);
+      $html = str_replace("==LAST==", $last, $html);
+      $html = str_replace("==URL==", $this->thispage . "?command=$command", $html);
+
       $this->template->setCurrentBlock('QUERY');
-      $this->template->setVariable('QUERY', $form);
+      $this->template->setVariable("QUERY", $html);
       $this->template->parseCurrentBlock();
 
+/*
       if (!is_null($email)) {
       $person = Person::PersonFromEmail($email);
-      //      $person = Person::PersonFromId($mfs, $id); 
       if (!is_null($person))
 	DisplayPerson($this->template, $person);
+      }
+*/
+      if (!(empty($email) && empty($first) && empty($last) )) {
+	$result = Person::Lookup($email, $first, $last);
+	if (empty($result)) {
+	  $html = "no person found matching the criterion";
+	  $this->template->setCurrentBlock('QUERY');
+	  $this->template->setVariable("QUERY", $html);
+	  $this->template->parseCurrentBlock();
+	} else if (count($result) == 1) {
+	    DisplayPerson($this->template, $result[0]);
+	} else {
+	  Reports::DisplayPersonLookup($this->template, $result);
+	}
       }
       print $this->template->get();
       break;		

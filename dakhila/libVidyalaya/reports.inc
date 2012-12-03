@@ -563,6 +563,44 @@ class Reports {
     }
   }
 
+  public static function DisplayPersonLookup($template, $list) {
+    global $htmlDir;
+    if (empty($list)) return;
+
+    $template->addBlockFile('RESULT', 'F_RESULT', 'PersonLookup.tpl');
+    $template->touchBlock('F_RESULT');
+    
+    $template->setCurrentBlock("HIDDENFORMS");
+    $template->setVariable("STUDENTFORM", file_get_contents("$htmlDir/FamilyForm.inc"));
+    $template->parseCurrentBlock();
+
+    $count = count($list);
+    $maxDisplay = 20;
+    if ($count > $maxDisplay) {
+      $templateName="MORETHAN20";
+      $template->setCurrentBlock($templateName);
+      $template->setVariable("COUNT", $count);
+      $template->setVariable("MAXDISPLAY", $maxDisplay);
+      $template->parseCurrentBlock();
+    }
+
+    $templateName="LOOKUP";
+    $i=0;
+    foreach ($list as $s) {
+      $template->setCurrentBlock($templateName);
+      $template->setVariable("ID", $s->home->id);
+      $template->setVariable("FIRST", $s->firstName);
+      $template->setVariable("LAST", $s->lastName);
+      $template->setVariable("GENDER", $s->gender);
+      $template->setVariable("HOME", $s->home->phone);
+      $template->setVariable("CELL", $s->cellPhone);
+      $template->setVariable("EMAIL", $s->email);
+      $template->parseCurrentBlock();
+      $i++;
+      if ($i == $maxDisplay) break;
+    }
+  }
+
   public static function DisplayEventCalendarDetail($template, $params) {
     $id = isset($_POST['EventCalendarId']) ?  $_POST['EventCalendarId'] : null;
     if (empty($id)) return;

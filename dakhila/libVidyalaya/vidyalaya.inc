@@ -1236,6 +1236,18 @@ class Person { // a new concept to break away from praveen's students2003 and pa
     return $person;
   }
 
+  private static function GetAll() {
+    $all = array();
+    foreach (Family::GetAll() as $f) {
+      if (!empty($f->mother)) $all[] = self::PersonFromParent($f->mother, MFS::Mother, $f->id);
+      if (!empty($f->father)) $all[] = self::PersonFromParent($f->father, MFS::Father, $f->id);
+    }
+    foreach (Student::GetAll() as $s) {
+      $all[] = self::PersonFromStudent($s);
+    }
+    return $all;
+  }
+
   public static function PersonFromId($mfs, $id) {
       switch ($mfs) {
       case MFS::Mother:
@@ -1260,6 +1272,28 @@ class Person { // a new concept to break away from praveen's students2003 and pa
   // actually this works for any object that has mfs and mfsid. This is an unfortunate benefit of lack of type checking
   public static function PersonFromTeacher($teacher) {
     return Person::PersonFromId($teacher->MFS, $teacher->mfsId);
+  }
+
+  public static function Lookup($email, $first, $last) {
+    $persons=array();
+
+    // if email is provided, other lookups are irrelevant
+    if (!empty($email)) {
+      $person = Person::PersonFromEmail($email);
+      if (!empty($person)) {
+	$persons[] = $person;
+      }
+      return $persons;
+    }
+
+    foreach (self::GetAll() as $p) {
+      $match = true;
+      if (!empty($first) && $first != $p->firstName) $match = false;
+      if (!empty($last) && $last != $p->lastName) $match = false;
+      if ($match) $persons[] = $p;
+    }
+    
+    return $persons;
   }
 
   function __construct() {
