@@ -64,6 +64,52 @@ class Publications {
   const MAILINGLISTDIR="/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/mailinglist/";
   const rosterDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/roster/";
 
+  public static function FamilyVolunteerList($year=null) {
+    if (is_null($year)) $year=Calendar::CurrentYear();
+    if ($year >= 2010) $year -= 2010;
+
+    $startYear = Enrollment::familyStartingYear();
+    $role = array();
+    foreach(Teachers::TeacherListYear($year) as $teacher) {
+      $role[$teacher->person->home->id] = "Teacher";
+    }
+
+    $nonteachingfile = self::rosterDir . "nonTeachingVolunteers.csv";
+    if (($fh = fopen($nonteachingfile, "r")) !== FALSE) {
+      fgets($fh);
+      while ((list($familyid, $name, $start, $rolevalue )= fgetcsv($fh, 0, ",")) !== FALSE) {
+	$id = trim($familyid);
+	if (!empty($id)) {
+	  if (isset($role[$id])) {
+	    $role[$id] .= " $rolevalue";
+	  } else {
+	    $role[$id] = $rolevalue;
+	  }
+	  print "$role[$id]\n";
+	}
+      } 
+    }
+    
+    $fh = tmpfile();
+    if (!$fh) die ("could not open temporary file for writing");
+    fwrite ($fh, "Family, Parents, Starting, Role\n");
+    foreach (Enrollment::GetEnrolledFamilesForFacilitySession(Facility::Brooklawn, $year) as $family) {
+      $csv=array();
+      $csv[] = $family->id;
+      $csv[] = $family->parentsName();
+      $csv[] = $startYear[$family->id] + 2010;
+      $csv[] = isset($role[$family->id]) ? $role[$family->id] : "Available";
+      fputcsv($fh, $csv);
+     }
+
+    $filename = self::rosterDir . "familyVolunteerList.csv";
+    fseek($fh, 0);
+    file_put_contents("$filename", stream_get_contents($fh));
+    print "saved $filename\n";
+    fclose($fh);
+   
+  }
+
   public static function NotComingBack($year=null) {
     if (is_null($year)) $year=Calendar::CurrentYear();
     if ($year >= 2010) $year -= 2010;
@@ -90,6 +136,86 @@ class Publications {
     fclose($fh);
    
   }
+
+
+  public static function NewLanguageStudents($year) {
+    $fh = tmpfile();
+    if (!$fh) die ("could not open temporary file for writing");
+    fwrite ($fh, "Student, Family, Name, Age, Parents, Class\n");
+
+    $production=0;
+    $subject = "Vidyalaya Free Gift for ";
+    $mail =   Mail::SetupMailSPA();
+    if ($production != 1) {
+      $subject = "[Test] $subject";
+      $draft = "<p>This is a draft <br />";
+    }
+    $content = file_get_contents("freeGiftemail.html");
+
+
+    foreach(Department::GetAll() as $dept) {
+      if (Department::IsLanguage($dept)) {
+	foreach (Enrollment::GetAllEnrollmentForDeptSession($dept, $year) as $e) {
+	  if ($e->student->WasEverEnrolled()) continue;
+
+
+	  $csv = array(); $body = $content;
+
+	  $a = $e->student->id; $csv[] = $a;
+	  $body = str_replace("==STUDENTID==", $a, $body);
+
+	  $a = $e->student->family->id; $csv[] = $a;
+	  $family=Family::GetItemById($a);
+	  Mail::SetFamilyAddress($mail, $family, $production);
+	  $body = str_replace("==FAMILYID==", $a, $body);
+
+	  $a = $e->student->fullName(); $csv[] = $a;
+	  $s = "$subject $a";
+	  $mail->Subject = $s;
+	  $body = str_replace("==STUDENTNAME==", $a, $body);
+
+	  $a = intval($e->student->Age()); $csv[] = $a;
+	  $body = str_replace("==AGE==", $a, $body);
+
+	  $a = $e->student->family->parentsName(); $csv[] = $a;
+	  $salutation = "<p>Dear " . $a . ",</p>";
+	  $body = str_replace("==PARENTNAME==", $a, $body);
+
+	  $csv[] = $e->class->short();
+       	  fputcsv($fh, $csv);
+
+	  $mail->Body = $draft . $salutation . $body;
+	  $mail->AltBody = "Family: $family->id"; //Text Body
+
+	  //continue;
+	  //die ("i die here");
+
+	  //      return;
+	  if(!$mail->Send()) {
+	    echo "Mailer Error: $family->id:  " . $mail->ErrorInfo . "\n";
+	    return;
+	  }  else {
+	    echo "Message has been sent, Family $family->id\n";
+	  }
+
+	  die("hello\n");
+      
+	  $mail->ClearAllRecipients(); 
+	  $mail->ClearAttachments(); 
+	  $mail->ClearCustomHeaders(); 
+
+	}
+      }
+    }
+
+    $filename = self::rosterDir . "newLanguageStudents.csv";
+    fseek($fh, 0);
+    file_put_contents("$filename", stream_get_contents($fh));
+    print "saved $filename\n";
+    fclose($fh);
+
+  }
+
   public static function NewStudents($year=null) {
     if (is_null($year)) $year=Calendar::CurrentYear();
     if ($year >= 2010) $year -= 2010;
@@ -119,7 +245,7 @@ class Publications {
     }
 
     print "new = $i, old=$j\n";
-    $filename = self::rosterDir . "newstudents.csv";
+    $filename = self::rosterDir . "newStudents.csv";
     fseek($fh, 0);
     file_put_contents("$filename", stream_get_contents($fh));
     fclose($fh);
@@ -1311,7 +1437,7 @@ BODY;
 //print Codes::VolunteerCodeHtml();  exit(); // print volunteer codes for shiksha portal
 //EventManager::ReportParticipation(1); exit();
 //EventManager::PostPaymentFile(); exit();
-Publications::LanguageAssessment(2012); exit();
+//Publications::LanguageAssessment(2012); exit();
 //NewsletterHtml::Publish();
 //Publications::FamilyListForHandbookDistribution(2012); exit();
 //Publications::AttendanceSheet(2012); exit();
@@ -1320,6 +1446,8 @@ Publications::LanguageAssessment(2012); exit();
 
 //Publications::RosterSpa(2012); exit();
 //Publications::NotComingBack(2012); exit();
+//Publications::NewLanguageStudents(2012); exit();
+Publications::FamilyVolunteerList(2012); exit();
 //Publications::NewStudents(2012); exit();
 
 //Publications::FullDumpFamilies();

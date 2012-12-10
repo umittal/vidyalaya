@@ -956,6 +956,21 @@ class Enrollment{
     return $year;
   }
 
+  public static function familyStartingYear() {
+    $query ="SELECT Parents2003.`ID`, MIN(AvailableClass.`year`) AS startingyear
+             FROM Parents2003
+             JOIN Students2003 ON Students2003.`PARENT_ID` = Parents2003.`ID`
+             JOIN Enrollment ON Enrollment.`student` = Students2003.`ID`
+             JOIN AvailableClass ON AvailableClass.`id` = Enrollment.`availableClass`
+             GROUP BY Parents2003.`ID`";
+    $startYear = array();
+    $result = VidDb::query($query);
+    while ($row = mysql_fetch_array($result)) {
+      $startYear[$row[0]] = $row[1];
+    }
+    return $startYear;
+  }
+
 	// return all families in an availableclass
 	public static function GetFamilies($class) {
 	  $families = array();
