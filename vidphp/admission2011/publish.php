@@ -143,9 +143,10 @@ class Publications {
     if (!$fh) die ("could not open temporary file for writing");
     fwrite ($fh, "Student, Family, Name, Age, Parents, Class\n");
 
-    $production=0;
+    $production=1;
     $subject = "Vidyalaya Free Gift for ";
     $mail =   Mail::SetupMailSPA();
+    $draft="";
     if ($production != 1) {
       $subject = "[Test] $subject";
       $draft = "<p>This is a draft <br />";
@@ -198,7 +199,7 @@ class Publications {
 	    echo "Message has been sent, Family $family->id\n";
 	  }
 
-	  die("hello\n");
+	  //	  die("hello\n");
       
 	  $mail->ClearAllRecipients(); 
 	  $mail->ClearAttachments(); 
@@ -1446,8 +1447,8 @@ BODY;
 
 //Publications::RosterSpa(2012); exit();
 //Publications::NotComingBack(2012); exit();
-//Publications::NewLanguageStudents(2012); exit();
-Publications::FamilyVolunteerList(2012); exit();
+Publications::NewLanguageStudents(2012); exit();
+//Publications::FamilyVolunteerList(2012); exit();
 //Publications::NewStudents(2012); exit();
 
 //Publications::FullDumpFamilies();
