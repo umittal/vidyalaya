@@ -64,6 +64,61 @@ class Publications {
   const MAILINGLISTDIR="/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/mailinglist/";
   const rosterDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/roster/";
 
+  // call people for meeting with Trustee based on Praveen's date assignment
+  public static function FamilyMarshalling() {
+    $nonteachingfile = self::rosterDir . "familyVolunteerList.csv";
+
+    $production=1;
+    $subject = "Meeting Request from Vidyalaya for Family ";
+    $mail =   Mail::SetupMailSPA();
+    $draft="";
+    if ($production != 1) {
+      $subject = "[Test] $subject";
+      $draft = "<p>This is a draft <br />";
+    }
+    $content = file_get_contents("volunteerMarshall.html");
+
+
+    if (($fh = fopen($nonteachingfile, "r")) !== FALSE) {
+      fgets($fh);
+      while ((list($familyid, $name, $start, $rolevalue, $date )= fgetcsv($fh, 0, ",")) !== FALSE) {
+	$id = trim($familyid);
+	if (empty($id) || $rolevalue != "Available") continue;
+
+
+	print "$id, $date\n";
+	$body = str_replace("==DATE==", $date, $content);
+	$family=Family::GetItemById($id);
+	Mail::SetFamilyAddress($mail, $family, $production);
+	$s = "$subject $id";
+	$mail->Subject = $s;
+	$a = $family->parentsName(); $csv[] = $a;
+	$salutation = "<p>Dear " . $a . ",</p>";
+	$mail->Body = $draft . $salutation . $body;
+	$mail->AltBody = "Family: $family->id"; //Text Body
+
+	//	continue;
+	  //die ("i die here");
+
+	  //      return;
+	  if(!$mail->Send()) {
+	    echo "Mailer Error: $family->id:  " . $mail->ErrorInfo . "\n";
+	    return;
+	  }  else {
+	    echo "Message has been sent, Family $family->id\n";
+	  }
+
+	  //	  die("hello\n");
+	  sleep(1);
+      
+	  $mail->ClearAllRecipients(); 
+	  $mail->ClearAttachments(); 
+	  $mail->ClearCustomHeaders(); 
+
+      } 
+    }
+  }
+
   public static function FamilyVolunteerList($year=null) {
     if (is_null($year)) $year=Calendar::CurrentYear();
     if ($year >= 2010) $year -= 2010;
@@ -1447,7 +1502,7 @@ BODY;
 
 //Publications::RosterSpa(2012); exit();
 //Publications::NotComingBack(2012); exit();
-Publications::NewLanguageStudents(2012); exit();
+//Publications::NewLanguageStudents(2012); exit();
 //Publications::FamilyVolunteerList(2012); exit();
 //Publications::NewStudents(2012); exit();
 
@@ -1456,6 +1511,7 @@ Publications::NewLanguageStudents(2012); exit();
 //Publications::BadgeFile(2012); exit();
 //Publications::CreateMailingLists(2012);exit();
 //Publications::VolunteerListForHandbook(2012); exit();
+Publications::FamilyMarshalling(); exit();
 //Publications::TeacherListForHandbook(2012);exit();
 
 //Publications::SchoolDirectory(2012); exit();
