@@ -1303,8 +1303,8 @@ class Person { // a new concept to break away from praveen's students2003 and pa
 
     foreach (self::GetAll() as $p) {
       $match = true;
-      if (!empty($first) && $first != $p->firstName) $match = false;
-      if (!empty($last) && $last != $p->lastName) $match = false;
+      if (!empty($first) && !stristr($p->firstName, $first)) $match = false;
+      if (!empty($last) && !stristr($p->lastName, $last)) $match = false;
       if ($match) $persons[] = $p;
     }
     

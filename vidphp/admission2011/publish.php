@@ -69,15 +69,16 @@ class Publications {
     $nonteachingfile = self::rosterDir . "familyVolunteerList.csv";
 
     $production=1;
-    $subject = "Meeting Request from Vidyalaya for Family ";
+    $subject = "Meeting Reminder:  Family ";
     $mail =   Mail::SetupMailSPA();
     $draft="";
     if ($production != 1) {
       $subject = "[Test] $subject";
       $draft = "<p>This is a draft <br />";
     }
-    $content = file_get_contents("volunteerMarshall.html");
-
+    //    $content = file_get_contents("volunteerMarshall.html");
+    $content = file_get_contents("volunteerMarshallReminder.html");
+    $count=0;
 
     if (($fh = fopen($nonteachingfile, "r")) !== FALSE) {
       fgets($fh);
@@ -85,8 +86,9 @@ class Publications {
 	$id = trim($familyid);
 	if (empty($id) || $rolevalue != "Available") continue;
 
-
-	print "$id, $date\n";
+	if ($date != "Sunday, January 06, 2013") continue;
+	$count++;
+	print "$count. Family $id, $date\n";
 	$body = str_replace("==DATE==", $date, $content);
 	$family=Family::GetItemById($id);
 	Mail::SetFamilyAddress($mail, $family, $production);
@@ -97,7 +99,9 @@ class Publications {
 	$mail->Body = $draft . $salutation . $body;
 	$mail->AltBody = "Family: $family->id"; //Text Body
 
-	//	continue;
+	print "foo, $family->id, " . $family->mother->fullName() . ", " .
+	  $family->father->fullName() . "\n";
+		continue;
 	  //die ("i die here");
 
 	  //      return;
@@ -1493,7 +1497,7 @@ BODY;
 //print Codes::VolunteerCodeHtml();  exit(); // print volunteer codes for shiksha portal
 //EventManager::ReportParticipation(1); exit();
 //EventManager::PostPaymentFile(); exit();
-//Publications::LanguageAssessment(2012); exit();
+Publications::LanguageAssessment(2012); exit();
 //NewsletterHtml::Publish();
 //Publications::FamilyListForHandbookDistribution(2012); exit();
 //Publications::AttendanceSheet(2012); exit();
@@ -1511,7 +1515,7 @@ BODY;
 //Publications::BadgeFile(2012); exit();
 //Publications::CreateMailingLists(2012);exit();
 //Publications::VolunteerListForHandbook(2012); exit();
-Publications::FamilyMarshalling(); exit();
+//Publications::FamilyMarshalling(); exit();
 //Publications::TeacherListForHandbook(2012);exit();
 
 //Publications::SchoolDirectory(2012); exit();
