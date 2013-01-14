@@ -487,13 +487,44 @@ EOT;
       break;
 		
     case "RegistrationSummary":
+      $year = isset($_POST['YEAR']) ?  $_POST['YEAR'] : null;
+      $form = <<<EOT
+	<script>
+	dojo.require("dijit.form.Select");
+        </script>
+	<form method="post" action="$url">
+	Year: 
+	<select id="YEAR" dojoType="dijit.form.Select" name="YEAR">
+	<option value=0>2010</option>
+	<option value=1>2011</option>
+	<option value=2 selected="selected">2012</option>
+	<option value=3>2013</option>
+	</select>
+   <input type="submit" name="submit" value="GO"><br>
+</form>
+
+EOT;
+
+      $this->template->setCurrentBlock('QUERY');
+      $this->template->setVariable('QUERY', $form);
+      $this->template->parseCurrentBlock();
+      
+      if (isset($_POST['YEAR']) && $_POST['YEAR'] != "") {
+	$year = $_POST['YEAR'];
+	if ($year >= 2010) $year -= 2010;
+      }
+
+      $thisSession = Calendar::SessionFromYear($year);
+      $prevSession = Calendar::SessionFromYear($year - 1);
+
 	  $sql = <<< SQLREGISTRATIONSUMMAY
 	    select previousYear, currentYear, count(*) 
-	    from FamilyTracker where year = 2 
+	    from FamilyTracker where year = $year
 	    group by previousYear, currentYear 
 	    order by previousYear, currentYear
 
 SQLREGISTRATIONSUMMAY;
+	  //	  print $sql;
 	  $result = VidDb::query($sql);
 	  $current = null; 
 	  $subTotal = 0; $subTotal1 = 0; $subTotal2 = 0; $subTotal3 = 0;
@@ -521,8 +552,8 @@ Current: <input type=\"text\" dojoType=\"dijit.form.TextBox\" name=\"CURRENT\" i
 </form>
 
 ";
-	  $html .= "<h4>Registration Status (2012-13)</h4><table width='400'  class='tablesorter'>\n";
-	  $html .= "<thead><tr><th>2011-12</th><th>2012-13</th><th>Yes</th><th>No</th><th>Maybe</th></tr></thead><tbody>\n";
+	  $html .= "<h4>Registration Status ($thisSession)</h4><table width='400'  class='tablesorter'>\n";
+	  $html .= "<thead><tr><th>$prevSession</th><th>$thisSession</th><th>Yes</th><th>No</th><th>Maybe</th></tr></thead><tbody>\n";
 	  while ($row = mysql_fetch_array($result)) {
 	    $currentYear = $row[0];
 	    if ($current == null) $current = $currentYear;
@@ -573,7 +604,7 @@ Current: <input type=\"text\" dojoType=\"dijit.form.TextBox\" name=\"CURRENT\" i
 
 	  $html .=  "</tfooter></table>\n";
 
-	  $html .= "<p>Total Tuition Collected: " . FamilyTracker::TuitionCollected() . "</p>\n";
+	  $html .= "<p>Total Tuition Collected: " . FamilyTracker::TuitionCollected($year) . "</p>\n";
 	  $html .= "</body></html>";
 	  $this->template->setCurrentBlock('RESULT');
 	  $this->template->setVariable("RESULT", $html);
@@ -606,6 +637,7 @@ Current: <input type=\"text\" dojoType=\"dijit.form.TextBox\" name=\"CURRENT\" i
 	<option value=0>2010</option>
 	<option value=1>2011</option>
 	<option value=2 selected="selected">2012</option>
+	<option value=3>2013</option>
 	</select>
 	Previous: 
 	<select id="previous" dojoType="dijit.form.Select" name="PREVIOUS">

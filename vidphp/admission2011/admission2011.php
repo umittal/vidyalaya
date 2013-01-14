@@ -112,7 +112,7 @@ function NewFamilyOrientation($family) {
 function PostOrientation($family) {
   $production=1;
   $mail =   Mail::SetupMailAdmissions();
-  Mail::SetFamilyAddress(&$mail, $family, $production);
+  //  Mail::SetFamilyAddress(&$mail, $family, $production);
 
   $subject = "Vidyalaya Admission (late) 2011-12 - Family $family->id";
   if ($production == 0) $subject = "[Test] $subject";
@@ -300,11 +300,11 @@ BODY_WAITING;
 //Evaluation::ProcessAllExcelFiles(); exit();
 
 //FamilyTracker::loadPayments();exit();
-//FamilyTracker::UpdateFamilyTracker(); exit();
-TwoYearLayout::assignClass(); exit();
+FamilyTracker::UpdateFamilyTracker(); exit();
+//TwoYearLayout::assignClass(); exit();
 //TwoYearLayout::checkFeePaid(); exit(); do not use this, use the feecheck in jadu
 //TwoYearLayout::twoYearCsv(); exit();
-Admission::Validation(2012); exit();
+//Admission::Validation(2012); exit();
 
 
 

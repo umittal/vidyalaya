@@ -2,122 +2,122 @@
 require_once "util.inc";
 
 final class Gender {
-      const Girl = 1
-      , Boy = 2
-      , Unknown = 3
-      ;
+  const Girl = 1
+    , Boy = 2
+    , Unknown = 3
+    ;
 
-public static function NameFromId($number) {
-	switch ($number) {
-		case 1: return "Girl";
-		case 2: return "Boy";
-		default: return "Unknown";
-	}
-	}
+  public static function NameFromId($number) {
+    switch ($number) {
+    case 1: return "Girl";
+    case 2: return "Boy";
+    default: return "Unknown";
+    }
+  }
 
 }
 
 final class Department {
-	public $id = null;
+  public $id = null;
 
-	const Hindi = 1
-	, Gujarati = 2
-	, Telugu = 3
-	, Culture = 4
-	, Kindergarten = 5
-	, PublicSpeaking = 6
-	;
+  const Hindi = 1
+    , Gujarati = 2
+    , Telugu = 3
+    , Culture = 4
+    , Kindergarten = 5
+    , PublicSpeaking = 6
+    ;
 
-	public static $colors = Array (
-				       Department::Hindi => "#0033cc", 
-				       Department::Gujarati => "#AA7", 
-				       Department::Telugu => "#dd1100", 
-				       Department::Culture => "#ff0066", 
-				       Department::Kindergarten => "#AA7", 
-				       Department::PublicSpeaking => "##AA7", 
-				       );
+  public static $colors = Array (
+				 Department::Hindi => "#0033cc", 
+				 Department::Gujarati => "#AA7", 
+				 Department::Telugu => "#dd1100", 
+				 Department::Culture => "#ff0066", 
+				 Department::Kindergarten => "#AA7", 
+				 Department::PublicSpeaking => "##AA7", 
+				 );
 
-	public function Name() {
-		return Department::NameFromId($this->id);
-	}
+  public function Name() {
+    return Department::NameFromId($this->id);
+  }
 
-	public static function IsLanguage($id) {
-	  switch ($id) {
-	  case 1: case 2: case 3: return true;
-	  default: return false;
-	  }
-	}
+  public static function IsLanguage($id) {
+    switch ($id) {
+    case 1: case 2: case 3: return true;
+    default: return false;
+    }
+  }
 
-	public static function GetAll() {
-	  return  array(self::Kindergarten, self::Hindi, self::Gujarati, self::Telugu, self::Culture);
-	}
+  public static function GetAll() {
+    return  array(self::Kindergarten, self::Hindi, self::Gujarati, self::Telugu, self::Culture);
+  }
 
-	public static function NameFromId($number) {
-		switch ($number) {
-			case 1: return "Hindi";
-			case 2: return "Gujarati";
-			case 3: return "Telugu";
-			case 4: return "Culture";
-			case 5: return "Kindergarten";
-			case 6: return "Public Speaking";
-			default: return "Unknown";
-		}
-	}
+  public static function NameFromId($number) {
+    switch ($number) {
+    case 1: return "Hindi";
+    case 2: return "Gujarati";
+    case 3: return "Telugu";
+    case 4: return "Culture";
+    case 5: return "Kindergarten";
+    case 6: return "Public Speaking";
+    default: return "Unknown";
+    }
+  }
 
-	public static function NameFromChar($char) {
-		switch ($char) {
-			case "H": return Department::NameFromId(1);
-			case "G": return Department::NameFromId(2);
-			case "T": return Department::NameFromId(3);
-			case "C": return Department::NameFromId(4);
-			case "K": return Department::NameFromId(5);
-			case "P": return Department::NameFromId(6);
-			default: return "unknown";
-		}
-	}
+  public static function NameFromChar($char) {
+    switch ($char) {
+    case "H": return Department::NameFromId(1);
+    case "G": return Department::NameFromId(2);
+    case "T": return Department::NameFromId(3);
+    case "C": return Department::NameFromId(4);
+    case "K": return Department::NameFromId(5);
+    case "P": return Department::NameFromId(6);
+    default: return "unknown";
+    }
+  }
 
-	public static function IdFromChar($char) {
-		switch ($char) {
-			case "H": return 1;
-			case "G": return 2;
-			case "T": return 3;
-			case "C": return 4;
-			case "K": return 5;
-			case "P": return 6;
-			default: return null;
-		}
-	}
+  public static function IdFromChar($char) {
+    switch ($char) {
+    case "H": return 1;
+    case "G": return 2;
+    case "T": return 3;
+    case "C": return 4;
+    case "K": return 5;
+    case "P": return 6;
+    default: return null;
+    }
+  }
 
-	public static function CharFromId($char) {
-		switch ($char) {
-			case 1: return "H";
-			case 2: return "G";
-			case 3: return "T";
-		        case 4: return "C";
-			case 5: return "KG";
-			case 6: return "P";
-			default: return null;
-		}
-	}
+  public static function CharFromId($char) {
+    switch ($char) {
+    case 1: return "H";
+    case 2: return "G";
+    case 3: return "T";
+    case 4: return "C";
+    case 5: return "KG";
+    case 6: return "P";
+    default: return null;
+    }
+  }
 
 
-	public static function NameFromPraveenSymbol($symbol) {
-		if (beginsWith($symbol, "KG")) {
-			$langChar = $symbol[count($symbol)-1];
-		} else {
-			$langChar = $symbol[0];
-		}
-		return Department::NameFromChar($langChar);
-	}
+  public static function NameFromPraveenSymbol($symbol) {
+    if (beginsWith($symbol, "KG")) {
+      $langChar = $symbol[count($symbol)-1];
+    } else {
+      $langChar = $symbol[0];
+    }
+    return Department::NameFromChar($langChar);
+  }
 	
-	public static function IdFromPraveenSymbol($symbol) {
-		if (beginsWith($symbol, "KG")) {
-			$langChar = $symbol[3];
-		} else {
-			$langChar = $symbol[0];
-		}
-		return Department::IdFromChar($langChar);
-	}
+  public static function IdFromPraveenSymbol($symbol) {
+    if (beginsWith($symbol, "KG")) {
+      $langChar = $symbol[3];
+    } else {
+      $langChar = $symbol[0];
+    }
+    return Department::IdFromChar($langChar);
+  }
 }
 
 // ************** 
@@ -167,7 +167,7 @@ class Student {
 
   
   public static function GetStudent($row) {
-  	$key = $row["Students2003.ID"];
+    $key = $row["Students2003.ID"];
     if (!array_key_exists($key, self::$objArray)) {
       self::$objArray[$key] = new Student($row);
     }
@@ -203,8 +203,8 @@ class Student {
   }
   
   private static function firstTimeCall() {
-  	if (!empty(self::$objArray)) return;
-  	GetAllData();
+    if (!empty(self::$objArray)) return;
+    GetAllData();
   }
 
   public static function FindStudentsForKey($phone) {
@@ -214,59 +214,59 @@ class Student {
   }
 
   public static function GetItemById($key) {
-  	self::firstTimeCall();
-  	return self::$objArray[$key];
+    self::firstTimeCall();
+    return self::$objArray[$key];
   }
   
   public static function AllStudents() {
-  	self::firstTimeCall();
-  	return self::$objArray;
+    self::firstTimeCall();
+    return self::$objArray;
   }
 
   public static function GetAll() {
-  	self::firstTimeCall();
-  	return self::$objArray;
+    self::firstTimeCall();
+    return self::$objArray;
   }
   
   public static function RegisteredStudents() {
-  	self::firstTimeCall();
-  	$students = Array();
-  	foreach (Student::$objArray as $student) {
-  		if ($student->IsEnrolled) $students[] = $student;
-  	}
-  	return $students;
+    self::firstTimeCall();
+    $students = Array();
+    foreach (Student::$objArray as $student) {
+      if ($student->IsEnrolled) $students[] = $student;
+    }
+    return $students;
   }
 
   public function Age(){
-  	return Calendar::Age($this->dateOfBirth);
+    return Calendar::Age($this->dateOfBirth);
   }
 
   public function AgeAt($rule){
-  	return Calendar::AgeAt($this->dateOfBirth, $rule);
+    return Calendar::AgeAt($this->dateOfBirth, $rule);
   }
 
   public function Grade(){
-  	return Calendar::GradeAt($this->firstGradeYear, Calendar::CurrentSession);
+    return Calendar::GradeAt($this->firstGradeYear, Calendar::CurrentSession);
   }
 
   public function GradeAt($rule){
-  	return Calendar::GradeAt($this->firstGradeYear, $rule);
+    return Calendar::GradeAt($this->firstGradeYear, $rule);
   }
 
   public function GenderName() {
-  	 return Gender::NameFromId($this->gender);
-	 }
+    return Gender::NameFromId($this->gender);
+  }
 
   public function LanguageInterest() {
-  	if (!empty($this->languagePreference)) {
-  		return Department::NameFromId($this->languagePreference);
-  	}
-  	return "Unknown";
+    if (!empty($this->languagePreference)) {
+      return Department::NameFromId($this->languagePreference);
+    }
+    return "Unknown";
   }
 
 
   public function fullName() {
-  	return $this->firstName . " " . $this->lastName;
+    return $this->firstName . " " . $this->lastName;
   }
 
   public function __toString() {
@@ -274,14 +274,14 @@ class Student {
   }
   
   public function CellEmail() {
-  	$fields = array();
-  	if (!empty($this->cellPhone)) $fields[] = "Cell:" . $this->cellPhone;
-  	if (!empty($this->email)) $fields[] = "email:" . $this->email;
-  	return implode ($fields, ",");
+    $fields = array();
+    if (!empty($this->cellPhone)) $fields[] = "Cell:" . $this->cellPhone;
+    if (!empty($this->email)) $fields[] = "email:" . $this->email;
+    return implode ($fields, ",");
   }
 
   public function parentsName() {
-  	return $this->family->parentsName();
+    return $this->family->parentsName();
   }
 
 
@@ -325,10 +325,10 @@ class Student {
 
     $dob = $row["Students2003.DOB"];
     if (strtotime($dob) < strtotime("1970-01-01")) {
-    	//    if ($dob < "1970-01-01") {
-     $this->dateOfBirth = null;
+      //    if ($dob < "1970-01-01") {
+      $this->dateOfBirth = null;
     } else {
-    	$this->dateOfBirth = $dob;
+      $this->dateOfBirth = $dob;
     }
 
     $this->family = Family::GetItemById($row["Students2003.PARENT_ID"]);
@@ -382,21 +382,21 @@ class Course {
       $instance->setVariables($row, $lc);
     }
     return self::$objArray[$key];
- }
+  }
  
-   public static function GetCourseId($id, $lc) {
+  public static function GetCourseId($id, $lc) {
     if ($lc == "l") {$key = $lc . $id; }
     else if ($lc == "c") {$key = $lc . $id; }
 
     if (!array_key_exists($key, self::$objArray)) {
-		return null;
+      return null;
     }
     return self::$objArray[$key];
- }
+  }
  
 
   private function setVariables($row, $lc) {
-  	$this->lc = $lc;
+    $this->lc = $lc;
     if ($lc == "l") {
       $this->id = $lc . $row["LanguageGrades.ID"];
       $this->SetVariablesFromRow($row, "LanguageGrades.Value", "LanguageGrades.Description",
@@ -410,36 +410,36 @@ class Course {
   }
   
   private static function GetLevelFromPraveenSymbol($symbol, $description, $lc) {
-  	if ($lc == "c") $symbol = $description;
-  	  	if (empty($symbol)) return 0;
-  	if (beginswith($symbol, "KG")) return 0;
-  	if (strlen($symbol) < 2) {
-  		print "Debug: having issues with symbol: $symbol\n"; 
-  	}
-  	return $symbol[1];
+    if ($lc == "c") $symbol = $description;
+    if (empty($symbol)) return 0;
+    if (beginswith($symbol, "KG")) return 0;
+    if (strlen($symbol) < 2) {
+      print "Debug: having issues with symbol: $symbol\n"; 
+    }
+    return $symbol[1];
   }
 
   private function GetDepartmnetFromPraveenSymbol() {
-  	$chartolook = $this->lc == "c"? $this->description[0] : $this->symbol[0];
-  	return Department::IdFromChar($chartolook);
+    $chartolook = $this->lc == "c"? $this->description[0] : $this->symbol[0];
+    return Department::IdFromChar($chartolook);
   }
 
   public function GetSectionFromPraveenSymbol() {
-  	  $symboltocheck = $this->lc == "c"? $this->description : $this->symbol;
-	  $courseSection = strlen($symboltocheck) > 2 ? $symboltocheck[2] : "";
-	  if ($courseSection == "-") return null;
-	  return $courseSection;
+    $symboltocheck = $this->lc == "c"? $this->description : $this->symbol;
+    $courseSection = strlen($symboltocheck) > 2 ? $symboltocheck[2] : "";
+    if ($courseSection == "-") return null;
+    return $courseSection;
   }
   
   private function SetVariablesFromRow($row, $symbol, $description, $room, $teachers, $lc) {
-      $this->symbol = $row[$symbol];
-      $this->description = $row[$description];
-      $this->room = $row[$room];
-      $this->teachers = $row[$teachers];
+    $this->symbol = $row[$symbol];
+    $this->description = $row[$description];
+    $this->room = $row[$room];
+    $this->teachers = $row[$teachers];
       
-//      print "what is going on $row[$symbol], $row[$description]  \n";
-      $this->level =  self::GetLevelFromPraveenSymbol($this->symbol, $this->description, $this->lc);
-      $this->department = $this->GetDepartmnetFromPraveenSymbol();
+    //      print "what is going on $row[$symbol], $row[$description]  \n";
+    $this->level =  self::GetLevelFromPraveenSymbol($this->symbol, $this->description, $this->lc);
+    $this->department = $this->GetDepartmnetFromPraveenSymbol();
     //print "Adding course: dept = $this->department, level = $this->level: $this->symbol, $this->description: \n";
   }
 
@@ -447,495 +447,495 @@ class Course {
 
 // ************** 
 class CourseCatalog {
-	public $id=null;
-	public $department = null;
-	public $level= null;
-	public $short=null;
-	public $full = null;
+  public $id=null;
+  public $department = null;
+  public $level= null;
+  public $short=null;
+  public $full = null;
 	
-	public static function CompareShort($a, $b) {
-	  if ($a->short == $b->short) return 0;
-	  return ($a->short < $b->short) ? -1 : 1;
-	}
+  public static function CompareShort($a, $b) {
+    if ($a->short == $b->short) return 0;
+    return ($a->short < $b->short) ? -1 : 1;
+  }
 
-	public static function GetCourseCatalogFromCourse($course) {
-		print "Debug: Going to look for $course->department, $course->level\n";
-	 	self::firstTimeCall();
-		foreach (self::$objArray as $coursecatalog ) {
-			if (($coursecatalog->department == $course->department) && 
-			    ($coursecatalog->level == $course->level))
-			return $coursecatalog;
-		}
-		return null;
-	}
+  public static function GetCourseCatalogFromCourse($course) {
+    print "Debug: Going to look for $course->department, $course->level\n";
+    self::firstTimeCall();
+    foreach (self::$objArray as $coursecatalog ) {
+      if (($coursecatalog->department == $course->department) && 
+	  ($coursecatalog->level == $course->level))
+	return $coursecatalog;
+    }
+    return null;
+  }
 
-	private static function ReadRow($row) {
-		$key = $row["CourseCatalog.id"];
-		if (!array_key_exists($key, self::$objArray)) 
-			return  new self($row);
-	}
+  private static function ReadRow($row) {
+    $key = $row["CourseCatalog.id"];
+    if (!array_key_exists($key, self::$objArray)) 
+      return  new self($row);
+  }
 
-	private static function firstTimeCall() {
-		if (!empty(self::$objArray)) return;
-		$query = "select * from CourseCatalog";
-		$result = VidDb::query($query);
-		$temp = array();
-		while ($row = mysql_fetch_alias_array($result)) {
-			$temp[] = new self($row);
-		}
-	        usort ($temp, "CourseCatalog::CompareShort");
-		foreach ($temp as $value) {
-		  if (array_key_exists($value->id, self::$objArray)) print "duplicate key found coursecatalog\n";
-		  self::$objArray[$value->id] = $value;
-		}
+  private static function firstTimeCall() {
+    if (!empty(self::$objArray)) return;
+    $query = "select * from CourseCatalog";
+    $result = VidDb::query($query);
+    $temp = array();
+    while ($row = mysql_fetch_alias_array($result)) {
+      $temp[] = new self($row);
+    }
+    usort ($temp, "CourseCatalog::CompareShort");
+    foreach ($temp as $value) {
+      if (array_key_exists($value->id, self::$objArray)) print "duplicate key found coursecatalog\n";
+      self::$objArray[$value->id] = $value;
+    }
 		
-	}
+  }
 		
-	public static function GetItemById($key) {
-	 	self::firstTimeCall();
-		//		print "<p>debug: trying to find $key in coursecatalog\n";
+  public static function GetItemById($key) {
+    self::firstTimeCall();
+    //		print "<p>debug: trying to find $key in coursecatalog\n";
 		
-		if (isset(self::$objArray[$key])) {
-		  $item= self::$objArray[$key];
-		return $item;
-		}
-		print "<p>debug: course catalog for key $key not found\n";
-		return null;
-	 }	
+    if (isset(self::$objArray[$key])) {
+      $item= self::$objArray[$key];
+      return $item;
+    }
+    print "<p>debug: course catalog for key $key not found\n";
+    return null;
+  }	
 
-	 public static function GetAll() {
-		self::firstTimeCall();
-		return self::$objArray;
-	}
+  public static function GetAll() {
+    self::firstTimeCall();
+    return self::$objArray;
+  }
 	 
-	private static $objArray = Array ();
+  private static $objArray = Array ();
 
 	
-	public function __construct($row) {
-		$this->id = $row["CourseCatalog.id"];
- 		$this->department = $row["CourseCatalog.department"];
-		$this->level = $row["CourseCatalog.level"];
-		$this->short = $row["CourseCatalog.short"];
-		$this->full = $row["CourseCatalog.full"];
+  public function __construct($row) {
+    $this->id = $row["CourseCatalog.id"];
+    $this->department = $row["CourseCatalog.department"];
+    $this->level = $row["CourseCatalog.level"];
+    $this->short = $row["CourseCatalog.short"];
+    $this->full = $row["CourseCatalog.full"];
 
-	}
+  }
 	
-	public static function findAvailableCourse($department, $level) {
-		foreach (self::GetAll() as $item) {
-			if ($item->department == $department && $item->level == $level) return $item;
-		}
-		return null;
-	}
+  public static function findAvailableCourse($department, $level) {
+    foreach (self::GetAll() as $item) {
+      if ($item->department == $department && $item->level == $level) return $item;
+    }
+    return null;
+  }
 
 }
 
 // ************** 
 class AvailableClass {
-	public $id=null;
-	public $year = null;
-	public $session = null;
-	public $course= null;
-	public $section=null;
-	public $room = null;
-	public $startTime = null;
-	public $endTime = null;
+  public $id=null;
+  public $year = null;
+  public $session = null;
+  public $course= null;
+  public $section=null;
+  public $room = null;
+  public $startTime = null;
+  public $endTime = null;
 	
-	public static function CompareShort($a, $b) {
-	  $ashort = $a->short();
-	  $bshort = $b->short();
+  public static function CompareShort($a, $b) {
+    $ashort = $a->short();
+    $bshort = $b->short();
 
-	  if ($ashort == $bshort) return 0;
-	  return ($ashort < $bshort) ? -1 : 1;
-	}
+    if ($ashort == $bshort) return 0;
+    return ($ashort < $bshort) ? -1 : 1;
+  }
 
-	public function url() {
-	  return $this->urlRoster() . $this->urlRoom();
+  public function url() {
+    return $this->urlRoster() . $this->urlRoom();
 
-	}
+  }
 
-	public function urlRoster() {
-	  return VidSession::IsLoggedIn() ?  "<a href=\"/dakhila/php/dataViewer2.php?command=ClassRoster&classId=$this->id\">" . 
-	    $this->short() . "</a>" : $this->short();
-	}
+  public function urlRoster() {
+    return VidSession::IsLoggedIn() ?  "<a href=\"/dakhila/php/dataViewer2.php?command=ClassRoster&classId=$this->id\">" . 
+      $this->short() . "</a>" : $this->short();
+  }
 
-	public function urlRoom() {
-	  return " (Room: " . $this->room->roomNumber . ")";
-	}
+  public function urlRoom() {
+    return " (Room: " . $this->room->roomNumber . ")";
+  }
 
 
-	public function IsChangeAllowed() {
-	  //	  return false;
-	  if ($this->session == "2012-13") return true;
-	}
+  public function IsChangeAllowed() {
+    //	  return false;
+    if ($this->session == "2012-13") return true;
+  }
 
-	public function short() {
-	       return empty($this->section) ? $this->course->short : $this->course->short . $this->section;
-	}	
-	public function shortWithoutSection() {
-	       return empty($this->section) ? $this->course->short : $this->course->short;
-	}		
+  public function short() {
+    return empty($this->section) ? $this->course->short : $this->course->short . $this->section;
+  }	
+  public function shortWithoutSection() {
+    return empty($this->section) ? $this->course->short : $this->course->short;
+  }		
 	
 
-	public static function GetItemById($key) {
-	  if (is_null($key)) return null;
-	 	self::firstTimeCall();
-	 	return array_key_exists($key, self::$objArray) ? self::$objArray[$key] : null;
-	 }	
+  public static function GetItemById($key) {
+    if (is_null($key)) return null;
+    self::firstTimeCall();
+    return array_key_exists($key, self::$objArray) ? self::$objArray[$key] : null;
+  }	
 
-	public static function GetItemByShort($short, $session) {
-	 	self::firstTimeCall();
-		foreach (self::$objArray as $item) {
-		  if ($short == $item->short() && $session == $item->session) return $item;
-		}
-	 }	
+  public static function GetItemByShort($short, $session) {
+    self::firstTimeCall();
+    foreach (self::$objArray as $item) {
+      if ($short == $item->short() && $session == $item->session) return $item;
+    }
+  }	
 
 	 
-	public static function GetClassesForRoom($roomId) {
-	  $list=array();
-	  foreach (self::GetAll() as $item) {
-	    if ($item->room->id === $roomId) $list[]= $item;
-	  }
-	  return $list;
-	}
+  public static function GetClassesForRoom($roomId) {
+    $list=array();
+    foreach (self::GetAll() as $item) {
+      if ($item->room->id === $roomId) $list[]= $item;
+    }
+    return $list;
+  }
 
-	public static function CreateClassCourseCatalog() {
-	  $year = Calendar::RegistrationYear() - 2010;
-	  $room = 19;
+  public static function CreateClassCourseCatalog() {
+    $year = Calendar::RegistrationYear() - 2010;
+    $room = 19;
 
-	  if (count(self::GetAllYear($year)) !=0 ) {
-	    print "Error: To create all classes for course cataglog, no class should be setp for the year\n";
-	    return; // return if any class exists for the year
-	  }
+    if (count(self::GetAllYear($year)) !=0 ) {
+      print "Error: To create all classes for course cataglog, no class should be setp for the year\n";
+      return; // return if any class exists for the year
+    }
 
-	  foreach(CourseCatalog::GetAll() as $course) {
-	    $sql = "insert into AvailableClass Set course = $course->id, year = $year , room = $room, section =' ' \n";
-	    $result = VidDb::query($sql);
-	  }
-	}
+    foreach(CourseCatalog::GetAll() as $course) {
+      $sql = "insert into AvailableClass Set course = $course->id, year = $year , room = $room, section =' ' \n";
+      $result = VidDb::query($sql);
+    }
+  }
 
-	private static function firstTimeCall() {
-		if (!empty(self::$objArray)) return;
-		$query = "select * from AvailableClass";
-		$result = VidDb::query($query);
-		while ($row = mysql_fetch_alias_array($result)) {
-			self::ReadRow($row);
-		}
-	}
+  private static function firstTimeCall() {
+    if (!empty(self::$objArray)) return;
+    $query = "select * from AvailableClass";
+    $result = VidDb::query($query);
+    while ($row = mysql_fetch_alias_array($result)) {
+      self::ReadRow($row);
+    }
+  }
 
-	public static function GetAll() {
-		self::firstTimeCall();
-		return self::$objArray;
-	}
+  public static function GetAll() {
+    self::firstTimeCall();
+    return self::$objArray;
+  }
 
-	public static function GetAllYear($year = null) {
-	  if (is_null($year)) $year=Calendar::CurrentYear();
-	  $list= array();
-	  if ($year >= 2010) $year -= 2010;
-	  foreach (self::GetAll() as $item) {
-	    if ($item->year == $year) $list[$item->id]=$item;
-	  }
+  public static function GetAllYear($year = null) {
+    if (is_null($year)) $year=Calendar::CurrentYear();
+    $list= array();
+    if ($year >= 2010) $year -= 2010;
+    foreach (self::GetAll() as $item) {
+      if ($item->year == $year) $list[$item->id]=$item;
+    }
 	  
-	  uasort ($list, "AvailableClass::CompareShort");
-	  return $list;
-	}
+    uasort ($list, "AvailableClass::CompareShort");
+    return $list;
+  }
 	 
-	public static function GetAllYearDepartment($dept, $year) {
-	  $list= array();
-	  if ($year >= 2010) $year -= 2010;
-	  foreach (self::GetAllYear($year) as $item) {
-	    if ($item->course->department == $dept) $list[$item->id]=$item;
-	  }
+  public static function GetAllYearDepartment($dept, $year) {
+    $list= array();
+    if ($year >= 2010) $year -= 2010;
+    foreach (self::GetAllYear($year) as $item) {
+      if ($item->course->department == $dept) $list[$item->id]=$item;
+    }
 	  
-	  uasort ($list, "AvailableClass::CompareShort");
-	  return $list;
-	}
+    uasort ($list, "AvailableClass::CompareShort");
+    return $list;
+  }
 	 
-	private static $objArray = Array ();
+  private static $objArray = Array ();
 
-	private static function ReadRow($row) {
-		$key = $row["AvailableClass.id"];
-		if (!array_key_exists($key, self::$objArray)) 
-			self::$objArray[$key] = new self($row);
-		return self::$objArray[$key];
-	}
+  private static function ReadRow($row) {
+    $key = $row["AvailableClass.id"];
+    if (!array_key_exists($key, self::$objArray)) 
+      self::$objArray[$key] = new self($row);
+    return self::$objArray[$key];
+  }
 	
-	public function __toString() {
-	  return $this->short();
-	}
+  public function __toString() {
+    return $this->short();
+  }
 
-	public function __construct($row) {
-		$this->id = $row["AvailableClass.id"];
-		$this->year= $row["AvailableClass.year"];
-		//		$this->session = sprintf("%s-%s",  $this->year+2010 , $this->year+11);
-		$this->session = Calendar::SessionFromYear($this->year);
-		$this->course = CourseCatalog::GetItemById($row["AvailableClass.course"]);
-		$this->section = $row["AvailableClass.section"];
-		$this->room = Rooms::GetItemById($row["AvailableClass.room"]);
-		$this->startTime = strftime("%H:%M", strtotime($row["AvailableClass.startTime"]));
-		$this->endTime = strftime("%H:%M", strtotime($row["AvailableClass.endTime"]));
+  public function __construct($row) {
+    $this->id = $row["AvailableClass.id"];
+    $this->year= $row["AvailableClass.year"];
+    //		$this->session = sprintf("%s-%s",  $this->year+2010 , $this->year+11);
+    $this->session = Calendar::SessionFromYear($this->year);
+    $this->course = CourseCatalog::GetItemById($row["AvailableClass.course"]);
+    $this->section = $row["AvailableClass.section"];
+    $this->room = Rooms::GetItemById($row["AvailableClass.room"]);
+    $this->startTime = strftime("%H:%M", strtotime($row["AvailableClass.startTime"]));
+    $this->endTime = strftime("%H:%M", strtotime($row["AvailableClass.endTime"]));
 
-	}
+  }
 
-	public static function findAvailableClassFromCourse($course) {
-		//print "Looking for $course->description, ";
-		$courseCatalog = CourseCatalog::GetCourseCatalogFromCourse($course);
-		if (empty($courseCatalog)) die ("catalog not found found for $course->description");
-		$courseSection = $course->GetSectionFromPraveenSymbol();
+  public static function findAvailableClassFromCourse($course) {
+    //print "Looking for $course->description, ";
+    $courseCatalog = CourseCatalog::GetCourseCatalogFromCourse($course);
+    if (empty($courseCatalog)) die ("catalog not found found for $course->description");
+    $courseSection = $course->GetSectionFromPraveenSymbol();
 
-		self::firstTimeCall();
-		foreach (self::$objArray as $availableClass) {
-			if (($availableClass->course->id == $courseCatalog->id) && ($availableClass->section == $courseSection)){
-			//	print "returned id should $availableClass->id\n";
-				return $availableClass;
-			}
+    self::firstTimeCall();
+    foreach (self::$objArray as $availableClass) {
+      if (($availableClass->course->id == $courseCatalog->id) && ($availableClass->section == $courseSection)){
+	//	print "returned id should $availableClass->id\n";
+	return $availableClass;
+      }
 
-		}
+    }
 
-		$startTime = "10:00"; $endTime="11:00";
-		if ($course->lc == "c") {$startTime = "11:00"; $endTime="11:45";}
-		if ($course->symbol[0] == "K") {$startTime = "10:00"; $endTime="11:30";}
+    $startTime = "10:00"; $endTime="11:00";
+    if ($course->lc == "c") {$startTime = "11:00"; $endTime="11:45";}
+    if ($course->symbol[0] == "K") {$startTime = "10:00"; $endTime="11:30";}
 
-		$room = Rooms::findEastlakeRoomFromCourse($course);
+    $room = Rooms::findEastlakeRoomFromCourse($course);
 
-		$sql = "insert into AvailableClass set ";
-		$sql .= "year=0, course=$courseCatalog->id, section = \"$courseSection\", room = $room->id, startTime = \"$startTime\", endTime = \"$endTime\" ";
-		//print "Debug: executing $sql;\n";
-		$result = VidDb::query($sql);
-		//print "inserted: course = $course->description\n";
-		self::$objArray = Array();
-		return self::findAvailableClassFromCourse($course);
-	}
+    $sql = "insert into AvailableClass set ";
+    $sql .= "year=0, course=$courseCatalog->id, section = \"$courseSection\", room = $room->id, startTime = \"$startTime\", endTime = \"$endTime\" ";
+    //print "Debug: executing $sql;\n";
+    $result = VidDb::query($sql);
+    //print "inserted: course = $course->description\n";
+    self::$objArray = Array();
+    return self::findAvailableClassFromCourse($course);
+  }
 	
-	public static function findAvailableClass($year, $department, $level, $section) {
-		if ($year >= 2010) $year-= 2010;
-//		print "Looking for course, dept: $department, level: $level      ";
-		$course = CourseCatalog::findAvailableCourse($department, $level);
+  public static function findAvailableClass($year, $department, $level, $section) {
+    if ($year >= 2010) $year-= 2010;
+    //		print "Looking for course, dept: $department, level: $level      ";
+    $course = CourseCatalog::findAvailableCourse($department, $level);
 		
-		if ($course == null) {
-//			print "not found\n";
-			return null;
-		} else {
-//			print "found $course->id\n";
-		}
+    if ($course == null) {
+      //			print "not found\n";
+      return null;
+    } else {
+      //			print "found $course->id\n";
+    }
 
-//		print "looking for course: $course->id, section: $section, year: $year\n";
-		foreach (self::GetAllYear($year) as $item) {
-			//print "comparing id $item->id, course=$item->course, course id = $course->id \n";
-			// if section is null, find the first available
-			if ($section == null) {
-				if ($item->course->id == $course->id) return $item;
-			} else {
-				if ($item->course->id == $course->id && $item->section == $section) return $item;
-			}
-		}
-		print "not found\n";
-		//nothing found
-		return null;
-	}
+    //		print "looking for course: $course->id, section: $section, year: $year\n";
+    foreach (self::GetAllYear($year) as $item) {
+      //print "comparing id $item->id, course=$item->course, course id = $course->id \n";
+      // if section is null, find the first available
+      if ($section == null) {
+	if ($item->course->id == $course->id) return $item;
+      } else {
+	if ($item->course->id == $course->id && $item->section == $section) return $item;
+      }
+    }
+    print "not found\n";
+    //nothing found
+    return null;
+  }
 	
 }
 
 // ************** 
 class Facility{
-	public $id=null;
-	public $name=null;
-	public $address=null;
-	public $zip=null;
+  public $id=null;
+  public $name=null;
+  public $address=null;
+  public $zip=null;
 	
-	const Eastlake = 1;
-	const PHHS = 2;
-	const Brooklawn = 3;
+  const Eastlake = 1;
+  const PHHS = 2;
+  const Brooklawn = 3;
 
-	private static function firstTimeCall() {
-		if (!empty(self::$objArray)) return;
-		$query = "select * from Facilities";
-		$result = VidDb::query($query);
-		while ($row = mysql_fetch_alias_array($result)) {
-			self::ReadRow($row);
-		}
-	}
+  private static function firstTimeCall() {
+    if (!empty(self::$objArray)) return;
+    $query = "select * from Facilities";
+    $result = VidDb::query($query);
+    while ($row = mysql_fetch_alias_array($result)) {
+      self::ReadRow($row);
+    }
+  }
 
-	public static function GetItemById($key) {
-	 	self::firstTimeCall();
-	 	return self::$objArray[$key];
-	 }	
+  public static function GetItemById($key) {
+    self::firstTimeCall();
+    return self::$objArray[$key];
+  }	
 	
-	public static function GetAll() {
-		self::firstTimeCall();
-		return self::$objArray;
-	}
+  public static function GetAll() {
+    self::firstTimeCall();
+    return self::$objArray;
+  }
 	
-	 private  static $objArray = Array ();
+  private  static $objArray = Array ();
 
-	private static function ReadRow($row) {
-		$key = $row["Facilities.id"];
-		if (!array_key_exists($key, self::$objArray)) 
-			self::$objArray[$key] = new self($row);
-		return self::$objArray[$key];
-	}
+  private static function ReadRow($row) {
+    $key = $row["Facilities.id"];
+    if (!array_key_exists($key, self::$objArray)) 
+      self::$objArray[$key] = new self($row);
+    return self::$objArray[$key];
+  }
 
-	public function __construct($row) {
-		$this->id = $row["Facilities.id"];
-		$this->name = $row["Facilities.name"];
-		$this->address = $row["Facilities.address"];
-		$this->zip = $row["Facilities.zip"];
-	}
+  public function __construct($row) {
+    $this->id = $row["Facilities.id"];
+    $this->name = $row["Facilities.name"];
+    $this->address = $row["Facilities.address"];
+    $this->zip = $row["Facilities.zip"];
+  }
 }
 
 // ************** 
 class Rooms{
-	public $id=null;
-	public $facility = null;
-	public $roomNumber = null;
-	public $capacity =null;
-	public $hint =null;
-	public $notes =null;
+  public $id=null;
+  public $facility = null;
+  public $roomNumber = null;
+  public $capacity =null;
+  public $hint =null;
+  public $notes =null;
 		
-	public static function CompareRoomnumber($a, $b) {
-	  if ($a->roomNumber == $b->roomNumber) return 0;
-	  return ($a->roomNumber < $b->roomNumber) ? -1 : 1;
-	}
+  public static function CompareRoomnumber($a, $b) {
+    if ($a->roomNumber == $b->roomNumber) return 0;
+    return ($a->roomNumber < $b->roomNumber) ? -1 : 1;
+  }
 
-	private static function firstTimeCall() {
-		if (!empty(self::$objArray)) return;
-		$query = "select * from Rooms";
-		$result = VidDb::query($query);
+  private static function firstTimeCall() {
+    if (!empty(self::$objArray)) return;
+    $query = "select * from Rooms";
+    $result = VidDb::query($query);
 
 
-		$temp = array();
-		while ($row = mysql_fetch_alias_array($result)) {
-			$temp[] = new self($row);
-		}
-	        usort ($temp, "Rooms::CompareRoomnumber");
-		foreach ($temp as $value) {
-		  if (array_key_exists($value->id, self::$objArray)) print "duplicate key found room\n";
-		  self::$objArray[$value->id] = $value;
-		}
+    $temp = array();
+    while ($row = mysql_fetch_alias_array($result)) {
+      $temp[] = new self($row);
+    }
+    usort ($temp, "Rooms::CompareRoomnumber");
+    foreach ($temp as $value) {
+      if (array_key_exists($value->id, self::$objArray)) print "duplicate key found room\n";
+      self::$objArray[$value->id] = $value;
+    }
 
-		return;
+    return;
 
-		while ($row = mysql_fetch_alias_array($result)) {
-			self::ReadRow($row);
-		}
-	        usort (self::$objArray, "Rooms::CompareRoomnumber");
-	}
+    while ($row = mysql_fetch_alias_array($result)) {
+      self::ReadRow($row);
+    }
+    usort (self::$objArray, "Rooms::CompareRoomnumber");
+  }
 	
-	public static function GetItemById($key) {
-	 	self::firstTimeCall();
-		if (isset(self::$objArray[$key])) return self::$objArray[$key];
-		print "debug: Room with id $key not found\n";
-	 	return null;
-	 }
+  public static function GetItemById($key) {
+    self::firstTimeCall();
+    if (isset(self::$objArray[$key])) return self::$objArray[$key];
+    print "debug: Room with id $key not found\n";
+    return null;
+  }
 
-	public static function GetRoomsFacility($facilityId) {
-	  $list = array();
-	  foreach (self::GetAll() as $item) {
-	    if ($item->facility->id == $facilityId) $list[] = $item;
-	  }
-	  return $list;
-	}
+  public static function GetRoomsFacility($facilityId) {
+    $list = array();
+    foreach (self::GetAll() as $item) {
+      if ($item->facility->id == $facilityId) $list[] = $item;
+    }
+    return $list;
+  }
 	
-	public static function GetHeatMap($facility, $year=null) {
-	  if (is_null($year)) $year=Calendar::CurrentYear();
-	  if ($year >= 2010) $year -= 2010;
+  public static function GetHeatMap($facility, $year=null) {
+    if (is_null($year)) $year=Calendar::CurrentYear();
+    if ($year >= 2010) $year -= 2010;
 	  
-	  $list = Enrollment::GetAllEnrollmentForFacilitySession($facility, $year);
-       	  uasort ($list, "Enrollment::CompareSessionDepartment") ;
+    $list = Enrollment::GetAllEnrollmentForFacilitySession($facility, $year);
+    uasort ($list, "Enrollment::CompareSessionDepartment") ;
 
-	  //	  print "list count is " . count($list) .  "<br />";
-	  foreach ($list as $item) {
-	    $room = $item->class->room->id;
-	    $class = $item->class->id;
-	    if (!isset($count[$room][$class])) $count[$room][$class]=0;
-	    $count[$room][$class]++;
-	    //	    print "$room, $class <br />";
-	  }
+    //	  print "list count is " . count($list) .  "<br />";
+    foreach ($list as $item) {
+      $room = $item->class->room->id;
+      $class = $item->class->id;
+      if (!isset($count[$room][$class])) $count[$room][$class]=0;
+      $count[$room][$class]++;
+      //	    print "$room, $class <br />";
+    }
 
-	  $heatMap=array();
-	  // transform array
-	  foreach ($count as $room => $classes) {
-	    $heatMap{$room}  = "";
-	    foreach ($classes as $classId => $count) {
-	      $class = AvailableClass::GetItemById($classId);
-	      $heatMap{$room} .= $class->urlRoster() . "($count) ";
-	    }
-	  }
-	  return $heatMap;
-	}
+    $heatMap=array();
+    // transform array
+    foreach ($count as $room => $classes) {
+      $heatMap{$room}  = "";
+      foreach ($classes as $classId => $count) {
+	$class = AvailableClass::GetItemById($classId);
+	$heatMap{$room} .= $class->urlRoster() . "($count) ";
+      }
+    }
+    return $heatMap;
+  }
 
-	public static function findEastlakeRoomFromCourse($course) {
-		self::firstTimeCall();
-		foreach (self::$objArray as $room) {
-			//print "Trying, room = $room->roomNumber, facility = $room->facility\n";
-			if ($room->roomNumber== $course->room && $room->facility == 1) return $room;
-		}
-		die( "Error: room not found for $course->symbol, $course->description, $course->room\n");
-	}
+  public static function findEastlakeRoomFromCourse($course) {
+    self::firstTimeCall();
+    foreach (self::$objArray as $room) {
+      //print "Trying, room = $room->roomNumber, facility = $room->facility\n";
+      if ($room->roomNumber== $course->room && $room->facility == 1) return $room;
+    }
+    die( "Error: room not found for $course->symbol, $course->description, $course->room\n");
+  }
 
-	public static $objArray = Array ();
+  public static $objArray = Array ();
 
-	public static function GetAll() {
-		self::firstTimeCall();
-		return self::$objArray;
-	}
+  public static function GetAll() {
+    self::firstTimeCall();
+    return self::$objArray;
+  }
 
-	private static function ReadRow($row) {
-		$key = $row["Rooms.id"];
-		if (!array_key_exists($key, self::$objArray)) 
-			self::$objArray[$key] = new self($row);
-		return self::$objArray[$key];
-	}
+  private static function ReadRow($row) {
+    $key = $row["Rooms.id"];
+    if (!array_key_exists($key, self::$objArray)) 
+      self::$objArray[$key] = new self($row);
+    return self::$objArray[$key];
+  }
 
-	public function __construct($row) {
-		$this->id = $row["Rooms.id"];
-		$this->facility= Facility::GetItemById($row["Rooms.facility"]);
-		$this->roomNumber = $row["Rooms.room"];
-		$this->capacity = $row["Rooms.capacity"];
-		$this->hint = $row["Rooms.hint"];
-		$this->notes = $row["Rooms.notes"];
-	}
+  public function __construct($row) {
+    $this->id = $row["Rooms.id"];
+    $this->facility= Facility::GetItemById($row["Rooms.facility"]);
+    $this->roomNumber = $row["Rooms.room"];
+    $this->capacity = $row["Rooms.capacity"];
+    $this->hint = $row["Rooms.hint"];
+    $this->notes = $row["Rooms.notes"];
+  }
 }
 
 // Enrolled students 
 // ************** 
 class Enrollment{
-	public $student=null;
-	public $class = null;
-	public $academicGrade = null;
-	public $disciplineGrade =null;
+  public $student=null;
+  public $class = null;
+  public $academicGrade = null;
+  public $disciplineGrade =null;
 
-	public static function CompareStudentName($a, $b) {
-	  if ($a->student->id == $b->student->id) return 0;
-	  if ($a->student->lastName < $b->student->lastName) return -1;
-	  if ($a->student->lastName > $b->student->lastName) return 1;
-	  if ($a->student->firstName < $b->student->firstName) return -1;
-	  if ($a->student->firstName > $b->student->firstName) return 1;
-	  return 0;
-	}
+  public static function CompareStudentName($a, $b) {
+    if ($a->student->id == $b->student->id) return 0;
+    if ($a->student->lastName < $b->student->lastName) return -1;
+    if ($a->student->lastName > $b->student->lastName) return 1;
+    if ($a->student->firstName < $b->student->firstName) return -1;
+    if ($a->student->firstName > $b->student->firstName) return 1;
+    return 0;
+  }
 
-	public static function CompareSessionDepartment($a, $b) {
-	  if (( $a->class->session == $b->class->session )
+  public static function CompareSessionDepartment($a, $b) {
+    if (( $a->class->session == $b->class->session )
 
-	      && ($a->class->course->department == $b->class->course->department) )return 0;
-	  if ($a->class->session < $b->class->session) return -1;
-	  if ($a->class->session > $b->class->session) return 1;
-	  if ($a->class->course->department < $b->class->course->department) return -1;
-	  if ($a->class->course->department > $b->class->course->department) return 1;
-	  return 0;
-	}
+	&& ($a->class->course->department == $b->class->course->department) )return 0;
+    if ($a->class->session < $b->class->session) return -1;
+    if ($a->class->session > $b->class->session) return 1;
+    if ($a->class->course->department < $b->class->course->department) return -1;
+    if ($a->class->course->department > $b->class->course->department) return 1;
+    return 0;
+  }
 
-	public static function CompareDepartmentName($a, $b) {
-	  $adept = Department::IsLanguage($a->class->course->department) ? 1 : $a->class->course->department;
-	  $bdept = Department::IsLanguage($b->class->course->department) ? 1 : $b->class->course->department;
-	  if (( $a->student->firstName == $b->student->firstName )
-	      && ($adept == $bdept ) )return 0;
+  public static function CompareDepartmentName($a, $b) {
+    $adept = Department::IsLanguage($a->class->course->department) ? 1 : $a->class->course->department;
+    $bdept = Department::IsLanguage($b->class->course->department) ? 1 : $b->class->course->department;
+    if (( $a->student->firstName == $b->student->firstName )
+	&& ($adept == $bdept ) )return 0;
 
-	  if ($adept < $bdept) return -1;
-	  if ($adept > $bdept) return 1;
-	  if ($a->student->firstName < $b->student->firstName) return -1;
-	  if ($a->student->firstName > $b->student->firstName) return 1;
-	  return 0;
-	}
+    if ($adept < $bdept) return -1;
+    if ($adept > $bdept) return 1;
+    if ($a->student->firstName < $b->student->firstName) return -1;
+    if ($a->student->firstName > $b->student->firstName) return 1;
+    return 0;
+  }
 
   private static $firstYearArray = Array ();
 
@@ -971,53 +971,53 @@ class Enrollment{
     return $startYear;
   }
 
-	// return all families in an availableclass
-	public static function GetFamilies($class) {
-	  $families = array();
-	  $query = "select * from Enrollment where availableClass=$class";
+  // return all families in an availableclass
+  public static function GetFamilies($class) {
+    $families = array();
+    $query = "select * from Enrollment where availableClass=$class";
 
-	  $result = VidDb::query($query);
-	  while ($row = mysql_fetch_alias_array($result)) {
-	    $item = new self($row);
-#	    $student = Student::GetItemById($item->student);
-	    $families[] = $item->student->family;
-	  }
-	  return $families;
-	}
+    $result = VidDb::query($query);
+    while ($row = mysql_fetch_alias_array($result)) {
+      $item = new self($row);
+      #	    $student = Student::GetItemById($item->student);
+      $families[] = $item->student->family;
+    }
+    return $families;
+  }
 	
-	private static function ArrayFromQueryUnsorted($query) {
-		$enrollmentArray = Array();
+  private static function ArrayFromQueryUnsorted($query) {
+    $enrollmentArray = Array();
 		
-		$result = VidDb::query($query);
-		while ($row = mysql_fetch_alias_array($result)) {
-		  $foo = new self($row);
-		  $enrollmentArray[] = $foo;
-		}
-		return $enrollmentArray;
-	}
+    $result = VidDb::query($query);
+    while ($row = mysql_fetch_alias_array($result)) {
+      $foo = new self($row);
+      $enrollmentArray[] = $foo;
+    }
+    return $enrollmentArray;
+  }
 
-	private static function ArrayFromQuery($query) {
-	  $enrollmentArray = self::ArrayFromQueryUnsorted($query);
-	  uasort ($enrollmentArray, "Enrollment::CompareStudentName");
-	  return $enrollmentArray;
-	}
+  private static function ArrayFromQuery($query) {
+    $enrollmentArray = self::ArrayFromQueryUnsorted($query);
+    uasort ($enrollmentArray, "Enrollment::CompareStudentName");
+    return $enrollmentArray;
+  }
 	
-	public static function GetEnrollmentForClass ($classId) {
-		$query = "select * 
+  public static function GetEnrollmentForClass ($classId) {
+    $query = "select * 
 		from Enrollment
 		where availableClass = $classId
 		";
-		return self::ArrayFromQuery($query);
-	}
+    return self::ArrayFromQuery($query);
+  }
 
-	public function __toString() {
-	  return $this->student->fullName() . ", " . $this->class->short();
-	}
+  public function __toString() {
+    return $this->student->fullName() . ", " . $this->class->short();
+  }
 
-	public static function GetEnrollmentForFamily ($familyId, $year=null ) {
-	  if (is_null($year)) $year=Calendar::CurrentYear();
-	  if ($year >= 2010) $year -= 2010;
-	  $query = "select * 
+  public static function GetEnrollmentForFamily ($familyId, $year=null ) {
+    if (is_null($year)) $year=Calendar::CurrentYear();
+    if ($year >= 2010) $year -= 2010;
+    $query = "select * 
 		from Enrollment
 		left join AvailableClass on Enrollment.availableClass = AvailableClass.id
 		left join CourseCatalog on AvailableClass.course = CourseCatalog.id
@@ -1027,9 +1027,9 @@ class Enrollment{
 
 		";
 
-	  $foo = self::ArrayFromQueryUnsorted($query);
-	  uasort ($foo, "Enrollment::CompareDepartmentName");
-	  return $foo;
+    $foo = self::ArrayFromQueryUnsorted($query);
+    uasort ($foo, "Enrollment::CompareDepartmentName");
+    return $foo;
 	}
 
 	public static function GetEnrollmentFamily($familyId, $year=null) {
@@ -2649,7 +2649,6 @@ class Parents {
 // ******** Family Tracker
 class FamilyTracker {
 	const facility = 2;
-	const prevYear = 1;
 	const currYear = 2;
 
 	public $year=null;
@@ -2757,10 +2756,6 @@ class FamilyTracker {
 	}
 
 
-	private static function createInsertString($familyID, $prevStatus, $currStatus) {
-		return " (" . self::currYear . ", $familyID, $prevStatus, $currStatus, 0)";
-	}
-
 	public static function UpdateStatus($familyId, $newStatus, $tuition) {
 	  $thisyear=Calendar::RegistrationYear() - 2010;
 	  $sql = "update FamilyTracker Set currentYear=$newStatus, tuition = $tuition where family=$familyId and year=$thisyear";
@@ -2772,22 +2767,43 @@ class FamilyTracker {
 
 	}
 
-	public static function TuitionCollected() {
-	  $sql="select sum(tuition) from FamilyTracker where year= " . FamilyTracker::currYear;
+	public static function TuitionCollected($year=null) {
+	  if (is_null($year)) $year=Calendar::RegistrationYear();
+	  $sql="select sum(tuition) from FamilyTracker where year= $year";
 	  $result = VidDb::query($sql);
 	  $row = mysql_fetch_array($result);
 	 return $row[0];
 	}
 
-	public static function UpdateFamilyTracker() {
-		self::firstTimeCall();
+	private static function createInsertString($familyID, $prevStatus, 
+						   $currStatus, $year=null) {
+	  if (is_null($year)) $year=Calendar::RegistrationYear();
+	  if ($year >= 2010) $year -= 2010;
+	  return " (" . $year . ", $familyID, $prevStatus, $currStatus, 0, null)";
+	}
 
-		$insert = array();
-		foreach ( Family::GetRegisteredFamilies(self::facility, self::prevYear) as $family) {
+	public static function UpdateFamilyTracker($prevYear=null) {
+	  self::firstTimeCall();
+
+	  if (is_null($prevYear)) $prevYear=Calendar::RegistrationYearPrevious();
+	  $insert = array();
+	  
+	  foreach (self::GetAllForYear($prevYear) as $tracker) {
+	    if ($tracker->currentYear == EnumFamilyTracker::registered 
+		|| $tracker->currentYear == EnumFamilyTracker::nextYear
+		) {
+	      $insert[] = self::createInsertString($tracker->family
+						   , $tracker->currentYear
+						   ,EnumFamilyTracker::pendingInvitation);
+	    }
+	  }
+
+		/*
+		foreach ( Family::GetRegisteredFamilies(self::facility, $prevYear) as $family) {
 			if (empty(self::$objArray[$family->id])) {
 				$insert[] = self::createInsertString($family->id
-				, EnumFamilyTracker::enum('registered')
-				,EnumFamilyTracker::enum('pendingRegistration'));
+				, EnumFamilyTracker::registered
+				,EnumFamilyTracker::pendingInvitation);
 				self::$objArray[$family->id] = 1;
 			}
 		}
@@ -2795,20 +2811,26 @@ class FamilyTracker {
 		foreach ( Family::GetWaitlistFamilies() as $family) {
 			if (empty(self::$objArray[$family->id])) {
 				$insert[] = self::createInsertString($family->id
-				, EnumFamilyTracker::enum('waitlist')
-				,EnumFamilyTracker::enum('pendingRegistration'));
+				, EnumFamilyTracker::waitlist
+				,EnumFamilyTracker::pendingInvitation);
 				self::$objArray[$family->id] = 1;
 			}
 		}
-
-		if (count($insert) > 0) {
-			print "count of insert is " . count($insert) . "\n";
-			$result = VidDb::query("insert into FamilyTracker values " . implode (", ", $insert));
-		} else {
-		}
-		print "nothing to add\n";
+		*/
+	  if (count($insert) > 0) {
+	    print "count of insert is " . count($insert) . "\n";
+	    //	    var_dump($insert);
+	    foreach ($insert as $item) {
+	      //	      print "$item\n";
+	      $sql = "insert into FamilyTracker values $item";
+	      print "$sql\n";
+	      $result = VidDb::query($sql);
+	    }
+	  } else {
+	    print "nothing to add\n";
+	  }
 	}
-
+	
 	private static function  verifyParent($family, $child) {
 		//print "I was here\n";
 		$student = Student::GetItemById($child);

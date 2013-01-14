@@ -252,6 +252,10 @@ Class Calendar {
 	  return self::CurrentYear() - 1;
 	}
 	
+	public static function RegistrationYearPrevious() {
+	  return self::RegistrationYear() - 1;
+	}
+	
 	public static function StartDate($year= null) {
 	  if (is_null($year)) $year=self::CurrentYear();
 	  if ($year < 2010) $year+= 2010;
