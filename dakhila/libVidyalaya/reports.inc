@@ -328,7 +328,7 @@ class Reports {
     $html = Reports::RegistrationPacketHtml($family);
     $pdf = PrintFactory::HtmlToPdf($html);
     
-    $printDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission";
+    $printDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2013-14/admission";
     $fileName = $printDir . "/pdf/Family-" . $family->id . ".pdf";
     file_put_contents("$fileName", $pdf);
     echo "printed $fileName\n";

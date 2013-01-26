@@ -487,14 +487,15 @@ EOT;
       break;
 		
     case "RegistrationSummary":
-      $year = isset($_POST['YEAR']) ?  $_POST['YEAR'] : null;
+      $url = htmlentities($_SERVER['PHP_SELF']) . "?command=$command";
+      $year = isset($_POST['YEAR1']) ?  $_POST['YEAR1'] : Calendar::RegistrationYear();
       $form = <<<EOT
 	<script>
 	dojo.require("dijit.form.Select");
         </script>
 	<form method="post" action="$url">
 	Year: 
-	<select id="YEAR" dojoType="dijit.form.Select" name="YEAR">
+	<select id="YEAR1" dojoType="dijit.form.Select" name="YEAR1">
 	<option value=0>2010</option>
 	<option value=1>2011</option>
 	<option value=2 selected="selected">2012</option>
@@ -509,11 +510,11 @@ EOT;
       $this->template->setVariable('QUERY', $form);
       $this->template->parseCurrentBlock();
       
-      if (isset($_POST['YEAR']) && $_POST['YEAR'] != "") {
-	$year = $_POST['YEAR'];
-	if ($year >= 2010) $year -= 2010;
+      if (isset($_POST['YEAR1']) && $_POST['YEAR1'] != "") {
+	$year = $_POST['YEAR1'];
       }
 
+      if ($year >= 2010) $year -= 2010;
       $thisSession = Calendar::SessionFromYear($year);
       $prevSession = Calendar::SessionFromYear($year - 1);
 
@@ -1016,6 +1017,7 @@ LCMATRIXFORM;
       $html = str_replace("0000", $email, $html);
       $html = str_replace("==FIRST==", $first, $html);
       $html = str_replace("==LAST==", $last, $html);
+      $html = str_replace("==EMAIL==", $email, $html);
       $html = str_replace("==URL==", $this->thispage . "?command=$command", $html);
 
       $this->template->setCurrentBlock('QUERY');

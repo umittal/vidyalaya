@@ -1,5 +1,5 @@
 <div class="heading1">Student Medical Information Form </div>
-<div class="heading1">2012-13 </div>
+<div class="heading1">2013-14 </div>
 
 <div class=explanation>This form needs to be completed separately for each registered student.</div>
 
@@ -93,7 +93,7 @@
 </thead>
 <tbody>
 <!-- BEGIN PARENTS -->
-<tr><td>{PARENTSNAME}</td><td style="text-align: right;" class=input>/2012</td><td class=input></td></tr>
+<tr><td>{PARENTSNAME}</td><td style="text-align: right;" class=input>/2013</td><td class=input></td></tr>
 <!-- END PARENTS -->
 </tbody>
 </table>

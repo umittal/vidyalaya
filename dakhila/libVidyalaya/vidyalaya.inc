@@ -66,12 +66,12 @@ final class Department {
 
   public static function NameFromChar($char) {
     switch ($char) {
-    case "H": return Department::NameFromId(1);
-    case "G": return Department::NameFromId(2);
-    case "T": return Department::NameFromId(3);
     case "C": return Department::NameFromId(4);
+    case "G": return Department::NameFromId(2);
+    case "H": return Department::NameFromId(1);
     case "K": return Department::NameFromId(5);
     case "P": return Department::NameFromId(6);
+    case "T": return Department::NameFromId(3);
     default: return "unknown";
     }
   }

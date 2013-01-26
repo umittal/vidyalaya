@@ -5,8 +5,9 @@
   dojo.require("dojo.parser");  
   dojo.require("dijit.form.Button"); 
   dojo.require("dijit.form.Form");
+  dojo.require("dojox.validate");    
   dojo.require("dijit.form.ValidationTextBox");    
-  dojo.require("dijit.form.DateTextBox");
+
 </script>
 
 
@@ -18,10 +19,10 @@
 <table >
   <tr>
     <td style="padding-right:20px;">Email</td>
-    <td> <input type="text" size="35" name="email" id="email"  value="0000"
+    <td> <input type="text" size="35" name="email" id="email" value="==EMAIL=="
            dojoType="dijit.form.ValidationTextBox" 
+    validator="dojox.validate.isEmailAddress"
            required="false"  
-	regExp=dojox.validate.regexp.emailAddress 
            promptMessage="Enter email address."
            invalidMessage="Invalid Email Address." 
            trim="true"

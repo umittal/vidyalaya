@@ -86,8 +86,9 @@ function printRosterYear () {
 }
 
 function printAllFamilies() {
-  foreach (FamilyTracker::GetAll()  as $tracker) {
-    Reports::RegistrationPacketFamily(Family::GetItemById($tracker->family));
+  foreach (FamilyTracker::GetAllForYear(Calendar::RegistrationYear())  as $tracker) {
+    if ($tracker->currentYear == EnumFamilyTracker::pendingInvitation)
+      Reports::RegistrationPacketFamily(Family::GetItemById($tracker->family));
   }
 }
 
@@ -98,7 +99,7 @@ function printAllFamiliesOld($students) {
 	}
 }
 //printRosterYear (); exit();
-//printAllFamilies(); exit();
+printAllFamilies(); exit();
 $entry = GetSingleIntArgument();
 print "printing  $entry\n";
 Reports::RegistrationPacketFamily(Family::GetItemById($entry));

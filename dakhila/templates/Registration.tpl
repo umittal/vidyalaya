@@ -1,5 +1,5 @@
 <div class="heading1">Family Registration Form </div>
-<div class="heading1">2012-13 </div>
+<div class="heading1">2013-14 </div>
 
 <table cellspacing=0>
 <tbody>
@@ -10,24 +10,24 @@
 </tbody>
 </table>
 
-<div class=explanation>This form needs to be completed one per family. More information is available at http://www.vidyalaya.us/shiksha/admission2012.html. 
+<div class=explanation>This form needs to be completed one per family. More information is available at http://www.vidyalaya.us/shiksha/admission2013.html. 
 </div>
 
 <div class="section">Timeline</div>
 <table>
 <tbody>
 <tr>
-<td valign="top" width=120px>March 25 - April 22</td>
+<td valign="top" width=120px>March 24 - April 21</td>
 <td width=200px>Early registration for enrolled families</td><td>Discount: $25</td>
 </tr>
 <tr>
-<td valign="top">April 22 - June 3</td>
+<td valign="top">April 21 - June 2</td>
 <td>Registration Open</td>
 <td>Regular Fees Apply</td>
 </tr>
 <tr>
 
-<td valign="top">June 4 - onwards</td>
+<td valign="top">June 3 - onwards</td>
 <td>Late registration</td><td>Late Fee: $25</td>
 </tr>
 </tbody>
@@ -83,8 +83,8 @@ Select up to 4 volunteering options from the attached sheet and write the corres
 </thead>
 <tbody>
 <tr><td colspan=4 align=center style="font-style:italic">Tuition</td></tr>
-<tr><td>One Student Family</td><td colspan=2>$450</td><td  class=input rowspan=2></td></tr>
-<tr><td>All other Families</td><td colspan=2>$550</td></tr>
+<tr><td>One Student Family</td><td colspan=2>$400</td><td  class=input rowspan=2></td></tr>
+<tr><td>All other Families</td><td colspan=2>$500</td></tr>
 <tr><td>New per Student Registration</td><td>$50</td><td class=input></td><td class=input></td></tr>
 <tr><td>Discount/Late Fee</td><td>$25</td><td>&#177;</td><td  class=input ></td></tr>
 
@@ -116,7 +116,7 @@ the polices of Vidyalaya published in Student Handbook and website on behalf of 
 </thead>
 <tbody>
 <!-- BEGIN SIGNATURE -->
-<tr><td>{PARENTSNAME}</td><td style="text-align: right;" class=input>/2012</td><td class=input></td></tr>
+<tr><td>{PARENTSNAME}</td><td style="text-align: right;" class=input>/2013</td><td class=input></td></tr>
 <!-- END SIGNATURE -->
 </tbody>
 </table> 

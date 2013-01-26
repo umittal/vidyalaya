@@ -142,6 +142,7 @@ dojo.require("dijit.form.Button");
 <!-- END OTHERCONTACT -->
 </table>
 
+
 <!-- BEGIN oPACKINGLIST -->
 <li class="section">Packing List</li>
 <ol style="list-style-type: decimal;list-style-position:inside;padding-left:10px;">
@@ -162,5 +163,5 @@ dojo.require("dijit.form.Button");
 </ol>
 <p></p>
 <div class="explanation">
-Note: Please email corrections to admission2012@vidyalaya.us
+Note: Please email corrections to admission2013@vidyalaya.us
 </div>
