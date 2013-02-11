@@ -13,9 +13,9 @@ require_once "$libDir/OpeningDay.inc";
 require_once "../../MPDF53/mpdf.php";
 
 
-//EventCalendar::UpdateWeekNumber(2012);exit();
+EventCalendar::UpdateWeekNumber(2012);exit();
 
-FeeCheck::email1112(); exit ();
+//FeeCheck::email1112(); exit ();
 
 
 //OpeningDay::DisplayBoard();exit();

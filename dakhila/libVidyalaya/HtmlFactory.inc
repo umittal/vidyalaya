@@ -309,7 +309,7 @@ function DisplayFamilyTemplateV3 (&$template, $family) {
 	  $template->setVariable("TUITION", $item->tuition);
 	  $template->setVariable("REGDDATE", $item->registrationDate);
 	  $template->parseCurrentBlock();
-
+	  /*
 	  if (Calendar::CurrentYear() == $item->year+2010 && $item->previousYear == EnumFamilyTracker::registered) {
 	    $templateName="DVD2011";
 	    //	    print "debug: print DVD thing\n";
@@ -317,6 +317,7 @@ function DisplayFamilyTemplateV3 (&$template, $family) {
 	    $template->setVariable("DVDYEAR", "2011");
 	    $template->parseCurrentBlock();
 	  }
+	  */
 
 	}
 
@@ -382,6 +383,7 @@ function DisplayChildren(&$template, $student) {
 	    $template->setVariable("LTEACHER", Teachers::TeacherListClassHtml($item->class->id));
 	    $template->parseCurrentBlock();
 
+	    /*
 	    $templateName="ENROLLEDCHILDREN";
 	    $template->setCurrentBlock($templateName);
 	    $namestring = $student->id . ": " . $student->fullName();
@@ -394,6 +396,7 @@ function DisplayChildren(&$template, $student) {
 	      $template->setCurrentBlock($templateName);
 	      $template->setVariable("STUDENTNAME", "KG Note");
 	    }
+	    */
 	  }
 	}
 	$template->parseCurrentBlock();
@@ -855,7 +858,8 @@ function DisplayAvailableClass($template, $year, $facility) {
 </button>
 
 BUTTONHERE;
-	  if ($item->year == (Calendar::RegistrationYear() - 2010)) $teachers .= $addTeacherButton;
+	  //	  if ($item->year == (Calendar::RegistrationYear() - 2010)) 
+	    $teachers .= $addTeacherButton;
 	  $template->setVariable("TEACHERS", $teachers);
 
 

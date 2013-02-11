@@ -437,45 +437,37 @@ FAMILYUPDATE;
   }
 
   public static function TeacherEmailAttendanceAssessment($year) {
-    foreach (Teachers::TeacherListYear($year) as $item) {
-      $person=$item->person;
-      $classshort=$item->class->short();
-      if ($item->class->course->department > 3) continue;
-      $room=$item->class->room->roomNumber;
-      $body = <<<TEACHEREMAILATTENDANCEASSESSMENT
 
-<p>Thank you for your volunteering work at Vidyalaya in 2011-12. We have you teaching class $classshort class in room number $room. Attached please find the progress report template for your students this year.  Review the names of the students on your list, and please let us know if there are any discrepancies. An updated attendance sheet is also attached.
-
-<p> 
-Please print out a copy of this template for yourselves and use it to collect the relevant data from now until June 2012.  You should plan to administer the final exam in May, so that you will have sufficient time to fill out the progress report for each student. You will be asked to enter the progress directly onto this template and submit it electronically to us during the first week of June. 
-
-<p>
-Please feel free to ask questions or make comments at any time (asmita@vidyalaya.us or reply to this email).  It is best if you do not wait until the last minute to ask questions. 
-
- <p>Regards,
-
- <p>Asmita<br />Language and Curriculum Team<br />Vidyalya Inc.
-
-TEACHEREMAILATTENDANCEASSESSMENT;
       $footer = "";
       $subject="Attendance/Assessment Sheet";
       $production=1;
 
      //      if ($person->id() != "F227") continue;
-      if ($production == 0) $subject = "[Test] $subject";
+    $draft="";
+    if ($production != 1) {
+      $subject = "[Test] $subject";
+      $draft = "<p>This is a draft <br />";
+    }
+
+    foreach (Teachers::TeacherListYear($year) as $item) {
+      $person=$item->person;
+      $classshort=$item->class->short();
+      if ($item->class->course->department > 3) continue;
+      $room=$item->class->room->roomNumber;
+    $content = file_get_contents("teacherattendanceassessment.html");
      print "Trying to send email to id " . $person->id() . ", Class - $classshort, subject: $subject\n";
       $mail = Mail::SetupMailUmesh();
       Mail::SetPersonAddress($mail, $person, $production);
       $mail->Subject = $subject;
       $salutation = "<p>Dear " . $person->fullName() . ",";
-      $mail->Body = $salutation . $body . $footer;
+      $mail->Body = $draft . $salutation . $content . $footer;
       $mail->AltBody = "This is the body when user views in plain text format"; //Text Body
 
       $department=Department::NameFromId($item->class->course->department);
-      $filename="/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/attendance/$department/excel/$classshort.xlsx";
+      $filename="/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/attendance/$department/excel/$classshort.xlsx";
       $mail->AddAttachment($filename); // attachment
 
-      $filename="/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/assessment/excel/$classshort.xlsx";
+      $filename="/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/assessment/excel/$classshort.xlsx";
       $mail->AddAttachment($filename); // attachment
 
       //      continue;
@@ -485,8 +477,11 @@ TEACHEREMAILATTENDANCEASSESSMENT;
       }  else {
 	echo "Message has been sent, Person: " .$person->id() . ":\n";
       }
-
-      // die ("I die\n");
+      //die("hello\n");
+      sleep(1);
+	  $mail->ClearAllRecipients(); 
+	  $mail->ClearAttachments(); 
+	  $mail->ClearCustomHeaders(); 
     }
   }
 

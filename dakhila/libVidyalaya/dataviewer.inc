@@ -1017,7 +1017,11 @@ LCMATRIXFORM;
       $html = str_replace("0000", $email, $html);
       $html = str_replace("==FIRST==", $first, $html);
       $html = str_replace("==LAST==", $last, $html);
-      $html = str_replace("==EMAIL==", $email, $html);
+      if (!empty($email)) {
+	$html = str_replace("==EMAIL==", "value = $email", $html);
+      } else {
+	$html = str_replace("==EMAIL==", "", $html);
+      }
       $html = str_replace("==URL==", $this->thispage . "?command=$command", $html);
 
       $this->template->setCurrentBlock('QUERY');

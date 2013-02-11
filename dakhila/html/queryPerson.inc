@@ -19,12 +19,11 @@
 <table >
   <tr>
     <td style="padding-right:20px;">Email</td>
-    <td> <input type="text" size="35" name="email" id="email" value="==EMAIL=="
+    <td> <input type="text" size="35" name="email" id="email" ==EMAIL==
+    required="false"
            dojoType="dijit.form.ValidationTextBox" 
-    validator="dojox.validate.isEmailAddress"
-           required="false"  
-           promptMessage="Enter email address."
-           invalidMessage="Invalid Email Address." 
+	  placeholder="Enter email address"
+           invalidMessage="Invalid Email Address" 
            trim="true"
 />
     </td>

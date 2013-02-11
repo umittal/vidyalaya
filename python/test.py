@@ -2,19 +2,14 @@ import sys
 sys.path.append('/home/umesh/lib/python')
 import gdata.apps.groups.service
 
-def parse_groupfeed(groupFeedObject):
-    """Parse a groupFeedObject and get email for each entry."""
-    groups = []
-    for group in groupFeedObject:
-        group_email = group['groupId']
-        print group_email
-        groups.append(group_email)
-    return groups
-
 service = gdata.apps.groups.service.GroupsService(email="umesh@vidyalaya.us", domain="vidyalaya.us", password="Praveen38")
 service.ProgrammaticLogin()
 
-groupFeedObject = service.RetrieveAllGroups()
+#groupFeedObject = service.RetrieveAllMembers('all2012@vidyalaya.us')
+#groupFeedObject = service.RetrieveAllMembers('fundraising@vidyalaya.us')
+groupFeedObject = service.RetrieveAllMembers('culture-teachers@vidyalaya.us')
+
+#groupFeedObject = service.RetrieveAllMembers('volunteer2012@vidyalaya.us')
 for group in groupFeedObject:
-  print group
+  print group['memberId']
 

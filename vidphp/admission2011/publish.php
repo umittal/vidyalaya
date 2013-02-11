@@ -69,7 +69,7 @@ class Publications {
   public static function FamilyMarshalling() {
     $nonteachingfile = self::volunteerDir . "familyVolunteerList.csv";
 
-    $production=0;
+    $production=1;
     $subject = "Volunteering Meeting:  Family ";
     $mail =   Mail::SetupMailSPA();
     $draft="";
@@ -89,7 +89,7 @@ class Publications {
 	if (empty($id) || $rolevalue != "Available") continue;
 	//	if (empty($id) || $rolevalue != "noshow") continue;
 
-	if ($date != "Sunday, January 20, 2013") continue;
+	if ($date != "Sunday, February 3, 2013") continue;
 	$count++;
 	print "$count. Family $id, $date\n";
 	$body = str_replace("==DATE==", $date, $content);
@@ -104,7 +104,7 @@ class Publications {
 
 	print "foo, $family->id, " . $family->mother->fullName() . ", " .	  $family->father->fullName() . "\n";
 	//continue;
-	  //die ("i die here");
+	//die ("i die here");
 
 	  //      return;
 	  if(!$mail->Send()) {
@@ -1506,7 +1506,7 @@ BODY;
 //Publications::RosterFromFile("/tmp/aa"); exit();
 //Publications::Roster(2012); exit();
 
-Publications::RosterSpa(2012); exit();
+//Publications::RosterSpa(2012); exit();
 //Publications::NotComingBack(2012); exit();
 //Publications::NewLanguageStudents(2012); exit();
 //Publications::FamilyVolunteerList(2012); exit();
@@ -1515,7 +1515,7 @@ Publications::RosterSpa(2012); exit();
 //Publications::FullDumpFamilies();
 
 //Publications::BadgeFile(2012); exit();
-//Publications::CreateMailingLists(2012);exit();
+Publications::CreateMailingLists(2012);exit();
 //Publications::VolunteerListForHandbook(2012); exit();
 //Publications::FamilyMarshalling(); exit();
 //Publications::TeacherListForHandbook(2012);exit();
