@@ -14,17 +14,15 @@ class Admission {
   //  const assesssmentFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2011-12/data/assessment.csv";
   const assesssmentFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission/assessment.csv";
   const rosterDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/roster/";
+  const volunteerCodeFile="/home/umesh/Dropbox/Vidyalaya-Management/Admission/Volunteer2011.pdf";
+  const participationAgreementFile="/home/umesh/Dropbox/Vidyalaya-Management/Admission/ParticipationAgreement.pdf";
+
+
   public static $students = Array ();
 
-  private static function sendItemEmail($familyId, $cd, $pb, $bag) {
+  private static function sendItemEmail($familyId, $cd, $pb, $bag, $body) {
 		
     $family = Family::GetItemById($familyId);
-    $body = <<<ITEMEMAIL
-      <p>As part of the registration process, you ordered the following items. 
-      Please collect it from us at Picnic tomorrow, Sunday June 19, 2011. Please also bring a printout of this email, 
-      if possible.
-	<p>
-ITEMEMAIL;
 
     $counter = 1;
     $table = "<table>\n";
@@ -195,7 +193,8 @@ ITEMEMAIL;
     foreach ($totalFamily as $familyId => $total) {
       if ($total == 0 ) continue;
       print "$familyId, $totalCD[$familyId], $totalPB[$familyId], $totalBag[$familyId], $totalFamily[$familyId]\n";
-      //			self::sendItemEmail($familyId, $totalCD[$familyId], $totalPB[$familyId], $totalBag[$familyId]);
+  EmailMessageText::findSubjectBody("002", $body, $subjectFoo);
+  //self::sendItemEmail($familyId, $totalCD[$familyId], $totalPB[$familyId], $totalBag[$familyId], $body);
       $grandTotal += $total;
     }
     print "Grand Total = $grandTotal\n";
@@ -261,31 +260,9 @@ ITEMEMAIL;
 
     if ($family->id != 543) return;
 
-    $body1 = <<<FOO
-<style>
-      td {padding-left:20px;}
-</style>
-      <p>The Trustees of Vidyalaya invite you to back to school day on 30 September 2012. Please be seated in the cafetorium by 9:25am. The details of the event are available at http://www.vidyalaya.us/shiksha/bts2012.html. Additional information for Teachers is available in the Teachers tab.</p>
-    <p>Attached please find the updated Family Information sheets that were distributed on the Opening Day. In some cases, parents may want to reprint it and update the sheets on student folders distributed on the opening day. The map of the facility is also attached.</p>
+  EmailMessageText::findSubjectBody("003", $body1, $subject);
+  EmailMessageText::findSubjectBody("004", $body, $subject);
 
-<p>Your family id is $family->id. Your class visits are listed below.</p>
-FOO;
-
-    $body = <<<FOO1
-
-<p>Vidyalaya is hosting its annual Back To School event on Sunday, September 30th, 2012. All parents are invited to attend.  It will be a wonderful opportunity to learn about your child's language and culture classes as well as meet his/her teachers.  The teachers will share important information about classroom policies and expectations.</p>
-<p>Attached please find the updated Family Information sheets that were distributed on the Opening Day. In some cases, parents may want to reprint it and update the sheets on student folders distributed on the opening day. The map of the facility is also attached.</p>
-
-<p>Please arrive promptly at 9:25 am along with your children.  Follow all driving rules; the driving lanes in the front parking lot are one-way and there is no parking in fire lane (yellow line means no parking).  The teachers and students will follow the regular school schedule, whereas the parents’ meeting will start in the cafetorium immediately following the prayer session.</p>
-
-<p>Your class visits are as follows:</p>
-
-<table>
-<thead>
-<tr><th>Name</th><th>Class</th><th>Room</th><th>Visit Time</th><th>Teachers</th><th>Level</th></tr>
-</thead>
-<tbody>
-FOO1;
 
     foreach (Enrollment::GetEnrollmentForFamily($tracker->family, $tracker->year) as $item) {
       switch ($item->class->course->department) {
@@ -391,15 +368,7 @@ FOO1;
 
     foreach ($families as $family) {
       //      print $family->id . ", " . $family->parentsName() . "\n";
-      $body = <<<FAMILYUPDATE
-	<p>Attached please find confirmation of update in the enrollment of your family. Please let me know if there is any update to the family detail form.
- <p>Please print the student sheet and put it in the student\'s bag for easy reference.
-<p>
-Regards,
-<p>
-Vidyalaya Administration<br /> (sent by: Umesh Mittal)
-
-FAMILYUPDATE;
+      EmailMessageText::findSubjectBody("005", $body, $subject);
       $footer="";
       $production=1;
       $subject = "Vidyalaya Update, Family- $family->id";
@@ -490,27 +459,8 @@ FAMILYUPDATE;
       $person=$item->person;
       $classshort=$item->class->short();
       $room=$item->class->room->roomNumber;
-      $body1 = <<<TEACHEREMAIL
-<p>Thank you for teaching at Vidyalaya 2012-13. The school starts tomorrow Sunday 9 September 2012. Please come early and familiarize yourself with the facilities. Please read the  opening day announcement posted at <a href="http://www.vidyalaya.us/shiksha/2012w1.html">http://www.vidyalaya.us/shiksha/2012w1.html</a>, it should answer most question you may have.
-
-<p>Language teachers: At the conclusion of General Assembly, please escort your students from the Cafeteria to your classroom.  At the end of the language class, please stay in your room until the Culture teacher arrives.  Students should never be left unattended in the classroom at any time.</p>
-<p>
-Culture teachers:Please reach your designated classroom 5 minutes before the class begins to monitor the students, and stay in the classroom until all students have vacated at the end of class. </p>
-<p>
-			    We have attached the details of your class, attendance sheet and a roster of students for your class. The roster can be reformatted using Microsoft Word for printing.  Please print these attachments and bring them with you.  </p>
-<p>Looking forward to another great year,
-
-<p>(The above  message is sent by Umesh Mittal  on behalf of various team leaders.)
-
-
-TEACHEREMAIL;
-
-      $body = <<<TEACHERUPDATE
-<p>Attached please find updated attendance sheet and student list for your class. Please take a moment to ensure that only students listed here are sitting in your class.There are more than 100 teachers teaching more than 275 students. The placement process will close now. If there are any discrepencies, please let us know.</p>
-
-
-TEACHERUPDATE;
-
+      EmailMessageText::findSubjectBody("006", $body1, $subject);
+      EmailMessageText::findSubjectBody("007", $body, $subject);
       $footer = "Regards, <p>Administration Team<br />(sent by: Umesh Mittal)</p>";
       $subject="Welcome to Vidyalaya 2012-13";
       $production=0;
@@ -547,20 +497,7 @@ TEACHERUPDATE;
   public static function VolunteerEmail($year) {
     foreach (Volunteers::GetAllYear($year) as $item) {
       $person=$item->person;
-      $body = <<<VOLUNTEEREMAIL
-<p>
-	<p>On behalf of Board of Trustees, Vidyalaya would like to thank you for volunteering at Vidyalaya. This year over 200 families have registered their kids to come to school. We appreciate your efforts to help us manage the school.
-<p>Attached please find your personal information that we have in our database along with the Participation Agreement signed by all participants. We request you to read the participation agreement,  mark any changes in the personal information sign and date  it at the bottom and bring it with you when you come to our facilities.
-
-<p>Regards,
-
-<p>Vidyalaya Inc.<br />(sent by: Umesh Mittal)<p>
-
-<p>ps: Please see the Google satellite image of the school below
-
-<img src="http://www.vidyalaya.us/modx/assets/images/phhs-maps.jpg"></img>
-
-VOLUNTEEREMAIL;
+      EmailMessageText::findSubjectBody("008", $body, $subject);
       $footer = "";
       $subject="Welcome to Vidyalaya 2011";
 
@@ -738,23 +675,7 @@ VOLUNTEEREMAIL;
     $pdfDir = "/home/umesh/student2011";
     foreach (Volunteers::GetAllYear($year) as $item) {
       $full = $item->person->fullName();
-      $openingHtml = <<< AGREEMENT
-	<p>As part of providing Voluntary Services to Vidyalaya, I have read the Family Participation Agreement of Vidyalaya dated April 2011. 
-	I hereby agree to the Terms of the agreement and the Student Handbook.
-<table>
-<thead>
-<tr><th class="name">Name</th><th class="phone">Date</th><th class="name">Signature</th></tr>
-</thead>
-<tbody>
-	<tr><td>$full</td><td style="text-align: right;" class=input>&nbsp;/2011</td><td class=input>&nbsp;</td></tr>
-</tbody>
-</table> 
-<div style='font-size:50%'><p>
-
-Note: Please print, sign, date and bring this form to opening day, Septmber 18, 2011
- Parsippany Hills High School. Review and mark any update to the personal information.</div>
-
-AGREEMENT;
+      EmailMessageText::findSubjectBody("009", $openingHtml, $subject);
       $html = PrintFactory::GetHtmlForPersonDetail($item->person) . $openingHtml;
 
       $mfskey=MFS::CodeFromId($item->MFS) . $item->mfsId;
@@ -965,49 +886,93 @@ print "Registered family count is " . count($familyarray) . "\n";
     }
   }
 
-  private static function AnnounceExisting($family) {
+  private static function AnnounceExisting($family, $body, $subject) {
 
-    $production=1;
+    $production=0;
     $mail =   Mail::SetupMailAdmissions();
-    Mail::SetFamilyAddress($mail, $family, $production);
-
-    $subject = "Vidyalaya Admission 2012-13, Family $family->id, Last Call";
+    //    $subject = "Vidyalaya Admission 2013-14, Family $family->id, Last Call";
     if ($production == 0) $subject = "[Test] $subject";
+
+    Mail::SetFamilyAddress($mail, $family, $production);
     $mail->Subject = $subject;
 
     // attachments
-    //    $customizedPdf = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission/pdf/Family-". $family->id . ".pdf";
-    //    $mail->AddAttachment("$customizedPdf"); // attachment
-    //   $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Management/Admission/Volunteer2011.pdf"); // attachment
-    //   $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Management/Admission/ParticipationAgreement.pdf"); // attachment
+    $customizedPdf = "/home/umesh/Dropbox/Vidyalaya-Roster/2013-14/admission/pdf/Family-". $family->id . ".pdf";
+    $mail->AddAttachment("$customizedPdf"); // attachment
+    $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Management/Admission/Volunteer2011.pdf"); // attachment
+    $mail->AddAttachment("/home/umesh/Dropbox/Vidyalaya-Management/Admission/ParticipationAgreement.pdf"); // attachment
   
     print "Family id: $family->id, Name: " . $family->parentsName() . " $subject\n";
 
     $salutation = "<p>Dear " . $family->parentsName() . ",";
-    $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/reminder-all.html");
+    $body=preg_replace("/==FAMILYID==/", $family->id, $body);
+    //    $mail->Body = $draft . $salutation . file_get_contents("../../vidphp/admission2011/reminder-all.html");
+    $mail->Body = $draft . $salutation . $body;
     $mail->AltBody = "Family: $family->id"; //Text Body
 
-    //    return;
+    //        return;
     if(!$mail->Send()) {
       echo "Mailer Error: " . $mail->ErrorInfo . "\n";
     }  else {
       echo "Message has been sent\n";
     }
+    die ("i sent one\n");
     sleep(5);
   }
 
   public static function ExistingFamilies() {
+    $production=0;
+    $mail =   Mail::SetupMailAdmissions();
+    EmailMessageText::findSubjectBody("001", $body, $subject);
+    //    $subject = "Vidyalaya Admission 2013-14, Family $family->id, Last Call";
+    $draft="";
+    if ($production != 1) {
+      $subject = "[Test] $subject";
+      $draft = "<p>This is a draft <br />";
+    }
+
+
     $i=1;
-    foreach (FamilyTracker::GetAll() as $tracker) {
-      //  if ($tracker->family <  461) continue;
-      //      if ($tracker->previousYear != EnumFamilyTracker::registered) continue;
-      if ($tracker->currentYear != EnumFamilyTracker::pendingRegistration) continue;
+    foreach (FamilyTracker::GetAllForYear(Calendar::RegistrationYear()) as $tracker) {
+      //      if ($tracker->family !=  253) continue;
+      if ($tracker->previousYear != EnumFamilyTracker::registered) continue;
+      //      if ($tracker->currentYear != EnumFamilyTracker::pendingRegistration) continue;
+      if ($tracker->currentYear != EnumFamilyTracker::pendingInvitation) continue;
       print $tracker->family . ", previous: " . EnumFamilyTracker::NameFromId($tracker->previousYear) . ", current: " 
 	. EnumFamilyTracker::NameFromId($tracker->currentYear) . "\n";
       $family = Family::GetItemById($tracker->family);
       print "-->$i. Family id: $family->id, Name: " . $family->parentsName() . "\n";
       $i++;
-      self::AnnounceExisting($family);
+
+      $mail->ClearAllRecipients(); 
+      $mail->ClearAttachments(); 
+      $mail->ClearCustomHeaders(); 
+      Mail::SetFamilyAddress($mail, $family, $production);
+      $mail->Subject = $subject;
+      $salutation = "<p>Dear " . $family->parentsName() . ",";
+      $body=preg_replace("/==FAMILYID==/", $family->id, $body);
+      $mail->Body = $draft . $salutation . $body;
+      $mail->AltBody = "Family: $family->id"; //Text Body
+
+      $customizedDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2013-14/admission/pdf/";
+      $customizedPdf = $customizedDir . "Family-". $family->id . ".pdf";
+      $mail->AddAttachment("$customizedPdf"); 
+      $mail->AddAttachment(self::volunteerCodeFile); 
+      $mail->AddAttachment(self::participationAgreementFile);
+
+      //      continue;
+      //die ("i die here");
+
+      //      return;
+      if(!$mail->Send()) {
+	echo "Mailer Error: $family->id:  " . $mail->ErrorInfo . "\n";
+	return;
+      }  else {
+	echo "Message has been sent, Family $family->id\n";
+      }
+      die("hello\n");
+      sleep(1);
+      
       
     }
     return;

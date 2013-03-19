@@ -99,7 +99,7 @@ function printAllFamiliesOld($students) {
 	}
 }
 //printRosterYear (); exit();
-printAllFamilies(); exit();
+//printAllFamilies(); exit();
 $entry = GetSingleIntArgument();
 print "printing  $entry\n";
 Reports::RegistrationPacketFamily(Family::GetItemById($entry));

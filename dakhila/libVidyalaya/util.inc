@@ -357,6 +357,63 @@ final class EnumFamilyTracker {
     }
 }
 
+class EmailMessageText {
+  // $dompdfDir = realpath(dirname(__FILE__)."/../../dompdf");
+  
+  private static $handle=null;
+
+  private static function TagFromString($s) {
+      $tata = explode("===", $s);$count = count($tata);
+      if ($count == 4) {
+	return $tata[2];
+      }
+
+      print "Debug:Error count is $count\n";
+  }
+
+  private static function GetText() {
+    $s=null;
+    while (($buffer = fgets(self::$handle)) !== false) {
+      if (beginsWith(trim($buffer), "===END==="))
+	return $s;
+      $s .= $buffer;
+    }
+    throw new Exception("Unexpected end of the file\n");
+  }
+
+  public static function findSubjectBody($tag, &$body, &$subject) {
+    if (empty(self::$handle)) {
+      $filename=realpath(dirname(__FILE__)."/../../vidphp/admission2011/email.txt");
+      self::$handle = fopen($filename, "r");
+    }
+
+    if (self::$handle) {
+      while (($buffer = fgets(self::$handle)) !== false) {
+
+	if (beginsWith(trim($buffer), "===MESSAGE===")) {
+	  if ($tag == self::TagFromString($buffer))
+	    $body = self::GetText();
+	} // Message
+
+	if (beginsWith(trim($buffer), "===SUBJECT===")) {
+	  if ($tag == self::TagFromString($buffer))
+	    $subject = self::GetText();
+	} // Subject
+	$html .= $buffer;
+      } // while
+
+      if (!feof(self::$handle)) {
+	$html=  "Error: unexpected fgets() fail<br />\n";
+      }
+
+      fclose(self::$handle);
+    } // $handle
+
+  }
+
+
+}
+
 class Mail {
   private static function SetupMailCommon($email, $name, $password, $replyEmail, $replyName) {
     $mail = new PHPMailer(false);
@@ -390,8 +447,8 @@ class Mail {
   }
 
   public static function SetupMailAdmissions() {
-    return self::SetupMailCommon("Admission2012@vidyalaya.us", "Vidyalaya Admissions", "Praveen38", 
-				 "Admission2012@vidyalaya.us", "Vidyalaya Admissions");
+    return self::SetupMailCommon("Admission2013@vidyalaya.us", "Vidyalaya Admissions", "SanjayKhera", 
+				 "Admission2013@vidyalaya.us", "Vidyalaya Admissions");
   }
 	
   public static function SetupMailSPA() {

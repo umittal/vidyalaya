@@ -28,6 +28,9 @@
 />
     </td>
 </tr>
+<!--
+    validator="dojox.validate.isEmailAddress"
+-->
 
 <tr>
     <td style="padding-right:20px;">First: </td>

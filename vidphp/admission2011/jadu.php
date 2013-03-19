@@ -12,8 +12,10 @@ require_once "$libDir/FeeCheck.inc";
 require_once "$libDir/OpeningDay.inc";
 require_once "../../MPDF53/mpdf.php";
 
+bodySubject(); exit ();
 
-EventCalendar::UpdateWeekNumber(2012);exit();
+
+//EventCalendar::UpdateWeekNumber(2012);exit();
 
 //FeeCheck::email1112(); exit ();
 
@@ -34,4 +36,9 @@ exit();
 
 //EventCalendar::AddSundays(2012);exit();
 
+function bodySubject() {
+  EmailMessageText::findSubjectBody("001", $body, $subject);
+  print "body is \n$body\n\n";
+  print "subject is \n$subject\n\n";
+}
 ?>

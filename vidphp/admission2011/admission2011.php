@@ -15,7 +15,7 @@ require_once "../../MPDF53/mpdf.php";
 
 function SetupMail() {
 
-  $email = "Admission2012@vidyalaya.us";
+  $email = "Admission2013@vidyalaya.us";
   $name = "Vidyalaya Admissions";
 
   $mail = new PHPMailer(false); 
@@ -280,13 +280,13 @@ BODY_WAITING;
 //Admission::Payment2012(); exit();
 //Admission::Mela2012(); exit();
 //Admission::InviteNew(); exit();
-//Admission::ExistingFamilies(); exit();
+Admission::ExistingFamilies(); exit();
 //Admission::AdultLanguage(); exit();
 
 //Teachers::AddTeacher(79, "hetalapurva@gmail.com", 0) ; exit(); // remove this code.
 //Admission::VolunteerEmail(2011);exit();
 //Admission::TeacherEmail(2012);exit();
-Admission::TeacherEmailAttendanceAssessment(2012);exit();
+//Admission::TeacherEmailAttendanceAssessment(2012);exit();
 
 
 //Admission::OpeningDay(2012); exit();

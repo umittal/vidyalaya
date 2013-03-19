@@ -499,7 +499,7 @@ class Publications {
       $document->SetHeader($text);
       $document->filename = "$directory/ClassShort/$short.docx";
       $document->SaveDocument();
-
+      print "Saved file $document->filename\n";
     }
   }
 
@@ -904,9 +904,9 @@ class Publications {
 
 
   public static function RosterSpa($year) {
-    //self::RosterSpaStudents($year);
+    self::RosterSpaStudents($year);
      //     self::RosterSpaTeachers($year);
-     self::RosterAdults($year);
+    //self::RosterAdults($year);
   }
 
 
@@ -1501,7 +1501,7 @@ BODY;
 //EventManager::PostPaymentFile(); exit();
 //Publications::LanguageAssessment(2012); exit();
 //NewsletterHtml::Publish();
-//Publications::FamilyListForHandbookDistribution(2012); exit();
+Publications::FamilyListForHandbookDistribution(2012); exit();
 //Publications::AttendanceSheet(2012); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
 //Publications::Roster(2012); exit();
@@ -1515,7 +1515,7 @@ BODY;
 //Publications::FullDumpFamilies();
 
 //Publications::BadgeFile(2012); exit();
-Publications::CreateMailingLists(2012);exit();
+//Publications::CreateMailingLists(2012);exit();
 //Publications::VolunteerListForHandbook(2012); exit();
 //Publications::FamilyMarshalling(); exit();
 //Publications::TeacherListForHandbook(2012);exit();
@@ -1523,7 +1523,7 @@ Publications::CreateMailingLists(2012);exit();
 //Publications::SchoolDirectory(2012); exit();
 //Publications::TeacherDirectory(2012); exit (); // Directory of all Teachers
 //Publications::VolunteerDirectory(2012); exit (); // Directory of all Volunteers
-//Publications::ClassDirectory(2012); exit (); // Directory of all classes, with and without email
+Publications::ClassDirectory(2012); exit (); // Directory of all classes, with and without email
 
 
 ?>
