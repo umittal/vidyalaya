@@ -15,6 +15,7 @@ class Admission {
   const assesssmentFile = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/admission/assessment.csv";
   const rosterDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/roster/";
   const volunteerCodeFile="/home/umesh/Dropbox/Vidyalaya-Management/Admission/Volunteer2011.pdf";
+  const formHelpFile="/home/umesh/Dropbox/Vidyalaya-Management/Admission/Form Submission.pdf";
   const participationAgreementFile="/home/umesh/Dropbox/Vidyalaya-Management/Admission/ParticipationAgreement.pdf";
 
 
@@ -923,7 +924,7 @@ print "Registered family count is " . count($familyarray) . "\n";
   public static function ExistingFamilies() {
     $production=0;
     $mail =   Mail::SetupMailAdmissions();
-    EmailMessageText::findSubjectBody("001", $body, $subject);
+    EmailMessageText::findSubjectBody("001", $body1, $subject);
     //    $subject = "Vidyalaya Admission 2013-14, Family $family->id, Last Call";
     $draft="";
     if ($production != 1) {
@@ -934,8 +935,9 @@ print "Registered family count is " . count($familyarray) . "\n";
 
     $i=1;
     foreach (FamilyTracker::GetAllForYear(Calendar::RegistrationYear()) as $tracker) {
-      //      if ($tracker->family !=  253) continue;
-      if ($tracker->previousYear != EnumFamilyTracker::registered) continue;
+      $body=$body1;
+      if ($tracker->family != 351) continue;
+	    //      if ($tracker->previousYear != EnumFamilyTracker::registered) continue;
       //      if ($tracker->currentYear != EnumFamilyTracker::pendingRegistration) continue;
       if ($tracker->currentYear != EnumFamilyTracker::pendingInvitation) continue;
       print $tracker->family . ", previous: " . EnumFamilyTracker::NameFromId($tracker->previousYear) . ", current: " 
@@ -956,11 +958,15 @@ print "Registered family count is " . count($familyarray) . "\n";
 
       $customizedDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2013-14/admission/pdf/";
       $customizedPdf = $customizedDir . "Family-". $family->id . ".pdf";
-      $mail->AddAttachment("$customizedPdf"); 
+      // check if customized pdf exists
+      if (!is_readable($customizedPdf)) die("File $customizedPdf does not exist\n");
+
+      $mail->AddAttachment(self::formHelpFile); 
+      $mail->AddAttachment($customizedPdf); 
       $mail->AddAttachment(self::volunteerCodeFile); 
       $mail->AddAttachment(self::participationAgreementFile);
 
-      //      continue;
+      // continue;
       //die ("i die here");
 
       //      return;
@@ -970,13 +976,89 @@ print "Registered family count is " . count($familyarray) . "\n";
       }  else {
 	echo "Message has been sent, Family $family->id\n";
       }
-      die("hello\n");
+      //      die("hello\n");
       sleep(1);
       
       
     }
     return;
   }
+
+  public static function InviteNewV2() {
+    $production=1;
+    $mail =   Mail::SetupMailAdmissions();
+    EmailMessageText::findSubjectBody("010", $body1, $subject);
+    //    $subject = "Vidyalaya Admission 2013-14, Family $family->id, Last Call";
+    $draft="";
+    if ($production != 1) {
+      $subject = "[Test] $subject";
+      $draft = "<p>This is a draft <br />";
+    }
+
+
+    $i=1;
+    foreach (FamilyTracker::GetAllForYear(Calendar::RegistrationYear()) as $tracker) {
+      $body=$body1;
+      //      if ($tracker->family != 351) continue;
+	    //      if ($tracker->previousYear != EnumFamilyTracker::registered) continue;
+      //      if ($tracker->currentYear != EnumFamilyTracker::pendingRegistration) continue;
+      if ($tracker->currentYear != EnumFamilyTracker::pendingInvitation) continue;
+      if ($tracker->previousYear == EnumFamilyTracker::registered) continue;
+      //      if ($tracker->previousYear != EnumFamilyTracker::waitlist) die("famiy $family->id is neither registered nor waitlist");
+
+      print $tracker->family . ", previous: " . EnumFamilyTracker::NameFromId($tracker->previousYear) . ", current: " 
+	. EnumFamilyTracker::NameFromId($tracker->currentYear) . "\n";
+      $family = Family::GetItemById($tracker->family);
+      $customizedPdf = "/home/umesh/Dropbox/Vidyalaya-Roster/2013-14/admission/pdf/Family-". $family->id . ".pdf";
+      if (!file_exists($customizedPdf)) Reports::RegistrationPacketFamily($family);
+      print "-->$i. Family id: $family->id, Name: " . $family->parentsName() . "\n";
+      $i++;
+
+      $mail->ClearAllRecipients(); 
+      $mail->ClearAttachments(); 
+      $mail->ClearCustomHeaders(); 
+      Mail::SetFamilyAddress($mail, $family, $production);
+      $mail->Subject = $subject;
+      $salutation = "<p>Dear " . $family->parentsName() . ",";
+      $body=preg_replace("/==FAMILYID==/", $family->id, $body);
+      $mail->Body = $draft . $salutation . $body;
+      $mail->AltBody = "Family: $family->id"; //Text Body
+
+      $customizedDir = "/home/umesh/Dropbox/Vidyalaya-Roster/2013-14/admission/pdf/";
+      $customizedPdf = $customizedDir . "Family-". $family->id . ".pdf";
+      // check if customized pdf exists
+      if (!is_readable($customizedPdf)) die("File $customizedPdf does not exist\n");
+
+      $mail->AddAttachment(self::formHelpFile); 
+      $mail->AddAttachment($customizedPdf); 
+      $mail->AddAttachment(self::volunteerCodeFile); 
+      $mail->AddAttachment(self::participationAgreementFile);
+
+                  continue;
+      //die ("i die here");
+
+      //      return;
+      if(!$mail->Send()) {
+	echo "Mailer Error: $family->id:  " . $mail->ErrorInfo . "\n";
+	return;
+      }  else {
+	echo "Message has been sent, Family $family->id\n";
+	$count = FamilyTracker::UpdateStatus($family->id, EnumFamilyTracker::pendingRegistration, 0);
+	if ($count != 1 ) {
+	  print "problem updating database, count = $count\n";
+	  return;
+	}
+	print "Database updated successfully\n";
+      }
+      //            die("hello\n");
+      sleep(1);
+      
+      
+    }
+    return;
+  }
+
+
 
   private static function AnnounceOrientation($family) {
     $production=1;

@@ -125,6 +125,20 @@ class Publications {
     }
   }
 
+  public static function idToContact() {
+    $filename="/home/umesh/Dropbox/Vidyalaya-Roster/2012-13/volunteer/mela.csv";
+    if (($fh = fopen($filename, "r")) !== FALSE) {
+      fgets($fh);
+      print "MF, ID, First, Last, Work, Cell, Email, Home\n";
+      while ((list($mf, $id )= fgetcsv($fh, 0, ",")) !== FALSE) {
+	$id = trim($id);
+	$mfs = $mf == "m" ? MFS::Mother : MFS::Father;
+	$person = Person::PersonFromId($mfs, $id);
+	print "$mf, $id, $person->firstName, $person->lastName, $person->workPhone, $person->cellPhone, $person->email, " . $person->home->phone . "\n";
+      }
+    }
+  }
+
   public static function FamilyVolunteerList($year=null) {
     if (is_null($year)) $year=Calendar::CurrentYear();
     if ($year >= 2010) $year -= 2010;
@@ -1501,11 +1515,13 @@ BODY;
 //EventManager::PostPaymentFile(); exit();
 //Publications::LanguageAssessment(2012); exit();
 //NewsletterHtml::Publish();
-Publications::FamilyListForHandbookDistribution(2012); exit();
+//Publications::FamilyListForHandbookDistribution(2012); exit();
 //Publications::AttendanceSheet(2012); exit();
 //Publications::RosterFromFile("/tmp/aa"); exit();
 //Publications::Roster(2012); exit();
+//Publications::idToContact(); exit();
 
+//Publications::RosterSpa(2012); exit();
 //Publications::RosterSpa(2012); exit();
 //Publications::NotComingBack(2012); exit();
 //Publications::NewLanguageStudents(2012); exit();

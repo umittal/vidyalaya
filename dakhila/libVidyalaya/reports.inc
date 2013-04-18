@@ -238,8 +238,9 @@ class Reports {
     $students = Student::AllStudents();
     $templateDir = realpath(dirname(__FILE__)."/../templates");
     $pageheader = '<a href=""><img src="http://www.vidyalaya.us/modx/assets/templates/vidyalaya/images/Vheader2.jpg" width="700" height="70" alt="php5 logo"/></a>';
-    $timestamp = date('d M Y h:i A');
-    $footer = '<div id="footer"> <table><tr><td>Copyright &#169; 2012 Vidyalya Inc., Printed at: ' 
+    date_default_timezone_set('America/New_York');
+    $timestamp = date('d M Y h:i A e');
+    $footer = '<div id="footer"> <table><tr><td>Copyright &#169; 2012, Printed at: ' 
       . $timestamp 
       . '</td><td style="text-align:right;"><div class="page-number"></div></td></tr></table></div>';
 

@@ -5,7 +5,7 @@ Vidyalaya Admissions: Register by April 21 to get discount
 ===MESSAGE===001===
 <p>Family ID: ==FAMILYID==</p>
 
-<p>The registration process for 2013-14 is now open for currently enrolled families. The complete process is published <a href="http://www.vidyalaya.us/shiksha/admission2013.html">here</a>. As you may notice, we are offering an early registration discount. Please complete the attached customized registration pack and return along with fees this Sunday. Let us know by email if any of your family's information needs to be updated and we will email updated forms to you as soon as possible.</p>
+<p>The registration process for 2013-14 is now open for currently enrolled families. The complete process is published <a href="http://www.vidyalaya.us/shiksha/admission2013.html">here</a>. As you may notice, we are offering an early registration discount. Please complete the attached customized registration pack and return along with fees to the admissions desk (located to the left while facing the stage). You can also mail it to PO BOX 775, Morris Plains, NJ 07950. Let us know by email if any of your family's information needs to be updated and we will email updated forms to you as soon as possible.</p>
  
 <p>We hope to see everyone back next year. You may receive additional reminders from us if we do not hear from you. If you are unable to come back next year, please let us know and we will stop sending the reminders.</p>
 <p>Regards,</p>
@@ -112,3 +112,54 @@ Note: Please print, sign, date and bring this form to opening day, Septmber 18, 
 
 ===END===
 
+
+ ===SUBJECT===010===
+New Parent Orientation
+===END===
+===MESSAGE===010===
+<p>It gives us great pleasure to invite you to New Parents Orientation detailed below -</p>
+
+<table style="margin-left:50px">     
+<tr><td width="100px">When</td><td>May 2, 2013 (Thursday)</td></tr>
+<tr><td valign=top>Where</td><td>Morris Plains Community Center<br />51 Jim Fear Drive<br /> Morris Plain, NJ,</td></tr>
+<tr><td>Time</td><td>8 pm -10 pm.</td></tr>
+</table>
+ 
+<p>This is a mandatory event for everyone (all parents and children) who would like to join Vidyalaya. We will start with a short presentation and end by evaluation of language skills of all potential students (except KG) for appropriate placement.</p>
+ 
+<p>Please RSPV to this email to confirm participation in the Orientation meeting.
+To be eligible for enrollment, a student should be enrolled in KG through 12 grades in the Fall of 2013 at their regular school.</p>
+ 
+<h4>What needs to be done before May 2</h4>
+ 
+<p>Following documents are attached -</p>
+<ol>
+<li>Instructions for filling forms</li>
+<li>Customized Registration Form for your Family - Please provide missing information</li>
+<li>Volunteer Form - Please select what you would like to volunteer for</li>
+<li>Participation Agreement - This governs the terms of your participation at Vidyalaya</li>
+</ol>
+<p>
+Between now and May 2, I will work with you to complete the details of your family and finalize customized application forms. Please provide missing information by replying to this email and referencing your Family Id.  After it has been updated in the database, you will get the updated customized application form for your Family.   </p>
+ 
+<h4>Please bring the following by May 2</h4>
+ 
+<p>We will need the registration form (one per family) and medical information form (one per child) along with a check for the Fees by May 2. This can be handed over to an admission volunteer on the New Parent Orientation day, or you can send it by mail to the address mentioned on the form.</p>
+<p>
+Volunteer team leaders will be present at the Orientation to answer any questions you may have.</p>
+ 
+<h4>Spread the word around</h4>
+<p>
+Feel free to publicize this to others who may be interested and let them know to send an email to waitlist@vidyalaya.us, so interested families could use this session year 2013-14 to enroll. Let us know if you would like us to take you off the mailing list.</p>
+ 
+<h4>More information about Vidyalaya</h4>
+<p>You can find more information about the Vidyalaya admission process at  http://www.vidyalaya.us/shiksha/admission2013.html.   
+More information about Vidyalaya can be found at www.vidyalaya.us.</p>
+ 
+ 
+<p>Regards,</p>
+<p>Sanjay Khera <br />
+Vidyalaya, Inc. <br />
+PO Box 775, Morris Plains, NJ 07950
+</p>
+===END===

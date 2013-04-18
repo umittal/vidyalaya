@@ -12,7 +12,8 @@ require_once "$libDir/FeeCheck.inc";
 require_once "$libDir/OpeningDay.inc";
 require_once "../../MPDF53/mpdf.php";
 
-bodySubject(); exit ();
+adolescent(); exit();
+//bodySubject(); exit ();
 
 
 //EventCalendar::UpdateWeekNumber(2012);exit();
@@ -36,9 +37,37 @@ exit();
 
 //EventCalendar::AddSundays(2012);exit();
 
+function adolescent() {
+    $query = "select distinct student from Enrollment 
+              left join Students2003 on Enrollment.student = Students2003.ID
+	      where Students2003.YearFirstGrade > 2001 and  Students2003.YearFirstGrade < 2006
+             ";
+    $result = VidDb::query($query);
+    
+    $fh = tmpfile();
+    if (!$fh) die ("could not open temporary file for writing");
+    fwrite ($fh, "Student, Parents, Grade\n");
+    while ($row = mysql_fetch_array($result)) {
+      $s = Student::GetItemById($row[0]);
+      $csv=array();
+      $csv[] = $s->fullName();
+      $csv[] = $s->parentsName();
+      $csv[] = Calendar::GradeAt($s->firstGradeYear, Calendar::RegistrationSession);
+      fputcsv($fh, $csv);
+    }
+
+    $filename = "/home/umesh/Dropbox/Vidyalaya-Roster/2013-14/roster/adolescent.csv";
+    fseek($fh, 0);
+    file_put_contents("$filename", stream_get_contents($fh));
+    print "saved $filename\n";
+    fclose($fh);
+}
+
 function bodySubject() {
   EmailMessageText::findSubjectBody("001", $body, $subject);
   print "body is \n$body\n\n";
   print "subject is \n$subject\n\n";
 }
+
+
 ?>
